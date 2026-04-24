@@ -1,0 +1,13 @@
+pandas
+numpy
+yfinance
+pyyaml
+matplotlib
+openpyxl
+scipy
+streamlit
+plotly
+PyPortfolioOpt
+pytest
+pytest-cov
+python-dotenv

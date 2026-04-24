@@ -1,0 +1,73 @@
+# 系統基礎設定
+system:
+  project_name: "TaiwanStockQuant"
+  log_level: "INFO"
+  data_source: "yfinance"
+  output_path: "./output"
+
+# 資料獲取設定
+data_settings:
+  start_date: "2022-01-01"
+  end_date: "2024-12-31"
+  # 台股約前 200 大市值標的
+  tickers: [
+    "2330.TW", "2317.TW", "2454.TW", "2308.TW", "2881.TW", "2882.TW", "2412.TW", "2603.TW", "2884.TW", "2886.TW",
+    "2382.TW", "2357.TW", "3711.TW", "2408.TW", "2301.TW", "2891.TW", "2892.TW", "5880.TW", "2885.TW", "2002.TW",
+    "1301.TW", "1303.TW", "1326.TW", "6505.TW", "3045.TW", "4904.TW", "2912.TW", "2207.TW", "9910.TW", "2379.TW",
+    "3034.TW", "2327.TW", "2395.TW", "3008.TW", "2409.TW", "3481.TW", "2303.TW", "2337.TW", "2344.TW", "2408.TW",
+    "2353.TW", "2324.TW", "3231.TW", "6669.TW", "2376.TW", "2356.TW", "2352.TW", "2474.TW", "4938.TW", "2383.TW",
+    "3037.TW", "8046.TW", "3189.TW", "2313.TW", "2368.TW", "3017.TW", "2421.TW", "2301.TW", "2385.TW", "3035.TW",
+    "3443.TW", "6415.TW", "3661.TW", "3532.TW", "5269.TW", "6488.TW", "8299.TW", "2458.TW", "6239.TW", "2345.TW",
+    "6206.TW", "5347.TW", "6147.TW", "3105.TW", "6223.TW", "8069.TW", "2880.TW", "2883.TW", "2887.TW", "2888.TW",
+    "2889.TW", "2890.TW", "5871.TW", "5876.TW", "6005.TW", "2801.TW", "2809.TW", "2812.TW", "2834.TW", "2838.TW",
+    "1101.TW", "1102.TW", "1216.TW", "1210.TW", "1201.TW", "1402.TW", "1476.TW", "1477.TW", "1503.TW", "1504.TW",
+    "1513.TW", "1514.TW", "1519.TW", "1605.TW", "1704.TW", "1717.TW", "1722.TW", "1802.TW", "1904.TW", "2006.TW",
+    "2014.TW", "2027.TW", "2101.TW", "2103.TW", "2105.TW", "2201.TW", "2204.TW", "2206.TW", "2354.TW", "2355.TW",
+    "2360.TW", "2362.TW", "2371.TW", "2377.TW", "2392.TW", "2404.TW", "2419.TW", "2439.TW", "2449.TW", "2451.TW",
+    "2480.TW", "2498.TW", "2501.TW", "2542.TW", "2606.TW", "2609.TW", "2610.TW", "2615.TW", "2618.TW", "2633.TW",
+    "2637.TW", "2707.TW", "2727.TW", "2845.TW", "2903.TW", "2915.TW", "3005.TW", "3023.TW", "3029.TW", "3030.TW",
+    "3036.TW", "3042.TW", "3044.TW", "3406.TW", "3533.TW", "3596.TW", "3702.TW", "3704.TW", "3706.TW", "3708.TW",
+    "4739.TW", "4915.TW", "4919.TW", "4958.TW", "5234.TW", "5434.TW", "5483.TW", "5522.TW", "6121.TW", "6176.TW",
+    "6202.TW", "6205.TW", "6213.TW", "6230.TW", "6257.TW", "6269.TW", "6271.TW", "6278.TW", "6281.TW", "6285.TW",
+    "6409.TW", "6412.TW", "6414.TW", "6446.TW", "6472.TW", "6510.TW", "6531.TW", "6533.TW", "6548.TW", "8021.TW",
+    "8050.TW", "8081.TW", "8112.TW", "8150.TW", "8215.TW", "8436.TW", "8454.TW", "8464.TW", "8933.TW", "9904.TW",
+    "9914.TW", "9917.TW", "9921.TW", "9933.TW", "9941.TW", "9945.TW"
+  ]
+  volume_threshold: 1000
+  cache_expire_days: 1
+  excluded_tickers: []
+
+# 策略因子參數
+strategy_params:
+  low_volatility:
+    lookback_days: 252
+  momentum:
+    long_term_days: 252
+    short_term_days: 60
+  technical:
+    rsi_period: 14
+    sma_short: 20
+    sma_long: 60
+  value:
+    pe_max: 25
+    dividend_min: 0.03
+
+# 投資組合與權重設定
+portfolio_params:
+  method: "inverse_volatility"
+  total_capital: 1000000
+  rebalance_frequency: "M"
+  max_position_size: 0.15
+  min_position_size: 0.02
+  max_sector_weight: 0.40
+  min_daily_volume_lots: 500
+
+# 回測設定
+backtest:
+  risk_free_rate: 0.02
+  slippage: 0.001
+  commission: 0.001425
+  transaction_tax_stock: 0.003
+  transaction_tax_etf: 0.001
+  execution_delay: 1
+  etf_tickers: []
