@@ -12,6 +12,7 @@ from modules.factors import FactorAnalyzer
 from modules.backtest import BacktestEngine, WalkForwardValidator, StressTestEngine
 from modules.watchlist import WatchlistManager
 from modules.factor_validator import FactorValidator
+from modules.factor_ic import FactorICAnalyzer
 
 st.set_page_config(page_title="台股量化分析系統 Pro", layout="wide")
 
@@ -55,6 +56,7 @@ def run_app():
         "個股追蹤看板 (平台C)",
         "Walk-Forward 驗證 (平台D)",
         "壓力情境測試 (平台E)",
+        "因子 IC/IR 分析 (平台F)",
     ])
 
     # 快取重置按鈕
@@ -80,6 +82,8 @@ def run_app():
         render_platform_d(fetcher, analyzer, engine, config, all_available_options, sector_map)
     elif platform_mode == "壓力情境測試 (平台E)":
         render_platform_e(fetcher, config, all_available_options)
+    elif platform_mode == "因子 IC/IR 分析 (平台F)":
+        render_platform_f(fetcher, config, all_available_options)
     elif platform_mode == "自定義投資組合建構 (平台A)":
         st.header("🔍 平台 A：自定義投資組合分析")
         
@@ -534,6 +538,93 @@ def render_platform_e(fetcher, config, all_available_options):
                 fig.add_trace(go.Scatter(x=ec.index, y=ec, name=name, mode="lines"))
         fig.update_layout(title="各情境淨值走勢", height=420, hovermode="x unified")
         st.plotly_chart(fig, use_container_width=True)
+
+
+def render_platform_f(fetcher, config, all_available_options):
+    """平台F：因子 IC/IR 分析。"""
+    st.header("📊 因子 IC / IR 分析")
+    st.caption("驗證各因子對下期報酬的預測力。IR > 0.5 為強因子，0.3~0.5 為中等，< 0.3 為弱因子。")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        selected_tickers = st.multiselect(
+            "選擇分析標的池（建議 ≥ 30 支）",
+            all_available_options,
+            default=all_available_options[: min(50, len(all_available_options))],
+            key="icir_tickers",
+        )
+    with col2:
+        forward_days = st.selectbox(
+            "下期報酬天數",
+            options=[5, 10, 21, 63],
+            index=2,
+            format_func=lambda x: {5: "1週", 10: "2週", 21: "1個月", 63: "3個月"}[x],
+        )
+
+    if st.button("🔍 開始計算 IC/IR（需要幾分鐘）", type="primary") and selected_tickers:
+        with st.spinner("計算因子截面快照與 IC 序列中…"):
+            try:
+                cleaned, fundamental = fetch_data(tuple(sorted(set(selected_tickers))), fetcher)
+                st.session_state['cleaned_data'].update(cleaned)
+                st.session_state['fundamental_info'].update(fundamental)
+
+                ic_analyzer = FactorICAnalyzer()
+                icir_df = ic_analyzer.batch_icir(
+                    cleaned_data=cleaned,
+                    fundamental_info=fundamental,
+                    config=config,
+                    forward_days=forward_days,
+                )
+
+                if icir_df.empty:
+                    st.warning("資料不足，無法計算 IC/IR。請增加標的數或拉長資料期間。")
+                    return
+
+                st.success(f"完成！共分析 {len(icir_df)} 個因子。")
+
+                def highlight_grade(row):
+                    if row["grade"] == "強因子":
+                        return ["background-color: #d4edda"] * len(row)
+                    elif row["grade"] == "中等因子":
+                        return ["background-color: #fff3cd"] * len(row)
+                    else:
+                        return ["background-color: #f8d7da"] * len(row)
+
+                st.dataframe(
+                    icir_df.style.apply(highlight_grade, axis=1).format({
+                        "IC_mean": "{:.4f}",
+                        "IC_std":  "{:.4f}",
+                        "IR":      "{:.4f}",
+                        "IC_positive_rate": "{:.1%}",
+                    }),
+                    use_container_width=True,
+                    height=450,
+                )
+
+                import plotly.express as px
+                fig = px.bar(
+                    icir_df.reset_index(),
+                    x="factor", y="IR", color="grade",
+                    color_discrete_map={"強因子": "#28a745", "中等因子": "#ffc107", "弱因子": "#dc3545"},
+                    title="各因子 IR 排序（絕對值越大預測力越強）",
+                    labels={"factor": "因子", "IR": "IR 值"},
+                )
+                fig.add_hline(y=0.5, line_dash="dash", line_color="green", annotation_text="強因子門檻")
+                fig.add_hline(y=0.3, line_dash="dash", line_color="orange", annotation_text="中等門檻")
+                fig.add_hline(y=-0.5, line_dash="dash", line_color="green")
+                fig.add_hline(y=-0.3, line_dash="dash", line_color="orange")
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.session_state["icir_result"] = icir_df
+
+            except Exception as e:
+                st.error(f"計算失敗：{e}")
+                import traceback
+                st.code(traceback.format_exc())
+
+    elif "icir_result" in st.session_state:
+        st.info("顯示上次計算結果（重新計算請按上方按鈕）")
+        st.dataframe(st.session_state["icir_result"], use_container_width=True)
 
 
 if __name__ == "__main__":
