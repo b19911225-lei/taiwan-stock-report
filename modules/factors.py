@@ -212,7 +212,54 @@ class FactorAnalyzer:
         if sector_map is not None and not factor_df.empty:
             factor_df = self.sector_neutralize(factor_df, sector_map)
 
+        # 7. FinLab 籌碼面因子（選用，需 use_finlab=True）
+        if self.config.get("data_source_settings", {}).get("use_finlab", False) and not factor_df.empty:
+            chip_df = self._get_finlab_chip_factors(list(data_dict.keys()))
+            if not chip_df.empty:
+                factor_df = factor_df.join(chip_df, how="left")
+                self.logger.info(f"已合併 FinLab 籌碼因子，新增欄位：{list(chip_df.columns)}")
+
         return factor_df
+
+    def _get_finlab_chip_factors(self, tickers: list) -> pd.DataFrame:
+        """取得 FinLab 籌碼面因子（外資/投信近 5 日買賣超）。
+
+        需要 ``finlab`` 套件及已登入 API Token。失敗時回傳空 DataFrame，
+        不影響主流程其他因子。
+        """
+        try:
+            from finlab import data as fl_data
+
+            foreign = fl_data.get(
+                "institutional_investors_trading_summary:"
+                "外陸資買賣超股數(不含外資自營商)"
+            )
+            trust = fl_data.get(
+                "institutional_investors_trading_summary:投信買賣超股數"
+            )
+
+            result: dict = {}
+            for ticker in tickers:
+                code = ticker.replace(".TW", "").replace(".TWO", "")
+                row: dict = {}
+                if code in foreign.columns:
+                    recent = foreign[code].dropna().tail(5)
+                    row["外資近5日買超"] = float(recent.sum())
+                    row["外資連買天數"] = int((recent > 0).sum())
+                if code in trust.columns:
+                    recent_t = trust[code].dropna().tail(5)
+                    row["投信近5日買超"] = float(recent_t.sum())
+                if row:
+                    result[ticker] = row
+
+            return pd.DataFrame(result).T
+
+        except ImportError:
+            self.logger.warning("FinLab 未安裝，跳過籌碼因子")
+            return pd.DataFrame()
+        except Exception as e:
+            self.logger.warning(f"FinLab 籌碼因子取得失敗: {e}")
+            return pd.DataFrame()
 
     def sector_neutralize(
         self,

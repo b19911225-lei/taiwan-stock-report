@@ -37,6 +37,11 @@ data_settings:
   cache_expire_days: 1
   excluded_tickers: []
 
+# 資料源進階設定（選用）
+data_source_settings:
+  use_finlab: false          # 設為 true 啟用 FinLab 籌碼因子
+  finlab_token: ""           # 填入 FinLab token（或用 finlab.login()）
+
 # 策略因子參數
 strategy_params:
   low_volatility:
