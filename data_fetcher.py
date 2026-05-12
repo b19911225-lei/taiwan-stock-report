@@ -138,3 +138,78 @@ def get_latest_trading_date():
     if df.empty:
         return datetime.today().strftime("%Y-%m-%d")
     return df.iloc[-1]["date"].strftime("%Y-%m-%d")
+
+
+def get_top_volume_stocks(date, top_n=10):
+    """
+    抓取指定日期成交量前 top_n 名的普通股（排除 ETF）。
+    使用 TWSE 公開 API，回傳 [(stock_id, name, volume_lots), ...] 清單。
+    """
+    import warnings
+    import ssl
+
+    date_fmt = date.replace("-", "")  # 20260512
+    url = f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20"
+    params = {"response": "json", "date": date_fmt}
+
+    for attempt in range(3):
+        try:
+            # verify=False 處理 Windows 上 TWSE 憑證相容問題
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                resp = requests.get(url, params=params, timeout=20, verify=False)
+            resp.raise_for_status()
+            data = resp.json()
+
+            if data.get("stat") != "OK" or "data" not in data:
+                _log_error(f"TWSE MI_INDEX20 非預期回應: {data.get('stat')}")
+                return []
+
+            fields = data.get("fields", [])
+            rows   = data.get("data", [])
+            df = pd.DataFrame(rows, columns=fields)
+
+            # 欄位：證券代號、證券名稱、成交股數...
+            code_col   = [c for c in df.columns if "代號" in c or "code" in c.lower()]
+            name_col   = [c for c in df.columns if "名稱" in c or "name" in c.lower()]
+            vol_col    = [c for c in df.columns if "成交股數" in c or "股數" in c or "volume" in c.lower()]
+
+            if not code_col:
+                _log_error(f"TWSE 回傳欄位無法辨識: {fields}")
+                return []
+
+            df = df.rename(columns={
+                code_col[0]: "stock_id",
+                name_col[0] if name_col else code_col[0]: "name",
+                vol_col[0]  if vol_col  else code_col[0]: "vol_str",
+            })
+
+            # 清理成交股數（含逗號）
+            if "vol_str" in df.columns:
+                df["vol"] = pd.to_numeric(
+                    df["vol_str"].astype(str).str.replace(",", ""), errors="coerce"
+                ).fillna(0)
+            else:
+                df["vol"] = 0
+
+            # 只保留 4 碼普通股，排除 ETF（00 開頭）
+            df = df[df["stock_id"].astype(str).str.match(r"^\d{4}$")]
+            df = df[~df["stock_id"].astype(str).str.startswith("00")]
+            df = df.sort_values("vol", ascending=False).head(top_n)
+
+            result = []
+            for _, row in df.iterrows():
+                sid  = str(row["stock_id"]).strip()
+                name = str(row.get("name", sid)).strip()
+                vol  = int(row["vol"]) // 1000  # 股 → 張
+                result.append((sid, name, vol))
+
+            time.sleep(1)
+            return result
+
+        except Exception as e:
+            if attempt < 2:
+                time.sleep(2 ** attempt)
+            else:
+                _log_error(f"get_top_volume_stocks 失敗: {e}")
+                return []

@@ -13,10 +13,11 @@ if sys.platform == "win32" and hasattr(sys.stdout, "buffer"):
 from config import STOCK_UNIVERSE, TARGET_STOCK_COUNT, MIN_RR_RATIO
 from data_fetcher import (
     get_stock_price, get_institutional_investors,
-    get_taiex_price, is_trading_day, get_latest_trading_date
+    get_taiex_price, is_trading_day, get_latest_trading_date,
+    get_top_volume_stocks
 )
 from analyzer import apply_filters, calc_price_targets, calc_theme_avg_chg
-from reporter import build_report, send_to_telegram
+from reporter import build_report, send_to_telegram, STOCK_NAMES
 
 REPORT_DIR = Path(__file__).parent / "reports"
 REPORT_DIR.mkdir(exist_ok=True)
@@ -45,11 +46,25 @@ def main(dry_run=False):
         print("  [!] 大盤資料取得失敗，繼續執行")
         market_df = None
 
+    # 動態合併當日成交量前10名
+    print("\n[1.5/4] 抓取當日成交量前10名...")
+    dynamic_universe = dict(STOCK_UNIVERSE)  # 複製固定清單
+    top_vol = get_top_volume_stocks(today, top_n=10)
+    new_count = 0
+    for sid, name, vol in top_vol:
+        if sid not in dynamic_universe:
+            dynamic_universe[sid] = ["T0_當日熱門"]
+            new_count += 1
+            if sid not in STOCK_NAMES:
+                STOCK_NAMES[sid] = name  # 動態補充名稱
+        print(f"  量排行: {sid} {name} {vol:,}張{'  [新加入]' if sid not in STOCK_UNIVERSE else ''}")
+    print(f"  新加入股票池: {new_count} 支，總計: {len(dynamic_universe)} 支")
+
     # 第一階段：取得所有股票原始資料（計算主題漲跌幅用）
-    print(f"\n[2/4] 抓取 {len(STOCK_UNIVERSE)} 支股票資料...")
+    print(f"\n[2/4] 抓取 {len(dynamic_universe)} 支股票資料...")
     raw_results = {}
-    for idx, (stock_id, themes) in enumerate(STOCK_UNIVERSE.items(), 1):
-        print(f"  [{idx:2d}/{len(STOCK_UNIVERSE)}] {stock_id}...", end=" ", flush=True)
+    for idx, (stock_id, themes) in enumerate(dynamic_universe.items(), 1):
+        print(f"  [{idx:2d}/{len(dynamic_universe)}] {stock_id}...", end=" ", flush=True)
         price_df = get_stock_price(stock_id, days=65)
         if price_df.empty or len(price_df) < 5:
             print("[x] 無資料")
@@ -79,7 +94,8 @@ def main(dry_run=False):
         price_df = raw["price_df"]
         inst_df  = get_institutional_investors(stock_id, days=10)
 
-        filter_result = apply_filters(stock_id, price_df, inst_df, theme_avg_chg)
+        filter_result = apply_filters(stock_id, price_df, inst_df, theme_avg_chg,
+                                      stock_themes=dynamic_universe)
         filter_result["today_chg"] = raw["today_chg"]
         filter_result["close"]     = raw["close"]
 
@@ -106,7 +122,7 @@ def main(dry_run=False):
 
     # 建立報告
     print(f"\n[4/4] 產生並推送報告...")
-    messages = build_report(results, market_df, today)
+    messages = build_report(results, market_df, today, dynamic_universe=dynamic_universe)
 
     # 儲存報告檔案
     report_file = REPORT_DIR / f"report_{today}.txt"

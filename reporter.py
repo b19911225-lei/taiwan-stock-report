@@ -40,7 +40,7 @@ def _sentiment(chg_pct):
     return "🔻 空方主導"
 
 
-def build_report(results, market_data, date):
+def build_report(results, market_data, date, dynamic_universe=None):
     """建立報告，回傳訊息列表（最多2則）"""
     # ─── 大盤概況 ───
     taiex_str = "N/A"
@@ -89,8 +89,9 @@ def build_report(results, market_data, date):
     stock_lines = []
     for rank, (sid, r) in enumerate(passed, 1):
         name   = _get_name(sid)
-        themes = [t.split("_", 1)[1] for t in STOCK_UNIVERSE.get(sid, [])]
-        theme_tag = "/".join(themes[:2])
+        universe = dynamic_universe if dynamic_universe else STOCK_UNIVERSE
+        themes = [t.split("_", 1)[1] for t in universe.get(sid, [])]
+        theme_tag = "/".join(themes[:2]) if themes else "熱門量能"
         close  = r.get("close", 0)
         chg    = r.get("today_chg", 0)
         score  = r.get("score", 0)
@@ -128,7 +129,8 @@ def build_report(results, market_data, date):
         rsi  = r.get("rsi14", "N/A")
         f_days = r.get("foreign_buy_days", 0)
         kd   = "KD金叉、" if r.get("kd_cross") else ""
-        themes = [t.split("_", 1)[1] for t in STOCK_UNIVERSE.get(sid, [])]
+        universe = dynamic_universe if dynamic_universe else STOCK_UNIVERSE
+        themes = [t.split("_", 1)[1] for t in universe.get(sid, [])]
         top3_lines.append(
             f"<b>{sid} {name}</b>\n"
             f"  動能：{'、'.join(sigs)}\n"

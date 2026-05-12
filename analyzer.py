@@ -102,7 +102,9 @@ def calc_institutional_signals(inst_df):
     return result
 
 
-def apply_filters(stock_id, price_df, inst_df, theme_avg_chg=None):
+def apply_filters(stock_id, price_df, inst_df, theme_avg_chg=None, stock_themes=None):
+    if stock_themes is None:
+        stock_themes = STOCK_UNIVERSE
     if price_df.empty or len(price_df) < 25:
         return {"passed": False, "score": 0, "signals": [], "exclude_reason": "資料不足", "momentum_count": 0}
 
@@ -192,7 +194,7 @@ def apply_filters(stock_id, price_df, inst_df, theme_avg_chg=None):
     # 主題熱度（20分）
     theme_score = 0
     if theme_avg_chg is not None:
-        themes = STOCK_UNIVERSE.get(stock_id, [])
+        themes = stock_themes.get(stock_id, [])
         max_chg = max((theme_avg_chg.get(t, 0) for t in themes), default=0)
         if max_chg > 0.01:   theme_score = 20
         elif max_chg > 0:    theme_score = 10
