@@ -1,0 +1,6 @@
+requests>=2.32
+pandas>=2.0
+numpy>=1.26
+ta>=0.10
+finmind>=1.9
+python-telegram-bot>=20.0
