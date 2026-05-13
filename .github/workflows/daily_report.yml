@@ -1,0 +1,52 @@
+name: 台股選股日報
+
+on:
+  schedule:
+    # 台灣時間 17:30 = UTC 09:30，週一至週五
+    - cron: '30 9 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout 程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 安裝系統依賴
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            gfortran \
+            libopenblas-dev
+
+      - name: 安裝套件
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+
+      - name: 執行選股報告
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+        run: python main.py
+
+      - name: 上傳報告為 Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock-report-${{ github.run_id }}
+          path: |
+            output/
+            logs/
+          retention-days: 30
