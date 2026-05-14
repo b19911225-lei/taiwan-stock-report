@@ -39,7 +39,7 @@ jobs:
         with:
           name: stock-report-${{ github.run_id }}
           path: |
-            output/
             reports/
             logs/
+          if-no-files-found: warn
           retention-days: 30

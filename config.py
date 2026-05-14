@@ -2,10 +2,10 @@
 
 import os
 
-# 優先從環境變數讀取（GitHub Actions Secrets），否則使用預設值
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8697694217:AAH0TbcFMK6Gychm9Ra726Ut9Tc3cdGIFTU")
-TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID",   "5961357097")
-FINMIND_TOKEN      = os.environ.get("FINMIND_TOKEN",      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYjE5OTExMjI1IiwiZW1haWwiOiJiMTk5MTEyMjVAZ21haWwuY29tIiwidG9rZW5fdmVyc2lvbiI6MH0.eKAkhs7WRuDiq41vfHr-O6uZA9FB2t2PvH6VRDE0P7s")
+# 從環境變數讀取（GitHub Actions Secrets），本地開發請設定環境變數或建立 .env
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID",   "")
+FINMIND_TOKEN      = os.environ.get("FINMIND_TOKEN",      "")
 
 # 主題股清單
 THEME_STOCKS = {
