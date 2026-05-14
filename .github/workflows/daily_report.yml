@@ -22,7 +22,9 @@ jobs:
           cache: 'pip'
 
       - name: 安裝套件
-        run: pip install -r requirements.txt
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
 
       - name: 執行選股報告
         env:
@@ -37,6 +39,7 @@ jobs:
         with:
           name: stock-report-${{ github.run_id }}
           path: |
+            output/
             reports/
             logs/
           retention-days: 30

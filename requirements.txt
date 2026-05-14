@@ -1,6 +1,5 @@
-requests>=2.32
-pandas>=2.0
-numpy>=1.26
-ta>=0.10
-finmind>=1.9
-python-telegram-bot>=20.0
+requests>=2.32,<3
+pandas>=2.0,<3
+numpy>=1.26,<2
+finmind>=1.9,<2
+python-telegram-bot>=20.0,<22
