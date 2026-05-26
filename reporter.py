@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import requests
-from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, THEME_STOCKS, STOCK_UNIVERSE
+from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, THEME_STOCKS, STOCK_UNIVERSE, TARGET_STOCK_COUNT
 
 LOG_DIR = Path(__file__).parent / "logs"
 LOG_DIR.mkdir(exist_ok=True)
@@ -60,7 +60,11 @@ def build_report(results, market_data, date, dynamic_universe=None):
                 chg_str = f"{chg_pct:+.2f}%"
                 sentiment_str = _sentiment(chg_pct)
             taiex_str = f"{taiex:,.0f}"
-            if "Trading_Volume" in row or "volume" in row:
+            # 優先使用成交金額（Trading_Money，單位：元），除以 1e8 得「億元」
+            if "Trading_Money" in row:
+                money = float(row.get("Trading_Money", 0))
+                vol_str = f"{money/1e8:,.0f}"
+            elif "Trading_Volume" in row or "volume" in row:
                 vol = float(row.get("volume", row.get("Trading_Volume", 0)))
                 vol_str = f"{vol/1e8:.0f}" if vol > 1e8 else f"{vol:.0f}"
         except Exception:
@@ -84,7 +88,7 @@ def build_report(results, market_data, date, dynamic_universe=None):
     # ─── 個股清單 ───
     passed = [(sid, r) for sid, r in results.items() if r.get("passed") and r.get("targets")]
     passed.sort(key=lambda x: x[1]["score"], reverse=True)
-    passed = passed[:15]
+    passed = passed[:TARGET_STOCK_COUNT]
 
     stock_lines = []
     for rank, (sid, r) in enumerate(passed, 1):

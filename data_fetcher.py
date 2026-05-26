@@ -31,6 +31,7 @@ def _fetch(dataset, stock_id=None, start_date=None, end_date=None, retries=3):
     if stock_id:
         params["data_id"] = stock_id
 
+    last_error = None
     for attempt in range(retries):
         try:
             resp = requests.get(BASE_URL, params=params, timeout=30)
@@ -41,11 +42,13 @@ def _fetch(dataset, stock_id=None, start_date=None, end_date=None, retries=3):
             df = pd.DataFrame(data.get("data", []))
             return df
         except Exception as e:
+            last_error = e
             if attempt < retries - 1:
                 time.sleep(2 ** attempt)
-            else:
-                _log_error(f"[{dataset}] {stock_id} 失敗: {e}")
-                return pd.DataFrame()
+
+    # 所有 retry 都失敗才回傳空值
+    _log_error(f"[{dataset}] {stock_id} 失敗（{retries}次重試後）: {last_error}")
+    return pd.DataFrame()
 
 
 def _log_error(msg):
@@ -145,8 +148,7 @@ def get_top_volume_stocks(date, top_n=10):
     抓取指定日期成交量前 top_n 名的普通股（排除 ETF）。
     使用 TWSE 公開 API，回傳 [(stock_id, name, volume_lots), ...] 清單。
     """
-    import warnings
-    import ssl
+    import certifi
 
     date_fmt = date.replace("-", "")  # 20260512
     url = f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20"
@@ -154,10 +156,7 @@ def get_top_volume_stocks(date, top_n=10):
 
     for attempt in range(3):
         try:
-            # verify=False 處理 Windows 上 TWSE 憑證相容問題
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                resp = requests.get(url, params=params, timeout=20, verify=False)
+            resp = requests.get(url, params=params, timeout=20, verify=certifi.where())
             resp.raise_for_status()
             data = resp.json()
 
