@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout 程式碼
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
       - name: 設定 Python 3.11
-        uses: actions/setup-python@v5.4.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -35,7 +35,7 @@ jobs:
 
       - name: 上傳報告為 Artifact
         if: always()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v4
         with:
           name: stock-report-${{ github.run_id }}
           path: |
@@ -61,10 +61,10 @@ jobs:
 
     steps:
       - name: Checkout 程式碼
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
       - name: 設定 Python 3.11
-        uses: actions/setup-python@v5.4.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
