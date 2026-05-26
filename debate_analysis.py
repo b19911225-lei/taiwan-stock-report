@@ -12,6 +12,8 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+import pytz
+
 # 在 Windows 上強制 stdout 使用 UTF-8
 if sys.platform == "win32" and hasattr(sys.stdout, "buffer"):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -28,8 +30,32 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
-from data_fetcher import is_trading_day, get_latest_trading_date
+from data_fetcher import get_latest_trading_date
 from reporter import send_to_telegram
+
+# ─── 台灣假日表（週末另外判斷） ───
+
+TW_HOLIDAYS = set([
+    # 2025
+    "2025-01-01", "2025-01-27", "2025-01-28", "2025-01-29",
+    "2025-01-30", "2025-01-31", "2025-02-28", "2025-04-03",
+    "2025-04-04", "2025-05-01", "2025-05-30", "2025-10-10",
+    # 2026
+    "2026-01-01", "2026-01-26", "2026-01-27", "2026-01-28",
+    "2026-01-29", "2026-01-30", "2026-02-28", "2026-04-03",
+    "2026-04-05", "2026-05-01", "2026-06-19", "2026-10-10",
+])
+
+
+def is_trading_day_local():
+    """本地判斷是否為交易日（週末 + 假日表），不呼叫 API。"""
+    tz = pytz.timezone('Asia/Taipei')
+    now = datetime.now(tz)
+    if now.weekday() >= 5:
+        return False
+    if now.strftime("%Y-%m-%d") in TW_HOLIDAYS:
+        return False
+    return True
 
 
 def check_api_keys():
@@ -392,8 +418,8 @@ def main():
     today = datetime.today().strftime("%Y-%m-%d")
     logging.info(f"多空辯證分析 {today}")
 
-    # 非交易日跳過
-    if not is_trading_day(today):
+    # 非交易日跳過（使用本地假日表，不呼叫 API）
+    if not is_trading_day_local():
         latest = get_latest_trading_date()
         logging.info(f"{today} 非交易日，最近交易日為 {latest}")
         print(f"非交易日，跳過（最近交易日：{latest}）")
