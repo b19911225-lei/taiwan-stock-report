@@ -26,7 +26,7 @@ logging.basicConfig(
 
 # ─── API Key 檢查 ───
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 from data_fetcher import get_latest_trading_date
