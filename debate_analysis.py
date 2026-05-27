@@ -168,19 +168,38 @@ BULL_SYSTEM_PROMPT = """你是一位積極進取的台股多方分析師。
 }"""
 
 
-def _get_claude_client():
-    """建立 Claude API client，設定較長 timeout 和 retry"""
-    import anthropic
-    return anthropic.Anthropic(
-        api_key=ANTHROPIC_API_KEY,
-        max_retries=3,
-        timeout=60.0,
-    )
+def _call_claude(system_prompt: str, user_prompt: str, max_tokens: int = 1024) -> str:
+    """直接用 requests 呼叫 Claude API（避免 httpx 連線問題）"""
+    import requests as req
+
+    url = "https://api.anthropic.com/v1/messages"
+    headers = {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    }
+    payload = {
+        "model": "claude-3-5-sonnet-latest",
+        "max_tokens": max_tokens,
+        "messages": [{"role": "user", "content": user_prompt}],
+    }
+    if system_prompt:
+        payload["system"] = system_prompt
+
+    for attempt in range(3):
+        try:
+            resp = req.post(url, json=payload, headers=headers, timeout=60)
+            resp.raise_for_status()
+            data = resp.json()
+            return data["content"][0]["text"].strip()
+        except Exception as e:
+            logging.warning(f"Claude API attempt {attempt+1}/3 失敗：{type(e).__name__}: {e}")
+            if attempt < 2:
+                time.sleep(2 ** attempt)
+    raise RuntimeError("Claude API 3 次呼叫全部失敗")
 
 
 def analyze_bull(stock: dict) -> dict:
-    client = _get_claude_client()
-
     user_prompt = f"""請分析以下台股個股，提供多方論點：
 
 股票：{stock['name']}（{stock['ticker']}）
@@ -195,13 +214,7 @@ RSI：{stock['rsi']:.1f}
 請以 JSON 格式輸出多方論點。"""
 
     try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-latest",
-            max_tokens=1024,
-            system=BULL_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}]
-        )
-        text = response.content[0].text.strip()
+        text = _call_claude(BULL_SYSTEM_PROMPT, user_prompt)
         if "```" in text:
             text = text.split("```")[1]
             if text.startswith("json"):
@@ -236,8 +249,6 @@ BEAR_SYSTEM_PROMPT = """你是一位謹慎保守的台股空方風險分析師�
 
 def analyze_bear(stock: dict) -> dict:
     """空方分析（Claude）— 使用不同 system prompt 確保立場對立"""
-    client = _get_claude_client()
-
     user_prompt = f"""請分析以下台股個股，提供空方風險論點：
 
 股票：{stock['name']}（{stock['ticker']}）
@@ -252,13 +263,7 @@ RSI：{stock['rsi']:.1f}
 請以 JSON 格式輸出空方風險論點。"""
 
     try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-latest",
-            max_tokens=1024,
-            system=BEAR_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}]
-        )
-        text = response.content[0].text.strip()
+        text = _call_claude(BEAR_SYSTEM_PROMPT, user_prompt)
         if "```" in text:
             text = text.split("```")[1]
             if text.startswith("json"):
@@ -292,8 +297,6 @@ INTEGRATOR_SYSTEM_PROMPT = """你是一位客觀的台股投資研究主管。
 
 
 def integrate(bull: dict, bear: dict) -> dict:
-    client = _get_claude_client()
-
     user_prompt = f"""請整合以下多空分析：
 
 【多方分析結果】
@@ -305,13 +308,7 @@ def integrate(bull: dict, bear: dict) -> dict:
 請以 JSON 格式輸出整合判斷。"""
 
     try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-latest",
-            max_tokens=1024,
-            system=INTEGRATOR_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}]
-        )
-        text = response.content[0].text.strip()
+        text = _call_claude(INTEGRATOR_SYSTEM_PROMPT, user_prompt)
         if "```" in text:
             text = text.split("```")[1]
             if text.startswith("json"):

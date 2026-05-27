@@ -25,22 +25,6 @@ jobs:
           pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
-      - name: 網路連線診斷
-        run: |
-          echo "--- DNS resolve ---"
-          nslookup api.anthropic.com || true
-          echo "--- curl test ---"
-          curl -sv --max-time 10 https://api.anthropic.com/ 2>&1 | head -30 || true
-          echo "--- python test ---"
-          python -c "
-          import urllib.request, ssl
-          try:
-              r = urllib.request.urlopen('https://api.anthropic.com/', timeout=10)
-              print(f'HTTP {r.status}')
-          except Exception as e:
-              print(f'Error: {type(e).__name__}: {e}')
-          "
-
       - name: 執行多空辯證
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
