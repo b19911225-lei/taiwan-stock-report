@@ -179,7 +179,7 @@ def _call_claude(system_prompt: str, user_prompt: str, max_tokens: int = 1024) -
         "content-type": "application/json",
     }
     payload = {
-        "model": "claude-3-5-sonnet-latest",
+        "model": "claude-sonnet-4-5",
         "max_tokens": max_tokens,
         "messages": [{"role": "user", "content": user_prompt}],
     }
