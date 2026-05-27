@@ -168,9 +168,18 @@ BULL_SYSTEM_PROMPT = """你是一位積極進取的台股多方分析師。
 }"""
 
 
-def analyze_bull(stock: dict) -> dict:
+def _get_claude_client():
+    """建立 Claude API client，設定較長 timeout 和 retry"""
     import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    return anthropic.Anthropic(
+        api_key=ANTHROPIC_API_KEY,
+        max_retries=3,
+        timeout=60.0,
+    )
+
+
+def analyze_bull(stock: dict) -> dict:
+    client = _get_claude_client()
 
     user_prompt = f"""請分析以下台股個股，提供多方論點：
 
@@ -187,7 +196,7 @@ RSI：{stock['rsi']:.1f}
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-5-sonnet-latest",
             max_tokens=1024,
             system=BULL_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}]
@@ -199,6 +208,7 @@ RSI：{stock['rsi']:.1f}
                 text = text[4:]
         return json.loads(text)
     except Exception as e:
+        logging.warning(f"Claude 多方分析失敗：{type(e).__name__}: {e}")
         return {"ticker": stock["ticker"], "error": str(e),
                 "bull_reasons": [], "confidence": 0, "one_liner": "分析失敗"}
 
@@ -226,8 +236,7 @@ BEAR_SYSTEM_PROMPT = """你是一位謹慎保守的台股空方風險分析師�
 
 def analyze_bear(stock: dict) -> dict:
     """空方分析（Claude）— 使用不同 system prompt 確保立場對立"""
-    import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    client = _get_claude_client()
 
     user_prompt = f"""請分析以下台股個股，提供空方風險論點：
 
@@ -244,7 +253,7 @@ RSI：{stock['rsi']:.1f}
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-5-sonnet-latest",
             max_tokens=1024,
             system=BEAR_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}]
@@ -283,8 +292,7 @@ INTEGRATOR_SYSTEM_PROMPT = """你是一位客觀的台股投資研究主管。
 
 
 def integrate(bull: dict, bear: dict) -> dict:
-    import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    client = _get_claude_client()
 
     user_prompt = f"""請整合以下多空分析：
 
@@ -298,7 +306,7 @@ def integrate(bull: dict, bear: dict) -> dict:
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-5-sonnet-latest",
             max_tokens=1024,
             system=INTEGRATOR_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}]
@@ -310,6 +318,7 @@ def integrate(bull: dict, bear: dict) -> dict:
                 text = text[4:]
         return json.loads(text)
     except Exception as e:
+        logging.warning(f"Claude 整合分析失敗：{type(e).__name__}: {e}")
         return {"ticker": bull.get("ticker"), "error": str(e),
                 "verdict": "分析失敗", "final_confidence": 0, "summary": "整合失敗"}
 
