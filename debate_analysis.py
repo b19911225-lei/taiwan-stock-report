@@ -26,7 +26,6 @@ logging.basicConfig(
 
 # ─── API Key 檢查 ───
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
@@ -60,14 +59,8 @@ def is_trading_day_local():
 
 def check_api_keys():
     """檢查 AI API Key 是否已設定，未設定則推播警告並退出。"""
-    missing = []
-    if not GEMINI_API_KEY:
-        missing.append("GEMINI_API_KEY")
     if not ANTHROPIC_API_KEY:
-        missing.append("ANTHROPIC_API_KEY")
-
-    if missing:
-        msg = f"⚠️ AI 分析 Secrets 未設定（{', '.join(missing)}），跳過多空辯證"
+        msg = "⚠️ ANTHROPIC_API_KEY 未設定，跳過多空辯證"
         logging.warning(msg)
         if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
             send_to_telegram([msg])
@@ -194,7 +187,7 @@ RSI：{stock['rsi']:.1f}
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-5",
+            model="claude-sonnet-4-20250514",
             max_tokens=1024,
             system=BULL_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}]
@@ -232,20 +225,11 @@ BEAR_SYSTEM_PROMPT = """你是一位謹慎保守的台股空方風險分析師�
 
 
 def analyze_bear(stock: dict) -> dict:
-    try:
-        from google import genai
-        _new_sdk = True
-    except ImportError:
-        try:
-            import google.generativeai as genai
-            _new_sdk = False
-        except ImportError:
-            return {"ticker": stock["ticker"], "error": "google-generativeai 未安裝",
-                    "bear_risks": [], "confidence": 0, "one_liner": "SDK未安裝"}
+    """空方分析（Claude）— 使用不同 system prompt 確保立場對立"""
+    import anthropic
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-    user_prompt = f"""{BEAR_SYSTEM_PROMPT}
-
-請分析以下台股個股，提供空方風險論點：
+    user_prompt = f"""請分析以下台股個股，提供空方風險論點：
 
 股票：{stock['name']}（{stock['ticker']}）
 收盤價：{stock['close']}
@@ -259,48 +243,10 @@ RSI：{stock['rsi']:.1f}
 請以 JSON 格式輸出空方風險論點。"""
 
     try:
-        if _new_sdk:
-            client = genai.Client(api_key=GEMINI_API_KEY)
-            response = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=user_prompt
-            )
-            text = response.text.strip()
-        else:
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-2.0-flash")
-            response = model.generate_content(user_prompt)
-            text = response.text.strip()
-
-        if "```" in text:
-            text = text.split("```")[1]
-            if text.startswith("json"):
-                text = text[4:]
-        return json.loads(text)
-    except Exception as e:
-        logging.warning(f"Gemini 空方分析失敗（{e}），使用 Claude fallback")
-        return _claude_bear_fallback(stock)
-
-
-def _claude_bear_fallback(stock: dict) -> dict:
-    import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-
-    user_prompt = f"""{BEAR_SYSTEM_PROMPT}
-
-請分析以下台股個股，提供空方風險論點：
-
-股票：{stock['name']}（{stock['ticker']}）
-收盤價：{stock['close']}
-RSI：{stock['rsi']:.1f}
-量化綜合評分：{stock['score']:.2f}（滿分1.0）
-
-請以 JSON 格式輸出空方風險論點。"""
-
-    try:
         response = client.messages.create(
-            model="claude-sonnet-4-5",
+            model="claude-sonnet-4-20250514",
             max_tokens=1024,
+            system=BEAR_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}]
         )
         text = response.content[0].text.strip()
@@ -308,11 +254,10 @@ RSI：{stock['rsi']:.1f}
             text = text.split("```")[1]
             if text.startswith("json"):
                 text = text[4:]
-        result = json.loads(text)
-        result["_fallback"] = "claude"
-        return result
-    except Exception as e2:
-        return {"ticker": stock["ticker"], "error": str(e2),
+        return json.loads(text)
+    except Exception as e:
+        logging.warning(f"Claude 空方分析失敗：{e}")
+        return {"ticker": stock["ticker"], "error": str(e),
                 "bear_risks": [], "confidence": 0, "one_liner": "空方分析失敗"}
 
 
@@ -353,7 +298,7 @@ def integrate(bull: dict, bear: dict) -> dict:
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-5",
+            model="claude-sonnet-4-20250514",
             max_tokens=1024,
             system=INTEGRATOR_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}]
@@ -382,7 +327,7 @@ def format_debate_message(results: list, today_str: str) -> str:
     lines = [
         f"⚔️ <b>多空辯證報告</b> {today_str}",
         "",
-        "TOP5 個股多空角力分析（Claude × Gemini）",
+        "TOP5 個股多空角力分析（Claude 多方 × Claude 空方）",
         "",
     ]
 
@@ -407,7 +352,7 @@ def format_debate_message(results: list, today_str: str) -> str:
 
     lines += [
         "⚠️ <b>本報告為 AI 輔助分析，不構成投資建議。</b>",
-        "🤖 Claude（多方）× Gemini（空方）辯證生成",
+        "🤖 Claude（多方）× Claude（空方）辯證生成",
     ]
     return "\n".join(lines)
 
