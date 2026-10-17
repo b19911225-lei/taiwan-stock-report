@@ -13,10 +13,13 @@
 # 共用參數：--date YYYY-MM-DD（補跑某天）、--dry-run（不送 Telegram、不存回 GitHub）、
 #           --force（已經發過也重發）、--no-git（不同步歷史分支）
 #
-# 結束代碼：0 成功｜1 AI 文字未通過檢查｜2 錯誤｜3 Telegram 發送失敗｜10 非交易日｜11 今天已經發過
+# 結束代碼：0 成功｜1 AI 文字未通過檢查｜2 錯誤｜3 Telegram 發送失敗｜4 已發送但歷史紀錄沒存回 GitHub
+#           10 非交易日｜11 今天已經發過｜12 還沒到收盤資料更新的時間，不判定休市
 
 import argparse
 import io
+import json
+import re
 import sys
 import time
 from collections import Counter
@@ -40,8 +43,13 @@ from config import (
 )
 from quality import DataQuality
 
-EXIT_OK, EXIT_AI_INVALID, EXIT_ERROR, EXIT_SEND_FAILED = 0, 1, 2, 3
-EXIT_NOT_TRADING, EXIT_ALREADY_SENT = 10, 11
+EXIT_OK, EXIT_AI_INVALID, EXIT_ERROR, EXIT_SEND_FAILED, EXIT_PUSH_FAILED = 0, 1, 2, 3, 4
+EXIT_NOT_TRADING, EXIT_ALREADY_SENT, EXIT_NOT_READY = 10, 11, 12
+
+# 台北時間這個時刻之前，加權指數沒有今天的資料不代表休市（可能還沒收盤或還沒更新）
+CLOSED_DECISION_HOUR = 17
+# 超過這個比例的股票沒有今日價格，或候選股的法人資料全缺，就算「資料不完整」
+INCOMPLETE_PRICE_RATIO = 0.5
 
 SIGNAL_MEANINGS = {
     "M1": "今日量大於 20 日均量 1.5 倍",
@@ -63,13 +71,18 @@ def log(msg):
     print(msg, flush=True)
 
 
+def now_tw():
+    return datetime.now(ZoneInfo(TIMEZONE))
+
+
 def today_tw():
-    return datetime.now(ZoneInfo(TIMEZONE)).strftime("%Y-%m-%d")
+    return now_tw().strftime("%Y-%m-%d")
 
 
-def resolve_trading_date(today, wait_minutes=0):
+def resolve_trading_date(today, wait_minutes=0, deadline=None):
     """回傳 (加權指數最新日期, 加權指數資料)。等到 today 的資料出現或時間到為止。"""
-    deadline = time.time() + wait_minutes * 60
+    if deadline is None:
+        deadline = time.time() + wait_minutes * 60
     while True:
         taiex = fetch.get_taiex_price(today)
         latest = fetch.latest_date_of(taiex)
@@ -77,6 +90,33 @@ def resolve_trading_date(today, wait_minutes=0):
             return latest, taiex
         log(f"  加權指數最新是 {latest}，還沒有 {today} 的資料，{DATA_WAIT_INTERVAL_SEC} 秒後再試")
         time.sleep(max(1, min(DATA_WAIT_INTERVAL_SEC, deadline - time.time())))
+
+
+def wait_for_institutional(date, deadline):
+    """法人資料通常比股價晚更新；用台積電的法人資料判斷今天的資料出來了沒。"""
+    while True:
+        daily, _ = fetch.get_institutional_investors("2330", date, days=3)
+        latest = fetch.latest_date_of(daily)
+        if latest == date:
+            return True
+        if time.time() >= deadline:
+            log(f"  法人資料最新是 {latest}，等不到 {date}，先繼續（報告會標示不完整，晚上的備援會補發）")
+            return False
+        log(f"  法人資料最新是 {latest}，{DATA_WAIT_INTERVAL_SEC} 秒後再試")
+        time.sleep(max(1, min(DATA_WAIT_INTERVAL_SEC, deadline - time.time())))
+
+
+def load_ai_output(date):
+    """讀 ai_output.json；容許外面多包一層 Markdown 程式碼框。回傳 (內容或 None, 錯誤訊息或 None)。"""
+    path = history.day_dir(date) / "ai_output.json"
+    if not path.exists():
+        return None, None
+    text = path.read_text(encoding="utf-8").strip()
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
+    try:
+        return json.loads(text), None
+    except json.JSONDecodeError as e:
+        return None, f"ai_output.json 不是合法的 JSON（第 {e.lineno} 行：{e.msg}）"
 
 
 def market_summary(taiex):
@@ -177,8 +217,13 @@ def collect(date, taiex):
 
     if unknown_inst:
         q.add_note(f"法人資料有無法辨識的類別：{'、'.join(sorted(unknown_inst))}（請更新 INSTITUTION_ALIASES）")
+    incomplete = []
     if stats["prefilter_passed"] and len(q.missing_inst) == stats["prefilter_passed"]:
-        q.add_note("所有候選股的法人資料都缺，可能是資料源尚未更新")
+        incomplete.append("所有候選股的法人資料都缺（可能尚未更新）")
+    if len(q.missing_price) > len(universe) * INCOMPLETE_PRICE_RATIO:
+        incomplete.append(f"{len(q.missing_price)}/{len(universe)} 檔沒有今日價格")
+    if incomplete:
+        q.add_note("資料不完整：" + "；".join(incomplete) + "。晚上的備援會在資料齊全後補發完整版")
 
     pick_ids = sorted((s for s, r in results.items() if r.get("rr_ok")),
                       key=lambda s: results[s]["score"], reverse=True)[:TARGET_STOCK_COUNT]
@@ -207,6 +252,7 @@ def collect(date, taiex):
         "picks": picks,
         "debate_ids": pick_ids[:DEBATE_STOCK_COUNT],
         "stats": stats,
+        "incomplete": incomplete,
         "exclude_counts": dict(Counter(r["exclude_reason"] for r in results.values() if not r.get("passed"))),
         "quality": q.to_dict(),
         "performance": performance.summarize(past, price_lookup, PERFORMANCE_LOOKBACK_DAYS),
@@ -258,11 +304,15 @@ def build_ai_input(payload):
 # ─── 指令 ───
 
 def _pull(args):
+    """同步歷史分支；失敗就停（不知道今天發過沒，硬跑可能重複發送）。"""
     if args.no_git:
-        history.HISTORY_DIR.mkdir(exist_ok=True)
-        return
+        history.HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        return True
     ok, msg = history.sync_pull()
     log(f"歷史分支：{msg}")
+    if not ok:
+        log("ERROR 歷史分支同步失敗，為避免重複發送先停止（本機測試請加 --no-git）")
+    return ok
 
 
 def _push(args, message):
@@ -275,14 +325,17 @@ def _push(args, message):
 
 def cmd_check_date(args):
     today = args.date or today_tw()
-    _pull(args)
+    if not _pull(args):
+        return EXIT_ERROR
     if history.is_sent(today) and not args.force:
         log(f"ALREADY_SENT {today}：今天的報告已經發過（要重發請加 --force）")
         return EXIT_ALREADY_SENT
     weekday = datetime.strptime(today, "%Y-%m-%d").weekday()
-    latest, _ = resolve_trading_date(today, args.wait_minutes if weekday < 5 else 0)
+    deadline = time.time() + (args.wait_minutes * 60 if weekday < 5 else 0)
+    latest, _ = resolve_trading_date(today, deadline=deadline)
     if latest == today:
         log(f"TRADING_DAY {today}")
+        wait_for_institutional(today, deadline)
         return EXIT_OK
     if latest is None:
         log("ERROR 抓不到加權指數，FinMind 可能連不上（Routine 請確認網路白名單有 api.finmindtrade.com）")
@@ -290,6 +343,9 @@ def cmd_check_date(args):
     if weekday >= 5:
         log(f"NOT_TRADING {today} 是週末")
         return EXIT_NOT_TRADING
+    if today == today_tw() and now_tw().hour < CLOSED_DECISION_HOUR:
+        log(f"NOT_READY 現在還不到 {CLOSED_DECISION_HOUR}:00，加權指數沒有今天的資料不代表休市，不發通知")
+        return EXIT_NOT_READY
 
     marker = history.closed_marker(today)
     if marker.exists() and not args.force:
@@ -305,13 +361,15 @@ def cmd_check_date(args):
     if status == "SUCCESS":
         marker.parent.mkdir(parents=True, exist_ok=True)
         marker.write_text(f'{{"latest_trading_date": "{latest}"}}\n', encoding="utf-8")
-        _push(args, f"closed {today}")
+        if not _push(args, f"closed {today}"):
+            log("  休市通知已發送，但標記沒有存回 GitHub，晚上的備援可能會再發一次")
     return EXIT_NOT_TRADING
 
 
 def cmd_collect(args):
     today = args.date or today_tw()
-    _pull(args)
+    if not _pull(args):
+        return EXIT_ERROR
     if history.is_sent(today) and not args.force:
         log(f"ALREADY_SENT {today}")
         return EXIT_ALREADY_SENT
@@ -336,12 +394,15 @@ def cmd_collect(args):
 def cmd_validate_ai(args):
     date = args.date or today_tw()
     ai_input = history.load_json(date, "ai_input.json")
-    ai_output = history.load_json(date, "ai_output.json")
     if ai_input is None:
         log(f"ERROR 找不到 history/{date}/ai_input.json，請先跑 collect")
         return EXIT_ERROR
+    ai_output, err = load_ai_output(date)
+    if err:
+        log(f"AI_INVALID {err}")
+        return EXIT_AI_INVALID
     if ai_output is None:
-        log(f"ERROR 找不到 history/{date}/ai_output.json")
+        log(f"AI_INVALID 找不到 history/{date}/ai_output.json")
         return EXIT_AI_INVALID
     _, issues = validate(ai_output, ai_input)
     for i in issues:
@@ -373,6 +434,7 @@ def cmd_write_ai(args):
 
 def cmd_finalize(args):
     date = args.date or today_tw()
+    prev = history.sent_info(date)
     if history.is_sent(date) and not args.force:
         log(f"ALREADY_SENT {date}")
         return EXIT_ALREADY_SENT
@@ -381,13 +443,27 @@ def cmd_finalize(args):
     if payload is None or ai_input is None:
         log(f"ERROR 找不到 history/{date}/picks.json，請先跑 collect")
         return EXIT_ERROR
+    incomplete = payload.get("incomplete") or []
+    resend_note = None
+    if prev is not None and not args.force:
+        # 稍早已經發過不完整的版本：資料還是不完整就不重發，齊全了才補發完整版
+        if incomplete:
+            log(f"ALREADY_SENT {date}：稍早已發過不完整的版本，資料仍不完整，不重發")
+            return EXIT_ALREADY_SENT
+        resend_note = "（資料更新後的完整版，取代稍早不完整的報告）"
 
-    ai_output = history.load_json(date, "ai_output.json")
     ai_clean, ai_issues, ai_note = None, [], None
-    if ai_output is None:
+    ai_output, load_err = load_ai_output(date)
+    if load_err:
+        ai_issues = [load_err]
+        ai_note = "AI 文字格式錯誤，以下只列程式數據"
+    elif ai_output is None:
         ai_note = "AI 文字未提供，以下只列程式數據"
     else:
-        ai_clean, ai_issues = validate(ai_output, ai_input)
+        try:
+            ai_clean, ai_issues = validate(ai_output, ai_input)
+        except Exception as e:  # 檢查程式本身出錯也不能擋住報告
+            ai_clean, ai_issues = None, [f"AI 檢查失敗：{type(e).__name__}: {e}"]
         if ai_issues:
             ai_note = f"AI 文字有 {len(ai_issues)} 處未通過程式檢查，已拿掉該段落"
     history.save_json(date, "ai_validation.json", {"issues": ai_issues})
@@ -395,9 +471,13 @@ def cmd_finalize(args):
     q = DataQuality.from_dict(payload.get("quality"))
     verify_issues = []
     if payload["picks"]:
-        twse, err = fetch.get_twse_closes()
+        twse, twse_date, err = fetch.get_twse_closes()
         if err:
             q.add_note(f"核對：{err}")
+        elif twse_date and twse_date != date:
+            q.add_note(f"證交所收盤價資料日期是 {twse_date}，不是 {date}，未核對收盤價")
+        elif not twse_date and date != today_tw():
+            q.add_note("補跑過去的日期：證交所只提供最新一日收盤價，未核對")
         else:
             result = verify.verify_closes(payload["picks"], twse)
             if result["ok"]:
@@ -407,7 +487,7 @@ def cmd_finalize(args):
             verify_issues += result["issues"]
     payload["quality"] = q.to_dict()
 
-    messages = reporter.build_messages(payload, ai_clean, ai_note, verify_issues)
+    messages = reporter.build_messages(payload, ai_clean, ai_note, verify_issues, resend_note)
     render_issues = verify.verify_messages(messages, payload["picks"])
     if render_issues:
         messages[-1] += "\n\n❗ 報告數字核對失敗：" + reporter.esc("；".join(render_issues))
@@ -428,13 +508,21 @@ def cmd_finalize(args):
     ok = all(s == "SUCCESS" for s in statuses)
     if ok:
         history.save_json(date, "sent.json", {
-            "sent_at": datetime.now(ZoneInfo(TIMEZONE)).isoformat(timespec="seconds"),
+            "sent_at": now_tw().isoformat(timespec="seconds"),
             "messages": len(messages),
             "ai_issues": len(ai_issues),
+            "complete": not incomplete,
+            "incomplete": incomplete,
         })
-    _push(args, f"report {date}")
-    log("SENT" if ok else "SEND_FAILED")
-    return EXIT_OK if ok else EXIT_SEND_FAILED
+    pushed = _push(args, f"report {date}")
+    if not ok:
+        log("SEND_FAILED")
+        return EXIT_SEND_FAILED
+    if not pushed:
+        log("SENT_BUT_NOT_SAVED 報告已發送，但紀錄沒有存回 GitHub（晚上的備援可能會重發）")
+        return EXIT_PUSH_FAILED
+    log("SENT" if not incomplete else "SENT_INCOMPLETE 已發送不完整的版本，資料齊全後會補發")
+    return EXIT_OK
 
 
 def cmd_all(args):

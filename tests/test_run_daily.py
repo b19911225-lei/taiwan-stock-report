@@ -1,6 +1,7 @@
 """整條每日流程（不連網路）：交易日、休市、去重、AI 檢查、報告核對。"""
 
-import json
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import pytest
@@ -8,11 +9,11 @@ import pytest
 import history
 import reporter
 import run_daily
-from config import STOCK_UNIVERSE
 from tests.conftest import make_price_df, make_inst_daily
 
 DATE = "2026-10-16"
 GOOD_IDS = ["2330", "3034", "6415"]
+NO_DATA_IDS = ["3014"]
 
 
 @pytest.fixture
@@ -20,6 +21,7 @@ def env(monkeypatch, tmp_path):
     sent = []
     monkeypatch.setattr(history, "HISTORY_DIR", tmp_path / "history")
     monkeypatch.setattr(run_daily, "today_tw", lambda: DATE)
+    monkeypatch.setattr(run_daily, "now_tw", lambda: datetime(2026, 10, 16, 18, 0, tzinfo=ZoneInfo("Asia/Taipei")))
     monkeypatch.setattr(reporter, "send_to_telegram", lambda msgs: sent.append(msgs) or ["SUCCESS"] * len(msgs))
 
     f = run_daily.fetch
@@ -35,16 +37,18 @@ def env(monkeypatch, tmp_path):
     def price(sid, end, days=65):
         if sid in GOOD_IDS:
             return make_price_df(end_date=end, start=100 + GOOD_IDS.index(sid) * 50)
-        if sid == "2409":
-            return make_price_df(end_date=end, drift=-0.004)
-        return pd.DataFrame()
+        if sid in NO_DATA_IDS:
+            return pd.DataFrame()
+        return make_price_df(end_date=end, drift=-0.004)   # 其他股票下跌趨勢，篩選不會過
     monkeypatch.setattr(f, "get_stock_price", price)
-    monkeypatch.setattr(f, "get_institutional_investors", lambda sid, end, days=10: (make_inst_daily(end_date=end), []))
+    inst_end = {"value": None}   # None：和查詢日期同一天；設成日期：模擬法人資料還沒更新
+    monkeypatch.setattr(f, "get_institutional_investors",
+                        lambda sid, end, days=10: (make_inst_daily(end_date=inst_end["value"] or end), []))
     monkeypatch.setattr(f, "get_tw_stock_news",
                         lambda: ([{"id": "N1", "source_id": "1", "title": "台積電法說會", "summary": "", "time": "",
                                    "url": "https://news.cnyes.com/news/id/1"}], None))
-    monkeypatch.setattr(f, "get_twse_closes", lambda: ({}, "證交所收盤價抓不到（測試）"))
-    return {"sent": sent, "taiex_date": taiex_date}
+    monkeypatch.setattr(f, "get_twse_closes", lambda: ({}, None, "證交所收盤價抓不到（測試）"))
+    return {"sent": sent, "taiex_date": taiex_date, "inst_end": inst_end}
 
 
 def run(*args):
@@ -57,7 +61,8 @@ def test_full_day_without_ai(env):
     payload = history.load_json(DATE, "picks.json")
     ids = [p["stock_id"] for p in payload["picks"]]
     assert ids and set(ids) <= set(GOOD_IDS)
-    assert len(payload["quality"]["missing_price"]) == len(STOCK_UNIVERSE) - len(GOOD_IDS)
+    assert payload["quality"]["missing_price"] == NO_DATA_IDS
+    assert payload["incomplete"] == []
     ai_input = history.load_json(DATE, "ai_input.json")
     assert {c["stock_id"] for c in ai_input["candidates"]} == set(ids)
 
@@ -133,8 +138,76 @@ def test_performance_tracks_previous_days_picks(env, monkeypatch):
     first = history.load_json("2026-10-15", "picks.json")["picks"]
 
     monkeypatch.setattr(run_daily, "today_tw", lambda: DATE)
+    monkeypatch.setattr(run_daily, "now_tw", lambda: datetime(2026, 10, 16, 18, 0, tzinfo=ZoneInfo("Asia/Taipei")))
     env["taiex_date"]["value"] = DATE
     assert run("all") == run_daily.EXIT_OK
     perf = history.load_json(DATE, "picks.json")["performance"]
     assert perf["total"] == len(first) > 0
     assert "推薦追蹤" in "\n".join(env["sent"][-1]) and "尚無歷史紀錄" not in "\n".join(env["sent"][-1])
+
+
+def test_not_ready_before_close_does_not_send_closed_notice(env, monkeypatch):
+    monkeypatch.setattr(run_daily, "now_tw", lambda: datetime(2026, 10, 16, 10, 0, tzinfo=ZoneInfo("Asia/Taipei")))
+    env["taiex_date"]["value"] = "2026-10-15"
+    assert run("check-date") == run_daily.EXIT_NOT_READY
+    assert env["sent"] == []
+
+
+def test_past_date_without_data_is_a_holiday(env, monkeypatch):
+    # 備援延遲到半夜、用 --date 指定前一天：那天沒資料就是休市
+    monkeypatch.setattr(run_daily.fetch, "get_taiex_price",
+                        lambda end: pd.DataFrame({"date": pd.to_datetime(["2026-10-13", "2026-10-14"]),
+                                                  "close": [47000.0, 47100.0]}))
+    assert run("check-date", "--date", "2026-10-15") == run_daily.EXIT_NOT_TRADING
+    assert "2026-10-15" in env["sent"][0][0]
+
+
+def test_malformed_ai_output_still_sends(env):
+    run("collect")
+    (history.day_dir(DATE) / "ai_output.json").write_text('{"date": "2026-10-16", "stocks": [,]}', encoding="utf-8")
+    assert run("validate-ai") == run_daily.EXIT_AI_INVALID
+    assert run("finalize") == run_daily.EXIT_OK
+    assert "AI 文字格式錯誤" in "\n".join(env["sent"][0])
+
+
+def test_code_fenced_ai_output_is_accepted(env):
+    run("collect")
+    body = '{"date": "2026-10-16", "highlights": [], "stocks": []}'
+    (history.day_dir(DATE) / "ai_output.json").write_text(f"```json\n{body}\n```", encoding="utf-8")
+    out, err = run_daily.load_ai_output(DATE)
+    assert err is None and out["date"] == DATE
+
+
+def test_incomplete_report_is_resent_once_data_is_complete(env):
+    env["inst_end"]["value"] = "2026-10-15"          # 17:53 法人資料還沒更新
+    assert run("collect") == run_daily.EXIT_OK
+    assert history.load_json(DATE, "picks.json")["incomplete"]
+    assert run("finalize") == run_daily.EXIT_OK
+    assert history.sent_info(DATE)["complete"] is False
+    assert not history.is_sent(DATE)
+
+    # 備援再跑一次，資料還是不完整：不重發
+    run("collect")
+    assert run("finalize") == run_daily.EXIT_ALREADY_SENT
+    assert len(env["sent"]) == 1
+
+    # 資料齊了：補發完整版，之後就不再發
+    env["inst_end"]["value"] = None
+    run("collect")
+    assert run("finalize") == run_daily.EXIT_OK
+    assert len(env["sent"]) == 2 and "完整版" in env["sent"][1][0]
+    assert history.is_sent(DATE)
+    assert run("check-date") == run_daily.EXIT_ALREADY_SENT
+
+
+def test_push_failure_has_its_own_exit_code(env, monkeypatch):
+    monkeypatch.setattr(run_daily, "_push", lambda args, msg: False)
+    run("collect")
+    assert run("finalize") == run_daily.EXIT_PUSH_FAILED
+    assert len(env["sent"]) == 1
+
+
+def test_git_pull_failure_stops_before_sending(env, monkeypatch):
+    monkeypatch.setattr(history, "sync_pull", lambda: (False, "連不上 origin"))
+    assert run_daily.main(["check-date"]) == run_daily.EXIT_ERROR
+    assert env["sent"] == []

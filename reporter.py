@@ -195,11 +195,14 @@ def _performance_lines(perf):
     return lines
 
 
-def build_messages(payload, ai_clean=None, ai_note=None, verify_issues=None):
+def build_messages(payload, ai_clean=None, ai_note=None, verify_issues=None, resend_note=None):
     date = payload["date"]
     picks = payload.get("picks", [])
 
-    msg1 = [f"📊 <b>台股選股日報 {esc(date)}</b>", ""]
+    msg1 = [f"📊 <b>台股選股日報 {esc(date)}</b>"]
+    if resend_note:
+        msg1.append(f"<i>{esc(resend_note)}</i>")
+    msg1.append("")
     msg1 += _market_lines(payload.get("market", {})) + [""]
     msg1 += _theme_lines(payload.get("themes", [])) + [""]
     msg1.append(f"📋 <b>觀察清單（{len(picks)}支）</b>")

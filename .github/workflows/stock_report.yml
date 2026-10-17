@@ -50,10 +50,12 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FORCE: ${{ inputs.force && '--force' || '' }}
         run: |
+          # 排程常延遲到半夜，用「台北時間減 6 小時」當報告日期，跨過午夜也還是當天的報告
+          DATE=$(TZ=Asia/Taipei date -d '-6 hours' +%F)
           rc=0
-          python run_daily.py all --ai api $FORCE || rc=$?
-          # 10 = 非交易日、11 = 今天已經發過（通常是 Routine 發的），都不算失敗
-          if [ "$rc" = 10 ] || [ "$rc" = 11 ]; then exit 0; fi
+          python run_daily.py all --ai api --date "$DATE" $FORCE || rc=$?
+          # 10 非交易日、11 已經發過（通常是 Routine 發的）、12 還沒收盤，都不算失敗
+          if [ "$rc" = 10 ] || [ "$rc" = 11 ] || [ "$rc" = 12 ]; then exit 0; fi
           exit $rc
 
       - name: 上傳紀錄為 Artifact

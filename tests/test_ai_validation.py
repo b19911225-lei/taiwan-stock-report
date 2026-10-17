@@ -99,3 +99,42 @@ def test_non_candidate_stock_is_ignored():
     clean, issues = validate(bad, AI_INPUT)
     assert "2330" not in clean["stocks"]
     assert any("2330" in i for i in issues)
+
+
+def test_half_up_rounding_is_accepted():
+    allowed = collect_allowed_numbers({"a": 61.25, "b": 64.5, "c": 2.5})
+    assert check_text("RSI 61.3、64.5 寫成 65%、量比 3 倍", allowed, 100) == []
+
+
+def test_direction_must_match_sign():
+    allowed = collect_allowed_numbers({"chg_pct": -0.82, "today_chg_pct": 4.82})
+    assert check_text("大盤下跌 0.82%", allowed, 100) == []
+    assert check_text("大盤 -0.82%", allowed, 100) == []
+    assert check_text("大盤上漲 0.82%", allowed, 100) != []
+    assert check_text("大盤 +0.82%", allowed, 100) != []
+    assert check_text("個股上漲 4.8%", allowed, 100) == []
+
+
+def test_dates_are_not_negative_numbers():
+    allowed = collect_allowed_numbers({"date": "2026-10-16"})
+    assert check_text("資料日期 2026-10-16", allowed, 100) == []
+
+
+def test_cjk_numerals_with_units_are_rejected():
+    allowed = collect_allowed_numbers(AI_INPUT)
+    assert check_text("上看六百元", allowed, 100) != []
+    assert check_text("還有兩成空間", allowed, 100) != []
+    assert check_text("成交金額 5,123 億元", collect_allowed_numbers({"m": 5123.0}), 100) == []
+
+
+def test_wrong_types_do_not_crash():
+    bad = copy.deepcopy(GOOD)
+    bad["stocks"] = 5
+    _, issues = validate(bad, AI_INPUT)
+    assert any("stocks 不是陣列" in i for i in issues)
+    bad = copy.deepcopy(GOOD)
+    bad["highlights"][0]["news_ids"] = [{"id": "N1"}]
+    bad["stocks"][0]["news_ids"] = [["N1"]]
+    bad["stocks"][1]["bull_points"] = [1, 2]
+    clean, issues = validate(bad, AI_INPUT)
+    assert clean["highlights"] == [] and clean["stocks"] == {}

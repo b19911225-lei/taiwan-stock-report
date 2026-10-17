@@ -2,7 +2,8 @@ import pandas as pd
 import pytest
 
 import data_fetcher
-from data_fetcher import TwseBlocked, _twse_get_json, parse_top_volume, parse_cnyes_news, normalize_price_df
+from data_fetcher import (TwseBlocked, _twse_get_json, parse_top_volume, parse_cnyes_news, normalize_price_df,
+                          parse_twse_date)
 
 
 class FakeResp:
@@ -84,6 +85,8 @@ def test_parse_cnyes_news():
     assert len(news) == 1
     assert news[0]["id"] == "N1" and news[0]["title"] == "台積電 法說" and news[0]["summary"] == "重點&摘要"
     assert news[0]["url"].endswith("/111")
+    # 1_000_000 = 1970-01-12 13:46 UTC → 台北 21:46（不受主機時區影響）
+    assert news[0]["time"] == "01/12 21:46"
 
 
 def test_normalize_price_df_drops_zero_price_rows():
@@ -93,3 +96,18 @@ def test_normalize_price_df_drops_zero_price_rows():
     })
     df = normalize_price_df(raw)
     assert len(df) == 1 and df.iloc[0]["volume"] == 1000
+
+
+def test_parse_twse_date():
+    assert parse_twse_date("1151016") == "2026-10-16"
+    assert parse_twse_date("115/10/16") == "2026-10-16"
+    assert parse_twse_date("20261016") == "2026-10-16"
+    assert parse_twse_date("2026-10-16") == "2026-10-16"
+    assert parse_twse_date("") is None
+
+
+def test_twse_closes_returns_date(monkeypatch):
+    rows = [{"Date": "1151016", "Code": "2330", "ClosingPrice": "2,420.00"}]
+    monkeypatch.setattr(data_fetcher.requests, "get", lambda *a, **k: FakeResp(200, "[]", rows))
+    closes, d, err = data_fetcher.get_twse_closes()
+    assert err is None and d == "2026-10-16" and closes == {"2330": 2420.0}

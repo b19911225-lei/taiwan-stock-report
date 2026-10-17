@@ -72,3 +72,31 @@ def test_past_picks_only_counts_sent_days(repo):
     past = history.past_picks("2026-10-16", 20)
     assert [d for d, _ in past] == ["2026-10-14"]
     assert past[0][1][0] == {"stock_id": "2330", "close": 100, "target1": 110, "stop_loss": 95}
+
+
+def test_unreachable_origin_is_an_error_not_an_empty_history(repo):
+    # 抓不到遠端時不能當成「還沒有歷史」，否則會重發
+    git("remote", "set-url", "origin", str(repo["tmp"] / "does-not-exist.git"), cwd=repo["work"])
+    ok, msg = history.sync_pull()
+    assert not ok
+    assert not (repo["work"] / "history").exists()
+
+
+def test_conflicting_push_is_reported_as_failure(repo):
+    history.sync_pull()
+    history.save_json("2026-10-16", "sent.json", {"by": "routine"})
+    assert history.sync_push("routine")[0]
+
+    # 另一個 clone（例如備援）同時也寫了同一天的 sent.json
+    other = repo["tmp"] / "other"
+    git("clone", "-q", "-b", "claude/report-history", str(repo["origin"]), str(other), cwd=repo["tmp"])
+    (other / "2026-10-16" / "sent.json").write_text('{"by": "fallback-first"}', encoding="utf-8")
+    git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qam", "fallback", cwd=other)
+    git("push", "-q", "origin", "claude/report-history", cwd=other)
+
+    history.save_json("2026-10-16", "sent.json", {"by": "routine-again"})
+    ok, msg = history.sync_push("again")
+    assert not ok and "衝突" in msg
+    # rebase 已經放棄，worktree 不會卡在一半
+    status = history._git("status", cwd=history.HISTORY_DIR).stdout
+    assert "rebase" not in status

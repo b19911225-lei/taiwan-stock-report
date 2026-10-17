@@ -49,8 +49,15 @@ def save_text(date, name, text):
     return path
 
 
+def sent_info(date):
+    """已發送標記；沒發過回 None。"""
+    return load_json(date, "sent.json")
+
+
 def is_sent(date):
-    return (day_dir(date) / "sent.json").exists()
+    """發過「完整」的報告才算。資料不完整時發的報告，之後資料齊了還會再補發一次。"""
+    info = sent_info(date)
+    return info is not None and info.get("complete", True)
 
 
 def closed_marker(date):
@@ -84,24 +91,49 @@ def _git(*args, cwd=None, check=True):
     return subprocess.run(["git", *args], cwd=cwd or REPO_DIR, capture_output=True, text=True, check=check)
 
 
+def _remote_branch_state():
+    """'exists'、'missing'，或連不上時回錯誤訊息。"""
+    for wait in (2, 4, None):
+        r = _git("ls-remote", "--exit-code", "origin", f"refs/heads/{HISTORY_BRANCH}", check=False)
+        if r.returncode == 0:
+            return "exists"
+        if r.returncode == 2:
+            return "missing"
+        if wait:
+            time.sleep(wait)
+    return f"連不上 origin：{(r.stderr or '').strip()[:200]}"
+
+
+def _fetch_branch():
+    return _git("fetch", "origin", f"+refs/heads/{HISTORY_BRANCH}:refs/remotes/origin/{HISTORY_BRANCH}",
+                check=False).returncode == 0
+
+
 def sync_pull():
-    """把 HISTORY_BRANCH 準備到 history/。回傳 (成功與否, 說明)。"""
+    """
+    把 HISTORY_BRANCH 準備到 history/。回傳 (成功與否, 說明)。
+    抓不到遠端時一定回 False：不能當成「還沒有歷史」，否則會重複發送。
+    """
     if not (REPO_DIR / ".git").exists():
-        HISTORY_DIR.mkdir(exist_ok=True)
-        return False, "不是 git repo，歷史紀錄只存在本機"
-    fetched = _git("fetch", "origin", f"+refs/heads/{HISTORY_BRANCH}:refs/remotes/origin/{HISTORY_BRANCH}",
-                   check=False).returncode == 0
+        return False, "不是 git repo（本機測試請加 --no-git）"
+    state = _remote_branch_state()
+    if state not in ("exists", "missing"):
+        return False, state
+    if state == "exists" and not _fetch_branch():
+        return False, f"抓取 {HISTORY_BRANCH} 失敗"
     try:
         if (HISTORY_DIR / ".git").exists():
-            if fetched:
-                _git("merge", "--ff-only", f"origin/{HISTORY_BRANCH}", cwd=HISTORY_DIR, check=False)
+            if state == "exists":
+                r = _git("merge", "--ff-only", f"origin/{HISTORY_BRANCH}", cwd=HISTORY_DIR, check=False)
+                if r.returncode != 0:
+                    return False, f"history/ 無法快轉到遠端：{(r.stderr or '').strip()[:200]}"
             return True, "已更新"
         if HISTORY_DIR.exists() and any(HISTORY_DIR.iterdir()):
-            return False, "history/ 已存在但不是 worktree，沿用本機資料"
+            return False, "history/ 已存在但不是 worktree（本機測試請加 --no-git）"
         if HISTORY_DIR.exists():
             HISTORY_DIR.rmdir()
         _git("worktree", "prune", check=False)
-        if fetched:
+        if state == "exists":
             _git("worktree", "add", "-B", HISTORY_BRANCH, str(HISTORY_DIR), f"origin/{HISTORY_BRANCH}")
             return True, "已取得歷史分支"
         _git("worktree", "add", "--orphan", "-b", HISTORY_BRANCH, str(HISTORY_DIR))
@@ -110,12 +142,11 @@ def sync_pull():
             encoding="utf-8")
         return True, "遠端還沒有歷史分支，已建立新的"
     except subprocess.CalledProcessError as e:
-        HISTORY_DIR.mkdir(exist_ok=True)
         return False, f"git worktree 失敗：{(e.stderr or '').strip()[:200]}"
 
 
 def sync_push(message):
-    """commit 並推送 history/。回傳 (成功與否, 說明)。"""
+    """commit 並推送 history/，推完確認遠端真的是這個 commit。回傳 (成功與否, 說明)。"""
     if not (HISTORY_DIR / ".git").exists():
         return False, "history/ 不是 git worktree，沒有推送"
     _git("add", "-A", cwd=HISTORY_DIR)
@@ -126,12 +157,20 @@ def sync_push(message):
     for wait in (2, 4, 8, 16, None):
         r = _git("push", "origin", f"HEAD:refs/heads/{HISTORY_BRANCH}", cwd=HISTORY_DIR, check=False)
         if r.returncode == 0:
-            return True, f"已推送到 {HISTORY_BRANCH}"
+            head = _git("rev-parse", "HEAD", cwd=HISTORY_DIR).stdout.strip()
+            remote = _git("ls-remote", "origin", f"refs/heads/{HISTORY_BRANCH}", check=False).stdout.split()
+            if remote and remote[0] == head:
+                return True, f"已推送到 {HISTORY_BRANCH}"
+            last = f"推送後遠端不是本機的 commit（遠端 {remote[:1]}，本機 {head[:7]}）"
+            return False, last
         last = (r.stderr or "").strip()
-        if "rejected" in last or "non-fast-forward" in last:
-            # 別的執行先推了：rebase 到遠端最新再推
-            _git("fetch", "origin", f"+refs/heads/{HISTORY_BRANCH}:refs/remotes/origin/{HISTORY_BRANCH}", check=False)
-            _git(*GIT_IDENTITY, "rebase", f"origin/{HISTORY_BRANCH}", cwd=HISTORY_DIR, check=False)
+        if "rejected" in last or "non-fast-forward" in last or "fetch first" in last:
+            # 別的執行先推了：rebase 到遠端最新再推；衝突（例如同一天都寫了 sent.json）就放棄
+            _fetch_branch()
+            rb = _git(*GIT_IDENTITY, "rebase", f"origin/{HISTORY_BRANCH}", cwd=HISTORY_DIR, check=False)
+            if rb.returncode != 0:
+                _git("rebase", "--abort", cwd=HISTORY_DIR, check=False)
+                return False, f"和遠端的紀錄衝突，沒有推送：{(rb.stdout + rb.stderr).strip()[:200]}"
         if wait:
             time.sleep(wait)
     return False, f"推送失敗：{last[:200]}"

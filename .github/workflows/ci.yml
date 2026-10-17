@@ -14,12 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 與備援 workflow 相同的環境（pandas 2）
+          # 與備援 workflow 相同的環境（Python 3.11、requirements.txt 解出來的最新版）
           - python: '3.11'
-            constraints: '"pandas<3" "numpy<2"'
-          # 與 Routine 雲端主機相同的環境（Python 3.13、pandas 3）
+            constraints: ''
+          # 與 Routine 雲端主機相同的環境（Python 3.13、預裝的 pandas 3）
           - python: '3.13'
             constraints: ''
+          # 本機舊安裝（pandas 2、numpy 1）
+          - python: '3.11'
+            constraints: '"pandas<3" "numpy<2"'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -12,11 +12,12 @@ import re
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import requests
 
-from config import FINMIND_TOKEN
+from config import FINMIND_TOKEN, TIMEZONE
 
 LOG_DIR = Path(__file__).parent / "logs"
 
@@ -243,25 +244,41 @@ def parse_top_volume(data, top_n=10):
     return out[:top_n]
 
 
+def parse_twse_date(value):
+    """證交所的日期可能是民國 1151016、115/10/16，或西元 20261016、2026-10-16。回傳 YYYY-MM-DD 或 None。"""
+    digits = re.sub(r"\D", "", str(value or ""))
+    try:
+        if len(digits) == 7:        # 民國年
+            return f"{int(digits[:3]) + 1911:04d}-{digits[3:5]}-{digits[5:7]}"
+        if len(digits) == 8:
+            return f"{digits[:4]}-{digits[4:6]}-{digits[6:8]}"
+    except ValueError:
+        pass
+    return None
+
+
 def get_twse_closes():
     """
-    證交所上市股票最新一日收盤價（核對用）。
-    回傳 ({代號: 收盤價}, 錯誤訊息或 None)。上櫃股不在這份清單裡。
+    證交所上市股票最新一日收盤價（核對用）。上櫃股不在這份清單裡。
+    回傳 ({代號: 收盤價}, 資料日期 YYYY-MM-DD 或 None（格式裡沒有日期）, 錯誤訊息或 None)。
     """
     try:
         data = _twse_get_json(TWSE_DAY_ALL_URL)
     except Exception as e:
         _log_error(f"STOCK_DAY_ALL 失敗: {e}")
-        return {}, f"證交所收盤價抓不到（{e}）"
+        return {}, None, f"證交所收盤價抓不到（{e}）"
     if not isinstance(data, list):
-        return {}, "證交所收盤價格式無法辨識"
-    closes = {}
+        return {}, None, "證交所收盤價格式無法辨識"
+    closes, dates = {}, set()
     for row in data:
         code = str(row.get("Code", "")).strip()
         price = pd.to_numeric(str(row.get("ClosingPrice", "")).replace(",", ""), errors="coerce")
         if code and not pd.isna(price):
             closes[code] = float(price)
-    return closes, None
+        d = parse_twse_date(row.get("Date"))
+        if d:
+            dates.add(d)
+    return closes, (max(dates) if dates else None), None
 
 
 # ─── 新聞（鉅亨網台股新聞）───
@@ -302,7 +319,8 @@ def parse_cnyes_news(data, hours=24, now_ts=None):
             "source_id": news_id,
             "title": title,
             "summary": _clean_text(item.get("summary"), 200),
-            "time": datetime.fromtimestamp(float(ts)).strftime("%m/%d %H:%M") if ts else "",
+            # 一律用台北時間（雲端主機和 Actions 是 UTC）
+            "time": datetime.fromtimestamp(float(ts), ZoneInfo(TIMEZONE)).strftime("%m/%d %H:%M") if ts else "",
             "url": f"https://news.cnyes.com/news/id/{news_id}",
         })
     return out
