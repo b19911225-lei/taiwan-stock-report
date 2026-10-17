@@ -1,210 +1,278 @@
-# reporter.py - 報告產生與 Telegram 推送
+# reporter.py - 產生 Telegram 訊息與推送
+#
+# 所有數字都從 picks.json 來（程式算好的），AI 只提供文字段落；
+# 動態文字一律 html.escape，避免 AI 或新聞裡的 < > & 讓 Telegram HTML 解析失敗。
 
+import html
 import time
-import logging
 from datetime import datetime
 from pathlib import Path
+
 import requests
-from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, THEME_STOCKS, STOCK_UNIVERSE, TARGET_STOCK_COUNT
+
+from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, MIN_RR_RATIO
 
 LOG_DIR = Path(__file__).parent / "logs"
-LOG_DIR.mkdir(exist_ok=True)
+TELEGRAM_LIMIT = 4000
 
-STOCK_NAMES = {
-    "2330": "台積電",   "3711": "日月光投控", "2325": "矽品",     "3034": "聯詠",
-    "6274": "台燿",     "3008": "大立光",     "2308": "台達電",   "6669": "緯穎",
-    "2376": "技嘉",     "2377": "微星",       "3231": "緯創",     "2356": "英業達",
-    "3706": "神達",     "4966": "譜瑞-KY",    "6456": "GUC",      "2454": "聯發科",
-    "2379": "瑞昱",     "8299": "群聯",
-    "6533": "晶心科",   "6247": "成電",       "6530": "創意",     "3105": "穩懋",
-    "4977": "眾達電通", "3490": "單驥",       "3491": "昇銳",     "4968": "立積",
-    "3703": "欣興",     "6288": "聯鈞",
-    "3081": "聯亞",     "2455": "全訊",       "2338": "光罩",     "3508": "位速",
-    "2303": "聯電",     "6770": "力積電",
-    "8150": "南茂",     "6147": "頎邦",       "3014": "台揚",     "6271": "同欣電",
-    "2344": "華邦電",   "2408": "南亞科",     "5483": "中美晶",   "3443": "創意電子",
-    "2049": "上銀",     "3017": "奇鋐",       "6230": "超眾",     "6415": "矽力-KY",
-    "1514": "亞力",
-}
+SIGNAL_LEGEND = "M1 量>20日均1.5倍｜M2 量>5日均1.3倍｜M3 外資連買≥3日｜M4 主力連增｜M5 KD金叉｜M6 RSI強勢"
+VERDICT_EMOJI = {"強力做多": "🟢🔥", "謹慎做多": "🟡✅", "中性觀察": "⚪👀", "規避": "🔴⚠️"}
 
 
-def _get_name(stock_id):
-    return STOCK_NAMES.get(stock_id, stock_id)
+def esc(text):
+    return html.escape(str(text), quote=False)
 
 
-def _sentiment(chg_pct):
-    if chg_pct >= 1.5:   return "🚀 強勢上攻"
-    if chg_pct >= 0.5:   return "📈 偏多格局"
-    if chg_pct >= -0.5:  return "😐 盤整觀望"
-    if chg_pct >= -1.5:  return "📉 偏弱震盪"
+def fmt_num(x, nd=2):
+    """價格格式：千分位、最多 nd 位小數、去掉多餘的 0。"""
+    if x is None:
+        return "N/A"
+    s = f"{float(x):,.{nd}f}"
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    return s
+
+
+def fmt_pct(x):
+    if x is None:
+        return "N/A"
+    arrow = "▲" if x > 0 else ("▼" if x < 0 else "─")
+    return f"{arrow}{abs(x):.2f}%"
+
+
+def sentiment(chg_pct):
+    if chg_pct is None:
+        return ""
+    if chg_pct >= 1.5:  return "🚀 強勢上攻"
+    if chg_pct >= 0.5:  return "📈 偏多格局"
+    if chg_pct >= -0.5: return "😐 盤整觀望"
+    if chg_pct >= -1.5: return "📉 偏弱震盪"
     return "🔻 空方主導"
 
 
-def build_report(results, market_data, date, dynamic_universe=None):
-    """建立報告，回傳訊息列表（最多2則）"""
-    # ─── 大盤概況 ───
-    taiex_str = "N/A"
-    chg_str   = "N/A"
-    vol_str   = "N/A"
-    sentiment_str = ""
-
-    if market_data is not None and not market_data.empty:
-        try:
-            row = market_data.iloc[-1]
-            taiex = float(row.get("close", row.get("price", 0)))
-            # 計算漲跌
-            if len(market_data) >= 2:
-                prev_row = market_data.iloc[-2]
-                prev_close = float(prev_row.get("close", prev_row.get("price", taiex)))
-                chg_pct = (taiex - prev_close) / prev_close * 100 if prev_close else 0
-                chg_str = f"{chg_pct:+.2f}%"
-                sentiment_str = _sentiment(chg_pct)
-            taiex_str = f"{taiex:,.0f}"
-            # 優先使用成交金額（Trading_Money，單位：元），除以 1e8 得「億元」
-            if "Trading_Money" in row:
-                money = float(row.get("Trading_Money", 0))
-                vol_str = f"{money/1e8:,.0f}"
-            elif "Trading_Volume" in row or "volume" in row:
-                vol = float(row.get("volume", row.get("Trading_Volume", 0)))
-                vol_str = f"{vol/1e8:.0f}" if vol > 1e8 else f"{vol:.0f}"
-        except Exception:
-            pass
-
-    # ─── 主題強弱 ───
-    theme_avg = {}
-    for theme, stocks in THEME_STOCKS.items():
-        chgs = [r["today_chg"] for s in stocks
-                if (r := results.get(s)) and "today_chg" in r]
-        theme_avg[theme] = sum(chgs) / len(chgs) if chgs else 0
-
-    theme_sorted = sorted(theme_avg.items(), key=lambda x: x[1], reverse=True)
-    theme_lines = []
-    for i, (t, avg) in enumerate(theme_sorted):
-        short = t.split("_", 1)[1] if "_" in t else t
-        star  = "★" if i == 0 else "  "
-        arrow = "▲" if avg > 0 else ("▼" if avg < 0 else "─")
-        theme_lines.append(f"{star}{short}：{arrow}{abs(avg):.2f}%")
-
-    # ─── 個股清單 ───
-    passed = [(sid, r) for sid, r in results.items() if r.get("passed") and r.get("targets")]
-    passed.sort(key=lambda x: x[1]["score"], reverse=True)
-    passed = passed[:TARGET_STOCK_COUNT]
-
-    stock_lines = []
-    for rank, (sid, r) in enumerate(passed, 1):
-        name   = _get_name(sid)
-        universe = dynamic_universe if dynamic_universe else STOCK_UNIVERSE
-        themes = [t.split("_", 1)[1] for t in universe.get(sid, [])]
-        theme_tag = "/".join(themes[:2]) if themes else "熱門量能"
-        close  = r.get("close", 0)
-        chg    = r.get("today_chg", 0)
-        score  = r.get("score", 0)
-        sigs   = " ".join(r.get("signals", []))
-        tgt    = r["targets"]
-        arrow  = "▲" if chg >= 0 else "▼"
-        line1 = (f"{rank}. <b>{sid} {name}</b> ｜{theme_tag}｜"
-                 f"{close} {arrow}{abs(chg):.2f}% ｜評分{score}｜{sigs}")
-        rr     = tgt["rr_ratio"]
-        entry  = f"{tgt['entry_low']}~{tgt['entry_high']}"
-        line2  = (f"   進場:{entry} 目標:{tgt['target1']} 停損:{tgt['stop_loss']} "
-                  f"RR:{rr:.1f}｜{_brief_comment(r)}")
-        stock_lines.append(line1 + "\n" + line2)
-
-    # ─── 組合第一則訊息 ───
-    msg1_parts = [
-        f"📊 <b>台股選股日報 {date}</b>\n",
-        f"🏦 <b>大盤概況</b>",
-        f"加權指數：{taiex_str} （{chg_str}）",
-        f"成交量：{vol_str} 億",
-        f"氛圍：{sentiment_str}\n",
-        f"🔥 <b>主題強弱</b>",
-        "\n".join(theme_lines),
-        f"\n📋 <b>觀察清單（{len(passed)}支）</b>",
-        "\n".join(stock_lines) if stock_lines else "（今日無符合條件個股）",
-    ]
-    msg1 = "\n".join(msg1_parts)
-
-    # ─── 第二則訊息：Top3 亮點 ───
-    top3 = passed[:5]
-    top3_lines = [f"⭐ <b>今日亮點 Top 5</b>\n"]
-    for sid, r in top3:
-        name = _get_name(sid)
-        sigs = r.get("signals", [])
-        rsi  = r.get("rsi14", "N/A")
-        f_days = r.get("foreign_buy_days", 0)
-        kd   = "KD金叉、" if r.get("kd_cross") else ""
-        universe = dynamic_universe if dynamic_universe else STOCK_UNIVERSE
-        themes = [t.split("_", 1)[1] for t in universe.get(sid, [])]
-        top3_lines.append(
-            f"<b>{sid} {name}</b>\n"
-            f"  動能：{'、'.join(sigs)}\n"
-            f"  技術：{kd}RSI={rsi}、收盤突破MA20\n"
-            f"  主題：{' / '.join(themes)}\n"
-            f"  外資連買：{f_days}日\n"
-        )
-
-    obs_lines = [
-        f"\n👀 <b>明日觀察</b>",
-        "1. 留意外資是否持續買超主流股",
-        "2. 觀察大盤成交量能否維持穩定",
-        "3. KD高檔個股注意追高風險\n",
-        "🤖 自動產出｜僅供參考，非投資建議",
-    ]
-    msg2 = "\n".join(top3_lines + obs_lines)
-
-    messages = [msg1]
-    if top3:
-        messages.append(msg2)
-
-    return messages
+def pick_number_strings(pick):
+    """報告上每檔一定會出現的數字字串（verify.py 用來核對報告有沒有寫錯）。"""
+    t = pick["targets"]
+    return {
+        "收盤": fmt_num(pick["close"]),
+        "進場下緣": fmt_num(t["entry_low"]),
+        "進場上緣": fmt_num(t["entry_high"]),
+        "目標": fmt_num(t["target1"]),
+        "停損": fmt_num(t["stop_loss"]),
+        "RR": f"{t['rr_ratio']:.1f}",
+    }
 
 
-def _brief_comment(r):
-    sigs = r.get("signals", [])
+def _brief_comment(p):
+    sigs = p.get("signals", [])
     parts = []
     if "M3" in sigs:
-        parts.append(f"外資連買{r.get('foreign_buy_days',0)}日")
+        parts.append(f"外資連買{p.get('foreign_buy_days', 0)}日")
     if "M5" in sigs:
         parts.append("KD金叉")
-    if "M6" in sigs:
-        parts.append(f"RSI強勢({r.get('rsi14',''):.0f})" if r.get("rsi14") else "RSI強勢")
+    if "M6" in sigs and p.get("rsi14") is not None:
+        parts.append(f"RSI強勢({p['rsi14']:.0f})")
     if "M1" in sigs:
-        parts.append(f"量能放大{r.get('vol_vs_20d',0):.1f}倍")
+        parts.append(f"量能放大{p.get('vol_vs_20d', 0):.1f}倍")
     return "、".join(parts[:2]) if parts else "多訊號共振"
 
 
-def send_to_telegram(messages: list):
-    date_str = datetime.today().strftime("%Y-%m-%d")
-    log_file = LOG_DIR / f"send_{date_str}.log"
-    results  = []
+def _market_lines(m):
+    lines = ["🏦 <b>大盤概況</b>"]
+    if m.get("close") is None:
+        lines.append("加權指數：無資料")
+        return lines
+    lines.append(f"加權指數：{fmt_num(m['close'])}（{fmt_pct(m.get('chg_pct'))}）")
+    if m.get("money_100m") is not None:
+        lines.append(f"成交金額：{fmt_num(m['money_100m'], 0)} 億")
+    s = sentiment(m.get("chg_pct"))
+    if s:
+        lines.append(f"氛圍：{s}")
+    return lines
 
+
+def _theme_lines(themes):
+    lines = ["🔥 <b>主題強弱</b>"]
+    for i, t in enumerate(themes):
+        star = "★" if i == 0 else "  "
+        lines.append(f"{star}{esc(t['name'])}：{fmt_pct(t['avg_chg_pct'])}")
+    return lines
+
+
+def _pick_lines(rank, p):
+    t = p["targets"]
+    nums = pick_number_strings(p)
+    theme_tag = "/".join(p.get("themes", [])[:2]) or "熱門量能"
+    line1 = (f"{rank}. <b>{esc(p['stock_id'])} {esc(p['name'])}</b>｜{esc(theme_tag)}｜"
+             f"{nums['收盤']} {fmt_pct(p.get('today_chg'))}｜評分{p['score']}｜{' '.join(p.get('signals', []))}")
+    line2 = (f"   進場 {nums['進場下緣']}~{nums['進場上緣']}｜目標 {nums['目標']}（{esc(t['target_basis'])}）"
+             f"｜停損 {nums['停損']}｜RR {nums['RR']}")
+    extra = _brief_comment(p)
+    if not p.get("inst_available", True):
+        extra += "｜法人資料缺"
+    return f"{line1}\n{line2}\n   {esc(extra)}"
+
+
+def _quality_lines(payload, verify_issues=None):
+    q = payload.get("quality", {})
+    stats = payload.get("stats", {})
+    lines = ["🧾 <b>資料檢查</b>"]
+    missing = []
+    if q.get("missing_price"):
+        ids = q["missing_price"]
+        missing.append(f"價格 {len(ids)} 檔（{'、'.join(ids[:8])}{'…' if len(ids) > 8 else ''}）")
+    if q.get("missing_inst"):
+        ids = q["missing_inst"]
+        missing.append(f"法人 {len(ids)} 檔（{'、'.join(ids[:8])}{'…' if len(ids) > 8 else ''}，未計籌碼分）")
+    lines.append("今日缺少：" + ("；".join(missing) if missing else "無"))
+    for note in q.get("notes", []):
+        lines.append(f"⚠️ {esc(note)}")
+    for issue in verify_issues or []:
+        lines.append(f"❗ {esc(issue)}")
+    for check in q.get("checks", []):
+        lines.append(f"✅ {esc(check)}")
+    if stats:
+        lines.append(
+            f"篩選：股票池 {stats.get('universe', 0)}｜有資料 {stats.get('fetched', 0)}｜"
+            f"趨勢通過 {stats.get('prefilter_passed', 0)}｜評分通過 {stats.get('scored_passed', 0)}｜"
+            f"RR≥{MIN_RR_RATIO:g} {stats.get('rr_ok', 0)}")
+    return lines
+
+
+def _debate_lines(payload, ai_clean, ai_note):
+    picks = payload.get("picks", [])
+    candidates = [p for p in picks if p["stock_id"] in set(payload.get("debate_ids", []))]
+    lines = [f"⚔️ <b>多空辯證 Top {len(candidates)}</b>"]
+    if ai_note:
+        lines.append(f"<i>{esc(ai_note)}</i>")
+    stocks = (ai_clean or {}).get("stocks", {})
+    for i, p in enumerate(candidates, 1):
+        lines.append("")
+        lines.append(f"<b>{i}. {esc(p['stock_id'])} {esc(p['name'])}</b>")
+        a = stocks.get(p["stock_id"])
+        if a:
+            emoji = VERDICT_EMOJI.get(a["verdict"], "❓")
+            lines.append(f"判決：{emoji} {esc(a['verdict'])}｜信心 {a['confidence']}/10")
+            lines.append("🐂 " + "；".join(esc(x) for x in a["bull_points"]))
+            lines.append("🐻 " + "；".join(esc(x) for x in a["bear_points"]))
+            lines.append(f"📝 {esc(a['summary'])}")
+        else:
+            kd = "KD金叉、" if p.get("kd_cross") else ""
+            rsi = p.get("rsi14")
+            lines.append(f"  動能：{'、'.join(p.get('signals', []))}")
+            lines.append(f"  技術：{kd}RSI={rsi if rsi is not None else 'N/A'}、收盤站上MA20")
+            lines.append(f"  外資連買：{p.get('foreign_buy_days', 0)}日"
+                         + ("" if p.get("inst_available", True) else "（法人資料缺）"))
+    return lines
+
+
+def _highlight_lines(payload, ai_clean):
+    highlights = (ai_clean or {}).get("highlights", [])
+    if not highlights:
+        return []
+    news = {n["id"]: n for n in payload.get("news", [])}
+    lines = ["📰 <b>今日重點</b>"]
+    for h in highlights:
+        refs = [news[r] for r in h.get("news_ids", []) if r in news]
+        links = " ".join(f'<a href="{esc(n["url"])}">[{esc(n["id"])}]</a>' for n in refs)
+        lines.append(f"• {esc(h['text'])}" + (f" {links}" if links else ""))
+    return lines
+
+
+def _performance_lines(perf):
+    lines = [f"📈 <b>推薦追蹤（近 {perf.get('lookback_days', 20)} 個交易日）</b>"] if perf else []
+    if not perf:
+        return lines
+    if not perf.get("total"):
+        lines.append("尚無歷史紀錄（從這一版上線後開始累積）")
+        return lines
+    lines.append(f"共 {perf['total']} 檔｜達標 {perf['hit']}｜停損 {perf['stopped']}｜持有中 {perf['holding']}")
+    win = perf.get("win_rate_pct")
+    avg = perf.get("avg_return_pct")
+    lines.append(f"已結案勝率 {'N/A' if win is None else f'{win:.1f}%'}｜"
+                 f"平均報酬 {'N/A' if avg is None else f'{avg:+.2f}%'}")
+    return lines
+
+
+def build_messages(payload, ai_clean=None, ai_note=None, verify_issues=None):
+    date = payload["date"]
+    picks = payload.get("picks", [])
+
+    msg1 = [f"📊 <b>台股選股日報 {esc(date)}</b>", ""]
+    msg1 += _market_lines(payload.get("market", {})) + [""]
+    msg1 += _theme_lines(payload.get("themes", [])) + [""]
+    msg1.append(f"📋 <b>觀察清單（{len(picks)}支）</b>")
+    if picks:
+        msg1 += [_pick_lines(i, p) for i, p in enumerate(picks, 1)]
+        msg1.append(f"<i>{SIGNAL_LEGEND}</i>")
+    else:
+        msg1.append("（今日無符合條件個股）")
+    msg1 += [""] + _quality_lines(payload, verify_issues)
+
+    msg2 = []
+    if payload.get("debate_ids"):
+        msg2 += _debate_lines(payload, ai_clean, ai_note) + [""]
+    hl = _highlight_lines(payload, ai_clean)
+    if hl:
+        msg2 += hl + [""]
+    msg2 += _performance_lines(payload.get("performance")) + [""]
+    msg2.append("🤖 數字由程式計算，文字由 AI 撰寫並經程式檢查｜僅供參考，非投資建議")
+
+    messages = []
+    for m in ("\n".join(msg1), "\n".join(msg2)):
+        messages += split_message(m)
+    return messages
+
+
+def closed_message(date):
+    return f"📅 {date} 沒有今日交易資料（休市，或資料源尚未更新），今天不發選股報告。"
+
+
+def split_message(text, limit=TELEGRAM_LIMIT):
+    """超過 Telegram 上限時，從空行或換行處切開，不截斷內容。"""
+    if len(text) <= limit:
+        return [text]
+    parts, current = [], ""
+    for block in text.split("\n"):
+        candidate = f"{current}\n{block}" if current else block
+        if len(candidate) > limit and current:
+            parts.append(current)
+            current = block
+        else:
+            current = candidate
+    if current:
+        parts.append(current)
+    return [p[:limit] for p in parts]
+
+
+def send_to_telegram(messages):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        return ["ERROR:未設定 TELEGRAM_BOT_TOKEN 或 TELEGRAM_CHAT_ID"] * len(messages)
+    LOG_DIR.mkdir(exist_ok=True)
+    log_file = LOG_DIR / f"send_{datetime.now().strftime('%Y-%m-%d')}.log"
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    results = []
     for i, msg in enumerate(messages):
-        # 超過 4000 字自動截斷（已在 build_report 拆分）
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        payload = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "text": msg[:4096],
-            "parse_mode": "HTML",
-            "disable_web_page_preview": True,
-        }
-        try:
-            resp = requests.post(url, json=payload, timeout=30)
-            resp.raise_for_status()
-            ok = resp.json().get("ok", False)
-            status = "SUCCESS" if ok else f"FAIL:{resp.json().get('description')}"
-        except Exception as e:
-            status = f"ERROR:{e}"
-
-        log_line = f"[{datetime.now()}] 訊息{i+1}: {status}"
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "HTML",
+                   "disable_web_page_preview": True}
+        status = "ERROR:未送出"
+        for attempt in range(3):
+            try:
+                resp = requests.post(url, json=payload, timeout=30)
+                body = resp.json()
+                if body.get("ok"):
+                    status = "SUCCESS"
+                    break
+                status = f"FAIL:{body.get('description')}"
+                if resp.status_code == 400:
+                    break  # 格式錯誤重送也不會好
+            except Exception as e:
+                # 例外訊息可能含有網址裡的 token，只記類型
+                status = f"ERROR:{type(e).__name__}"
+            time.sleep(2 ** attempt)
         with open(log_file, "a", encoding="utf-8") as f:
-            f.write(log_line + "\n")
+            f.write(f"[{datetime.now()}] 訊息{i + 1}: {status}\n")
         results.append(status)
-
         if i < len(messages) - 1:
             time.sleep(1)
-
     return results
-
-
-def send_test_message(text="✅ 台股選股系統連線測試成功"):
-    return send_to_telegram([text])
