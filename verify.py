@@ -19,23 +19,26 @@ from reporter import pick_number_strings
 
 
 def verify_closes(picks, twse_closes):
-    """回傳 (核對成功說明, 問題清單)。上櫃股不在證交所清單裡，略過不算錯。"""
-    issues, checked, skipped = [], 0, []
+    """
+    回傳 {"ok": 核對通過說明或 None, "skipped": 未核對說明或 None, "issues": 問題清單}。
+    上櫃股不在證交所清單裡，略過不算錯。
+    """
+    issues, matched, skipped = [], 0, []
     for p in picks:
         sid = p["stock_id"]
         if sid not in twse_closes:
             skipped.append(sid)
             continue
-        checked += 1
         if abs(float(twse_closes[sid]) - float(p["close"])) > 0.001:
             issues.append(f"{sid} 收盤價和證交所不一致（報告 {p['close']}、證交所 {twse_closes[sid]}），"
                           f"可能是資料源尚未更新")
-    summary = None
-    if checked:
-        summary = f"觀察清單 {checked} 檔收盤價與證交所一致" if not issues else None
-    if skipped:
-        summary = (summary + "；" if summary else "") + f"{len(skipped)} 檔上櫃股未核對"
-    return summary, issues
+        else:
+            matched += 1
+    return {
+        "ok": f"觀察清單 {matched} 檔收盤價與證交所一致" if matched else None,
+        "skipped": f"{len(skipped)} 檔上櫃股不在證交所清單，未核對收盤價" if skipped else None,
+        "issues": issues,
+    }
 
 
 def verify_messages(messages, picks):

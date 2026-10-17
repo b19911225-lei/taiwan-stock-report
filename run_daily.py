@@ -106,7 +106,8 @@ def collect(date, taiex):
     else:
         not_found, mismatched = verify.verify_universe(stock_info)
         if not_found:
-            q.add_note(f"股票池有 {len(not_found)} 個代號在官方清單查無：{'、'.join(not_found)}")
+            q.add_note(f"股票池有 {len(not_found)} 個代號在官方清單查無：{'、'.join(not_found[:8])}"
+                       f"{'…' if len(not_found) > 8 else ''}")
         if mismatched:
             q.add_note(f"股票池有 {len(mismatched)} 檔名稱和官方不符（{'、'.join(s for s, _, _ in mismatched)}），"
                        f"請執行 python verify.py universe")
@@ -190,8 +191,9 @@ def collect(date, taiex):
     } for sid in pick_ids]
 
     themes = sorted(
-        ({"theme": t, "name": t.split("_", 1)[1], "avg_chg_pct": round(v * 100, 2)} for t, v in theme_avg.items()),
-        key=lambda x: x["avg_chg_pct"], reverse=True)
+        ({"theme": t, "name": t.split("_", 1)[1], "avg_chg_pct": None if v is None else round(v * 100, 2)}
+         for t, v in theme_avg.items()),
+        key=lambda x: (x["avg_chg_pct"] is not None, x["avg_chg_pct"] or 0), reverse=True)
 
     news, err = fetch.get_tw_stock_news()
     if err:
@@ -397,10 +399,12 @@ def cmd_finalize(args):
         if err:
             q.add_note(f"核對：{err}")
         else:
-            summary, issues = verify.verify_closes(payload["picks"], twse)
-            if summary:
-                q.add_check(summary)
-            verify_issues += issues
+            result = verify.verify_closes(payload["picks"], twse)
+            if result["ok"]:
+                q.add_check(result["ok"])
+            if result["skipped"]:
+                q.add_note(result["skipped"])
+            verify_issues += result["issues"]
     payload["quality"] = q.to_dict()
 
     messages = reporter.build_messages(payload, ai_clean, ai_note, verify_issues)

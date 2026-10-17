@@ -57,12 +57,12 @@ def test_verify_messages_catches_wrong_numbers():
 
 
 def test_verify_closes():
-    summary, issues = verify_closes([PICK], {"6415": 489.0})
-    assert issues == [] and "一致" in summary
-    _, issues = verify_closes([PICK], {"6415": 480.0})
-    assert issues
-    summary, issues = verify_closes([PICK], {})
-    assert issues == [] and "上櫃" in summary
+    r = verify_closes([PICK], {"6415": 489.0})
+    assert r["issues"] == [] and "1 檔收盤價與證交所一致" in r["ok"]
+    r = verify_closes([PICK], {"6415": 480.0})
+    assert r["issues"] and r["ok"] is None
+    r = verify_closes([PICK], {})
+    assert r["issues"] == [] and r["ok"] is None and "上櫃" in r["skipped"]
 
 
 def test_split_message_keeps_everything():

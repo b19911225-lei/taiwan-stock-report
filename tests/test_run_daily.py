@@ -124,3 +124,17 @@ def test_dry_run_does_not_send(env):
 def test_all_command(env):
     assert run("all", "--ai", "none") == run_daily.EXIT_OK
     assert len(env["sent"]) == 1
+
+
+def test_performance_tracks_previous_days_picks(env, monkeypatch):
+    monkeypatch.setattr(run_daily, "today_tw", lambda: "2026-10-15")
+    env["taiex_date"]["value"] = "2026-10-15"
+    assert run("all") == run_daily.EXIT_OK
+    first = history.load_json("2026-10-15", "picks.json")["picks"]
+
+    monkeypatch.setattr(run_daily, "today_tw", lambda: DATE)
+    env["taiex_date"]["value"] = DATE
+    assert run("all") == run_daily.EXIT_OK
+    perf = history.load_json(DATE, "picks.json")["performance"]
+    assert perf["total"] == len(first) > 0
+    assert "推薦追蹤" in "\n".join(env["sent"][-1]) and "尚無歷史紀錄" not in "\n".join(env["sent"][-1])

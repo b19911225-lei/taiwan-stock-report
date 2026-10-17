@@ -182,7 +182,7 @@ def calc_theme_score(stock_id, theme_avg_chg, stock_themes):
     if not theme_avg_chg:
         return 0
     themes = stock_themes.get(stock_id, [])
-    max_chg = max((theme_avg_chg.get(t, 0) for t in themes), default=0)
+    max_chg = max((theme_avg_chg.get(t) or 0 for t in themes), default=0)
     if max_chg > 0.01:
         return 20
     if max_chg > 0:
@@ -287,10 +287,10 @@ def calc_price_targets(close, high_60d, ma20, atr):
 
 
 def calc_theme_avg_chg(raw_results):
-    """各主題平均漲跌幅（小數）。raw_results: {代號: {"today_chg": 百分比}}。"""
+    """各主題平均漲跌幅（小數）；整個主題都沒有資料時是 None。raw_results: {代號: {"today_chg": 百分比}}。"""
     out = {}
     for theme, stocks in THEME_STOCKS.items():
         chgs = [raw_results[s]["today_chg"] / 100 for s in stocks
                 if s in raw_results and "today_chg" in raw_results[s]]
-        out[theme] = float(np.mean(chgs)) if chgs else 0.0
+        out[theme] = float(np.mean(chgs)) if chgs else None
     return out

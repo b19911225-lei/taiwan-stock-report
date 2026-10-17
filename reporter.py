@@ -94,8 +94,9 @@ def _market_lines(m):
 def _theme_lines(themes):
     lines = ["🔥 <b>主題強弱</b>"]
     for i, t in enumerate(themes):
-        star = "★" if i == 0 else "  "
-        lines.append(f"{star}{esc(t['name'])}：{fmt_pct(t['avg_chg_pct'])}")
+        star = "★" if i == 0 and t["avg_chg_pct"] is not None else "  "
+        value = "無資料" if t["avg_chg_pct"] is None else fmt_pct(t["avg_chg_pct"])
+        lines.append(f"{star}{esc(t['name'])}：{value}")
     return lines
 
 
@@ -204,7 +205,7 @@ def build_messages(payload, ai_clean=None, ai_note=None, verify_issues=None):
     msg1.append(f"📋 <b>觀察清單（{len(picks)}支）</b>")
     if picks:
         msg1 += [_pick_lines(i, p) for i, p in enumerate(picks, 1)]
-        msg1.append(f"<i>{SIGNAL_LEGEND}</i>")
+        msg1.append(f"<i>{esc(SIGNAL_LEGEND)}</i>")  # 圖例裡有「>」，Telegram HTML 模式要跳脫
     else:
         msg1.append("（今日無符合條件個股）")
     msg1 += [""] + _quality_lines(payload, verify_issues)
