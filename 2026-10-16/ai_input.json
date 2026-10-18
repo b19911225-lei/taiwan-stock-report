@@ -1,0 +1,237 @@
+{
+  "date": "2026-10-16",
+  "instructions": "依 docs/AI_WRITING_RULES.md 撰寫 history/<date>/ai_output.json；數字只能照抄本檔。",
+  "market": {
+    "close": 47111.26,
+    "chg": 141.39,
+    "chg_pct": 0.3,
+    "money_100m": 9938.0
+  },
+  "themes": [
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": 2.24
+    },
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": 1.58
+    },
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": 0.63
+    },
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": 0.22
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": 0.16
+    }
+  ],
+  "candidates": [
+    {
+      "stock_id": "6415",
+      "name": "矽力*-KY",
+      "themes": [
+        "散熱電源"
+      ],
+      "close": 489.0,
+      "today_chg_pct": 4.82,
+      "chg_5d_pct": 5.73,
+      "score": 65,
+      "score_breakdown": {
+        "momentum": 20,
+        "chip": 0,
+        "tech": 25,
+        "theme": 20
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M5": "KD 近 3 日黃金交叉",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 4.21,
+      "vol_vs_5d": 2.28,
+      "rsi14": 68.1,
+      "kd_cross": true,
+      "ma5": 459.0,
+      "ma20": 436.88,
+      "atr14": 24.32,
+      "high_60d": 513.0,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 0,
+        "foreign_net_5d_lots": -2757,
+        "sitc_net_5d_lots": 369,
+        "dealer_net_5d_lots": 62
+      },
+      "program_levels": {
+        "entry_low": 479.22,
+        "entry_high": 498.78,
+        "target1": 586.28,
+        "target_basis": "4倍ATR",
+        "stop_loss": 454.77,
+        "rr_ratio": 2.84
+      }
+    },
+    {
+      "stock_id": "2379",
+      "name": "瑞昱",
+      "themes": [
+        "AI伺服器CoWoS"
+      ],
+      "close": 778.0,
+      "today_chg_pct": 1.83,
+      "chg_5d_pct": 3.87,
+      "score": 61,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 15,
+        "tech": 21,
+        "theme": 10
+      },
+      "signals": {
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M3": "外資連續買超 3 日以上",
+        "M4": "投信 + 自營商買超近 3 日逐日增加"
+      },
+      "vol_vs_20d": 1.47,
+      "vol_vs_5d": 1.66,
+      "rsi14": 57.1,
+      "kd_cross": false,
+      "ma5": 764.8,
+      "ma20": 751.35,
+      "atr14": 23.86,
+      "high_60d": 794.0,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 3,
+        "foreign_net_5d_lots": 1596,
+        "sitc_net_5d_lots": 1884,
+        "dealer_net_5d_lots": 235
+      },
+      "program_levels": {
+        "entry_low": 762.44,
+        "entry_high": 793.56,
+        "target1": 873.44,
+        "target_basis": "4倍ATR",
+        "stop_loss": 743.84,
+        "rr_ratio": 2.79
+      }
+    },
+    {
+      "stock_id": "3014",
+      "name": "聯陽",
+      "themes": [
+        "HBM先進封裝"
+      ],
+      "close": 148.0,
+      "today_chg_pct": 1.02,
+      "chg_5d_pct": 2.07,
+      "score": 53,
+      "score_breakdown": {
+        "momentum": 10,
+        "chip": 10,
+        "tech": 23,
+        "theme": 10
+      },
+      "signals": {
+        "M4": "投信 + 自營商買超近 3 日逐日增加",
+        "M5": "KD 近 3 日黃金交叉"
+      },
+      "vol_vs_20d": 0.86,
+      "vol_vs_5d": 0.89,
+      "rsi14": 58.3,
+      "kd_cross": true,
+      "ma5": 146.6,
+      "ma20": 142.57,
+      "atr14": 3.96,
+      "high_60d": 149.5,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 2,
+        "foreign_net_5d_lots": -229,
+        "sitc_net_5d_lots": 1979,
+        "dealer_net_5d_lots": -104
+      },
+      "program_levels": {
+        "entry_low": 145.04,
+        "entry_high": 150.96,
+        "target1": 163.84,
+        "target_basis": "4倍ATR",
+        "stop_loss": 141.14,
+        "rr_ratio": 2.31
+      }
+    }
+  ],
+  "other_picks": [],
+  "news": [
+    {
+      "id": "N1",
+      "title": "搶救荷包看這裡！營所稅暫繳還沒辦 最遲「這天」補繳省利息",
+      "summary": "115年度營所稅暫繳申報已於9月30日截止，未辦理企業應於10月31日前補報補繳。 逾10月31日未申報者，國稅局將按114年度結算應納稅額二分之一核定，並加計1個月利息。 企業可至稅務入口網列印繳款書，或向各分局、稽徵所、服務處索取後至金融機構繳納，郵局不代收。",
+      "time": "10/18 12:50"
+    },
+    {
+      "id": "N2",
+      "title": "〈智慧能源週〉淨零展、智慧能源周3天吸引1.8萬專業買主 聚焦AI時代兼顧能源與減碳需求",
+      "summary": "",
+      "time": "10/18 12:41"
+    },
+    {
+      "id": "N3",
+      "title": "〈熱門股〉煉油利差維持高檔+荷姆茲商船遇襲 台塑化周漲10.86%",
+      "summary": "中東戰事升級推升油價，台塑化受惠金九銀十旺季，周漲10.86%、周K連7紅，單周爆量35.6萬張。 UKMTO指10月逾20艘船在荷姆茲海峽、波斯灣及阿曼灣遇襲，多數為油輪，布蘭特原油16日觸及110美元。 台塑化第3季煉油價差擴大，煉油營業額年增31.8%、產能利用率回升91.2%，第4季仍看好。",
+      "time": "10/18 12:37"
+    },
+    {
+      "id": "N4",
+      "title": "〈友達運動會〉半導體領域相關業務成長快速 彭双浪：目標成為先進封裝重要夥伴",
+      "summary": "",
+      "time": "10/18 12:36"
+    },
+    {
+      "id": "N5",
+      "title": "正面回應大立光林恩平 友達彭双浪：Micro LED光通訊短距傳輸有優勢",
+      "summary": "",
+      "time": "10/18 12:02"
+    },
+    {
+      "id": "N6",
+      "title": "華碩、技嘉、微星強攻OCP峰會 機櫃級液冷與代理式AI成核心技術趨勢",
+      "summary": "華碩、技嘉、微星齊登2026年OCP全球高峰會，主打機架級系統、直接液冷與自主代理式運算。 華碩發表XA P2N-E2，導入輝達Vera架構；技鋼秀Vera CPU機櫃與Vera Rubin。 技嘉OCP ORV3全數標配直接液冷，微星推48RU機架級系統與WS300桌上型超級電腦。",
+      "time": "10/18 09:20"
+    },
+    {
+      "id": "N7",
+      "title": "AI 吃電怪獸逼出「二次能源革命」！傳統電網飽和，電力基礎設施迎來十年一遇洗牌巨浪",
+      "summary": "AIDC算力暴增帶動電力基礎設施重構，高壓配電、自主基載與微電網成焦點。 機房供電轉向800VDC與高密度匯流排，並以SF6-free ECO-GIS、EMS提升效率。 燃氣機組與SOFC自備發電興起，安葆、華城、大東電、士電、東元受惠。",
+      "time": "10/18 09:10"
+    },
+    {
+      "id": "N8",
+      "title": "雜音淡化回歸基本面 法人看台股：鎖定AI核心供應鏈 搭配金融多元配置",
+      "summary": "法人看好AI需求與台灣企業獲利上修，今、明兩年獲利預估持續上修 看好AI核心供應鏈：IP/ASIC、先進製程與封測、PCB/CCL、伺服器零組件、光通訊及液冷 AI投資分化加劇，布局金融控股與半導體等多元配置",
+      "time": "10/18 08:50"
+    },
+    {
+      "id": "N9",
+      "title": "光通訊水很深 !? 大立光跨足CPO真能變萬金股？美巨頭爆「缺貨率70%」！法人：不只台積電，還有這幾檔吃不完！",
+      "summary": "",
+      "time": "10/17 20:30"
+    }
+  ],
+  "missing": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  }
+}
