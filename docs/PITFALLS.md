@@ -37,6 +37,7 @@
 | 2026-10-17 | 證交所請求寫死 `verify=certifi.where()`，雲端主機走代理、CA 由 `REQUESTS_CA_BUNDLE` 指定，寫死會 TLS 失敗 | 拿掉，用 requests 預設（會讀環境變數） |
 | 2026-10-17 | 雲端主機的 `python3` 可能是沒裝套件的 3.11（文章坑 3），預裝的 3.13 是 pandas 3 | Routine 一律用 `/usr/bin/python3.13`；程式改成 pandas 2、3 都能跑，CI 兩個版本都測 |
 | 2026-10-17 | 預設網路連不到 FinMind、證交所、Telegram | docs/ROUTINE.md 列出要加的網域 |
+| 2026-10-18 | 雲端環境的金鑰和網路白名單只能由人在設定頁面填，Claude 沒有工具可以改 | Routine 預設改成只負責準時觸發 GitHub Actions（金鑰已在 Secrets），設定頁面完全不用動 |
 | 2026-10-18 | 開發用的雲端 session 連不到外部資料源，沒辦法驗證資料格式 | 改在 GitHub Actions 跑「資料源檢查」（`.github/workflows/probe.yml`），用 MCP 讀 log |
 | 2026-10-18 | 資料源檢查用 `cmd \| tee` 記錄輸出，沒有 `set -o pipefail`，檢查失敗也回報通過 | 加上 pipefail |
 | 2026-10-17 | 證交所擋雲端主機時回 HTTP 200 擋頁或沒有目標的 307（文章坑 1） | `_twse_get_json` 檢查內容，被擋寫進報告 |

@@ -14,8 +14,8 @@
 
 | 方式 | 時間 | 說明 |
 |---|---|---|
-| Claude Code Routine（主要） | 每個交易日 17:53 | 照 [docs/ROUTINE.md](docs/ROUTINE.md)；AI 文字由排程的 Claude 撰寫 |
-| GitHub Actions（備援） | 每個交易日 21:07 | Routine 發過就跳過；沒發才補發，AI 文字改用 Claude API |
+| Claude Code Routine（主要） | 每個交易日 17:53 | 準時觸發 GitHub Actions（預設），或在雲端環境設好金鑰後自己跑；見 [docs/ROUTINE.md](docs/ROUTINE.md) |
+| GitHub Actions（備援） | 每個交易日 21:07 | 已經發過就跳過；沒發成或不完整才補發 |
 | 本機 | 隨時 | `python run_daily.py all --dry-run --no-git` 看報告不發送 |
 
 需要的環境變數：`FINMIND_TOKEN`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`；
