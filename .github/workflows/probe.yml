@@ -1,0 +1,75 @@
+name: 資料源檢查
+
+# 對 FinMind、證交所、鉅亨網、Telegram 各抓一次真實資料，確認格式和程式的假設一致，
+# 再用同一天的真實資料把整個流程跑一次（--dry-run：不發 Telegram、不推送 git）。
+# 改到抓資料的程式時會自動跑；也可以手動執行。
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '檢查日期 YYYY-MM-DD（留空：最近一個交易日）'
+        required: false
+        default: ''
+  push:
+    branches: ['claude/**', '!claude/report-history']
+    paths:
+      - 'scripts/probe_sources.py'
+      - 'data_fetcher.py'
+      - 'ai_writer.py'
+      - '.github/workflows/probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: 安裝套件
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 檢查資料源
+        id: probe
+        run: |
+          set -o pipefail   # 沒有這行，管線的結束代碼是 tee 的，檢查失敗也會變成 0
+          rc=0
+          python scripts/probe_sources.py ${{ inputs.date }} 2>&1 | tee probe.log || rc=$?
+          echo "date=$(grep -m1 '檢查日期：' probe.log | sed 's/.*：//')" >> "$GITHUB_OUTPUT"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+
+      - name: 用真實資料演練整個流程（不發送）
+        if: always() && steps.probe.outputs.date != ''
+        # 自動觸發時不呼叫 Claude API（省錢）；手動執行才連 API 撰寫一起測
+        run: python run_daily.py all --ai ${{ github.event_name == 'workflow_dispatch' && 'api' || 'none' }} --dry-run --no-git --date "${{ steps.probe.outputs.date }}"
+
+      - name: 上傳演練結果
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-${{ github.run_id }}
+          path: |
+            probe.log
+            history/
+            logs/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: 檢查結果
+        if: always()
+        run: |
+          echo "資料源檢查結束代碼：${{ steps.probe.outputs.rc }}"
+          test "${{ steps.probe.outputs.rc }}" = "0"

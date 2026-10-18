@@ -1,214 +1,342 @@
-# data_fetcher.py - FinMind 資料抓取
+# data_fetcher.py - FinMind / 證交所 / 新聞資料抓取
+#
+# 原則（見 docs/SPEC.md）：
+# - 抓不到就回空值，由呼叫端記進「今日缺少」，不在這裡補數字。
+# - 證交所被擋時常回 HTTP 200 的擋頁或沒有轉址目標的 307，不能只看狀態碼。
+# - 不要寫死 verify=certifi.where()：Routine 的雲端主機走代理，CA 由
+#   REQUESTS_CA_BUNDLE 指定，寫死會讓 TLS 驗證失敗。
 
+import html
+import json
+import re
+import sys
 import time
-import logging
-import requests
-import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
-from config import FINMIND_TOKEN
+from zoneinfo import ZoneInfo
+
+import pandas as pd
+import requests
+
+from config import FINMIND_TOKEN, TIMEZONE
 
 LOG_DIR = Path(__file__).parent / "logs"
-LOG_DIR.mkdir(exist_ok=True)
 
-BASE_URL = "https://api.finmindtrade.com/api/v4/data"
+FINMIND_URL = "https://api.finmindtrade.com/api/v4/data"
+TWSE_TOP20_URL = "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20"
+TWSE_DAY_ALL_URL = "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
+CNYES_NEWS_URL = "https://api.cnyes.com/media/api/v1/newslist/category/tw_stock"
+
+FINMIND_SLEEP_SEC = 0.5
+USER_AGENT = "Mozilla/5.0 (taiwan-stock-report)"
+
+# 法人名稱：FinMind 回英文代號（實測：Foreign_Investor、Foreign_Dealer_Self、Investment_Trust、
+# Dealer_self、Dealer_Hedging），證交所是中文，兩種都要認得。
+# 外資自營商不另外計算：證交所註明「外資自營商買賣金額已計入自營商買賣金額」，
+# 加進來會重複計算。
+INSTITUTION_ALIASES = {
+    "foreign": {"foreign_investor", "外資", "外資及陸資", "外資及陸資(不含外資自營商)"},
+    "sitc": {"investment_trust", "投信"},
+    "dealer": {"dealer_self", "dealer_hedging", "dealer", "自營商", "自營商(自行買賣)", "自營商(避險)"},
+    "ignore": {"foreign_dealer_self", "外資自營商", "total", "合計"},
+}
 
 
-def _get_date_range(days):
-    end = datetime.today()
-    # 多抓一些日曆天以確保足夠交易日
-    start = end - timedelta(days=int(days * 1.8))
+class TwseBlocked(Exception):
+    """證交所回擋頁、無轉址目標的 3xx，或不是 JSON 的內容。"""
+
+
+def _log_error(msg):
+    LOG_DIR.mkdir(exist_ok=True)
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    with open(LOG_DIR / f"error_{date_str}.log", "a", encoding="utf-8") as f:
+        f.write(f"[{datetime.now()}] {msg}\n")
+
+
+def _date_range(end_date, days):
+    """end_date 往前抓 days 個交易日；多抓一些日曆天以確保足夠交易日。"""
+    end = datetime.strptime(end_date, "%Y-%m-%d")
+    start = end - timedelta(days=int(days * 1.6) + 10)
     return start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
 
 
 def _fetch(dataset, stock_id=None, start_date=None, end_date=None, retries=3):
-    params = {
-        "api_token": FINMIND_TOKEN,
-        "dataset": dataset,
-        "start_date": start_date,
-        "end_date": end_date,
-    }
+    params = {"dataset": dataset}
+    if start_date:
+        params["start_date"] = start_date
+    if end_date:
+        params["end_date"] = end_date
     if stock_id:
         params["data_id"] = stock_id
+    headers = {"Authorization": f"Bearer {FINMIND_TOKEN}"} if FINMIND_TOKEN else {}
+    if FINMIND_TOKEN:
+        # header 是 FinMind 目前的驗證方式；token / api_token 參數是舊寫法（原程式用 api_token），一併帶上以相容
+        params["token"] = FINMIND_TOKEN
+        params["api_token"] = FINMIND_TOKEN
 
     last_error = None
     for attempt in range(retries):
         try:
-            resp = requests.get(BASE_URL, params=params, timeout=30)
+            resp = requests.get(FINMIND_URL, params=params, headers=headers, timeout=30)
             resp.raise_for_status()
             data = resp.json()
             if data.get("status") != 200:
                 raise ValueError(f"API status {data.get('status')}: {data.get('msg')}")
-            df = pd.DataFrame(data.get("data", []))
-            return df
+            return pd.DataFrame(data.get("data", []))
         except Exception as e:
             last_error = e
             if attempt < retries - 1:
                 time.sleep(2 ** attempt)
+        finally:
+            time.sleep(FINMIND_SLEEP_SEC)
 
-    # 所有 retry 都失敗才回傳空值
-    _log_error(f"[{dataset}] {stock_id} 失敗（{retries}次重試後）: {last_error}")
+    msg = f"[{dataset}] {stock_id} 失敗（{retries}次重試後）: {last_error}"
+    _log_error(msg)
+    print(f"  [FinMind] {msg}", file=sys.stderr, flush=True)   # 讓 Routine / Actions 的 log 看得到原因
     return pd.DataFrame()
 
 
-def _log_error(msg):
-    date_str = datetime.today().strftime("%Y-%m-%d")
-    log_file = LOG_DIR / f"error_{date_str}.log"
-    with open(log_file, "a", encoding="utf-8") as f:
-        f.write(f"[{datetime.now()}] {msg}\n")
-
-
-def get_stock_price(stock_id, days=65):
-    start, end = _get_date_range(days)
+def get_stock_price(stock_id, end_date, days=65):
+    start, end = _date_range(end_date, days)
     df = _fetch("TaiwanStockPrice", stock_id=stock_id, start_date=start, end_date=end)
-    if df.empty:
-        return df
-    df = df[["date", "open", "max", "min", "close", "Trading_Volume"]].copy()
+    return normalize_price_df(df, days)
+
+
+def normalize_price_df(df, days=65):
+    needed = ["date", "open", "max", "min", "close", "Trading_Volume"]
+    if df.empty or not all(c in df.columns for c in needed):
+        return pd.DataFrame()
+    df = df[needed].copy()
     df.columns = ["date", "open", "high", "low", "close", "volume"]
     df["date"] = pd.to_datetime(df["date"])
+    for col in ["open", "high", "low", "close", "volume"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    df["volume"] = df["volume"].fillna(0) / 1000  # 股 → 張
+    # 沒成交的日子 FinMind 會給 0 價，不能拿去算指標
+    df = df[df["close"] > 0]
     df = df.sort_values("date").reset_index(drop=True)
-    df["volume"] = pd.to_numeric(df["volume"], errors="coerce").fillna(0) / 1000  # 轉換為張
-    df[["open", "high", "low", "close"]] = df[["open", "high", "low", "close"]].apply(
-        pd.to_numeric, errors="coerce"
-    )
-    time.sleep(1)
     return df.tail(days).reset_index(drop=True)
 
 
-def get_institutional_investors(stock_id, days=10):
-    start, end = _get_date_range(days + 5)
-    df = _fetch("TaiwanStockInstitutionalInvestors", stock_id=stock_id, start_date=start, end_date=end)
-    if df.empty:
-        return df
+# 個股三大法人買賣超。原程式用的 TaiwanStockInstitutionalInvestors 實測回 HTTP 422（資料集不存在），
+# 所以從上線起一筆法人資料都沒拿到過（2026-10-18 scripts/probe_sources.py 確認）。
+INSTITUTIONAL_DATASET = "TaiwanStockInstitutionalInvestorsBuySell"
+
+
+def get_institutional_investors(stock_id, end_date, days=10):
+    start, end = _date_range(end_date, days)
+    df = _fetch(INSTITUTIONAL_DATASET, stock_id=stock_id, start_date=start, end_date=end)
+    return normalize_institutional_df(df)
+
+
+def normalize_institutional_df(df):
+    """回傳每日一列：date, foreign, sitc, dealer（淨買超股數），以及無法辨識的名稱。"""
+    empty = pd.DataFrame(columns=["date", "foreign", "sitc", "dealer"])
+    if df.empty or not {"date", "name", "buy", "sell"}.issubset(df.columns):
+        return empty, []
+    df = df.copy()
     df["date"] = pd.to_datetime(df["date"])
-    df = df.sort_values("date").reset_index(drop=True)
-    # 轉換買賣超欄位
-    for col in ["buy", "sell"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-    if "buy" in df.columns and "sell" in df.columns:
-        df["net"] = df["buy"] - df["sell"]
-    time.sleep(1)
-    return df.tail(days * 3).reset_index(drop=True)
+    df["buy"] = pd.to_numeric(df["buy"], errors="coerce").fillna(0)
+    df["sell"] = pd.to_numeric(df["sell"], errors="coerce").fillna(0)
+    df["net"] = df["buy"] - df["sell"]
 
+    lookup = {}
+    for cat, names in INSTITUTION_ALIASES.items():
+        for n in names:
+            lookup[n.lower()] = cat
+    df["cat"] = df["name"].astype(str).str.strip().str.lower().map(lookup)
+    unknown = sorted(df.loc[df["cat"].isna(), "name"].astype(str).unique().tolist())
 
-def get_market_overview(date=None):
-    if date is None:
-        date = datetime.today().strftime("%Y-%m-%d")
-    start = (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d")
-    df = _fetch("TaiwanStockTotalReturnIndex", start_date=start, end_date=date)
+    df = df[df["cat"].isin(["foreign", "sitc", "dealer"])]
     if df.empty:
-        # 備用：嘗試加權指數
-        df = _fetch("TaiwanStockPrice", stock_id="TAIEX", start_date=start, end_date=date)
-    if not df.empty:
-        df["date"] = pd.to_datetime(df["date"])
-        df = df.sort_values("date")
-    time.sleep(1)
-    return df
+        return empty, unknown
+    pivot = df.pivot_table(index="date", columns="cat", values="net", aggfunc="sum").fillna(0)
+    for cat in ["foreign", "sitc", "dealer"]:
+        if cat not in pivot.columns:
+            pivot[cat] = 0.0
+    pivot = pivot[["foreign", "sitc", "dealer"]].sort_index().reset_index()
+    pivot.columns.name = None
+    return pivot, unknown
 
 
-def get_taiex_price(date=None):
-    """取得大盤加權指數資料"""
-    if date is None:
-        date = datetime.today().strftime("%Y-%m-%d")
-    start = (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
-    df = _fetch("TaiwanStockPrice", stock_id="TAIEX", start_date=start, end_date=date)
-    if df.empty:
+def get_taiex_price(end_date):
+    start = (datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=15)).strftime("%Y-%m-%d")
+    df = _fetch("TaiwanStockPrice", stock_id="TAIEX", start_date=start, end_date=end_date)
+    if df.empty or "date" not in df.columns:
+        return pd.DataFrame()
+    df["date"] = pd.to_datetime(df["date"])
+    return df.sort_values("date").reset_index(drop=True)
+
+
+def latest_date_of(df):
+    if df is None or df.empty:
         return None
-    df["date"] = pd.to_datetime(df["date"])
-    df = df.sort_values("date")
-    time.sleep(1)
-    return df
+    return pd.to_datetime(df["date"]).max().strftime("%Y-%m-%d")
 
 
-def is_trading_day(date=None):
-    if date is None:
-        date = datetime.today().strftime("%Y-%m-%d")
-    df = get_stock_price("2330", days=5)
-    if df.empty:
-        return False
-    latest = df.iloc[-1]["date"]
-    target = pd.to_datetime(date)
-    result = latest.date() == target.date()
-    if not result:
-        _log_error(f"{date} 非交易日，最新資料日期為 {latest.date()}")
-    return result
+def get_stock_info():
+    """官方股票清單：{代號: 名稱}。抓不到回空 dict。"""
+    df = _fetch("TaiwanStockInfo")
+    if df.empty or not {"stock_id", "stock_name"}.issubset(df.columns):
+        return {}
+    if "date" in df.columns:
+        df = df.sort_values("date")
+    names = {}
+    for sid, name in zip(df["stock_id"].astype(str), df["stock_name"].astype(str)):
+        names[sid.strip()] = name.strip()
+    return names
 
 
-def get_latest_trading_date():
-    """取得最近一個有資料的交易日"""
-    df = get_stock_price("2330", days=5)
-    if df.empty:
-        return datetime.today().strftime("%Y-%m-%d")
-    return df.iloc[-1]["date"].strftime("%Y-%m-%d")
+# ─── 證交所 ───
+
+BLOCK_MARKERS = ("安全性考量", "無法呈現", "Request Rejected", "The requested URL was rejected")
+
+
+def _twse_get_json(url, params=None, retries=2):
+    last_error = None
+    for attempt in range(retries):
+        try:
+            resp = requests.get(url, params=params, timeout=20, allow_redirects=False,
+                                headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+            text = resp.text or ""
+            if 300 <= resp.status_code < 400:
+                raise TwseBlocked(f"HTTP {resp.status_code}（轉址到 {resp.headers.get('Location') or '無目標'}）")
+            if any(m in text for m in BLOCK_MARKERS):
+                raise TwseBlocked(f"HTTP {resp.status_code} 但內容是擋頁")
+            resp.raise_for_status()
+            try:
+                return resp.json()
+            except ValueError:
+                raise TwseBlocked(f"HTTP {resp.status_code} 但內容不是 JSON：{text[:60]!r}")
+        except Exception as e:
+            last_error = e
+            if attempt < retries - 1:
+                time.sleep(3)
+    raise last_error
 
 
 def get_top_volume_stocks(date, top_n=10):
     """
-    抓取指定日期成交量前 top_n 名的普通股（排除 ETF）。
-    使用 TWSE 公開 API，回傳 [(stock_id, name, volume_lots), ...] 清單。
+    當日成交量前 top_n 名普通股（排除 ETF）。
+    回傳 (清單, 錯誤訊息或 None)；清單元素是 (代號, 名稱, 成交張數)。
     """
-    import certifi
+    try:
+        data = _twse_get_json(TWSE_TOP20_URL, {"response": "json", "date": date.replace("-", "")})
+    except Exception as e:
+        _log_error(f"MI_INDEX20 失敗: {e}")
+        return [], f"證交所成交量排行抓不到（{e}）"
+    if data.get("stat") != "OK" or "data" not in data:
+        return [], f"證交所成交量排行沒有資料（stat={data.get('stat')}）"
+    return parse_top_volume(data, top_n), None
 
-    date_fmt = date.replace("-", "")  # 20260512
-    url = f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20"
-    params = {"response": "json", "date": date_fmt}
 
-    for attempt in range(3):
-        try:
-            resp = requests.get(url, params=params, timeout=20, verify=certifi.where())
-            resp.raise_for_status()
-            data = resp.json()
+def parse_top_volume(data, top_n=10):
+    fields = data.get("fields", [])
+    rows = data.get("data", [])
+    df = pd.DataFrame(rows, columns=fields)
+    code_col = next((c for c in df.columns if "代號" in c), None)
+    name_col = next((c for c in df.columns if "名稱" in c), None)
+    vol_col = next((c for c in df.columns if "成交股數" in c), None)
+    if not code_col or not vol_col:
+        return []
+    out = []
+    for _, row in df.iterrows():
+        sid = str(row[code_col]).strip()
+        if not re.fullmatch(r"\d{4}", sid) or sid.startswith("00"):
+            continue
+        vol = pd.to_numeric(str(row[vol_col]).replace(",", ""), errors="coerce")
+        if pd.isna(vol):
+            continue
+        name = str(row[name_col]).strip() if name_col else sid
+        out.append((sid, name, int(vol) // 1000))
+    out.sort(key=lambda x: x[2], reverse=True)
+    return out[:top_n]
 
-            if data.get("stat") != "OK" or "data" not in data:
-                _log_error(f"TWSE MI_INDEX20 非預期回應: {data.get('stat')}")
-                return []
 
-            fields = data.get("fields", [])
-            rows   = data.get("data", [])
-            df = pd.DataFrame(rows, columns=fields)
+def parse_twse_date(value):
+    """證交所的日期可能是民國 1151016、115/10/16，或西元 20261016、2026-10-16。回傳 YYYY-MM-DD 或 None。"""
+    digits = re.sub(r"\D", "", str(value or ""))
+    try:
+        if len(digits) == 7:        # 民國年
+            return f"{int(digits[:3]) + 1911:04d}-{digits[3:5]}-{digits[5:7]}"
+        if len(digits) == 8:
+            return f"{digits[:4]}-{digits[4:6]}-{digits[6:8]}"
+    except ValueError:
+        pass
+    return None
 
-            # 欄位：證券代號、證券名稱、成交股數...
-            code_col   = [c for c in df.columns if "代號" in c or "code" in c.lower()]
-            name_col   = [c for c in df.columns if "名稱" in c or "name" in c.lower()]
-            vol_col    = [c for c in df.columns if "成交股數" in c or "股數" in c or "volume" in c.lower()]
 
-            if not code_col:
-                _log_error(f"TWSE 回傳欄位無法辨識: {fields}")
-                return []
+def get_twse_closes():
+    """
+    證交所上市股票最新一日收盤價（核對用）。上櫃股不在這份清單裡。
+    回傳 ({代號: 收盤價}, 資料日期 YYYY-MM-DD 或 None（格式裡沒有日期）, 錯誤訊息或 None)。
+    """
+    try:
+        data = _twse_get_json(TWSE_DAY_ALL_URL)
+    except Exception as e:
+        _log_error(f"STOCK_DAY_ALL 失敗: {e}")
+        return {}, None, f"證交所收盤價抓不到（{e}）"
+    if not isinstance(data, list):
+        return {}, None, "證交所收盤價格式無法辨識"
+    closes, dates = {}, set()
+    for row in data:
+        code = str(row.get("Code", "")).strip()
+        price = pd.to_numeric(str(row.get("ClosingPrice", "")).replace(",", ""), errors="coerce")
+        if code and not pd.isna(price):
+            closes[code] = float(price)
+        d = parse_twse_date(row.get("Date"))
+        if d:
+            dates.add(d)
+    return closes, (max(dates) if dates else None), None
 
-            df = df.rename(columns={
-                code_col[0]: "stock_id",
-                name_col[0] if name_col else code_col[0]: "name",
-                vol_col[0]  if vol_col  else code_col[0]: "vol_str",
-            })
 
-            # 清理成交股數（含逗號）
-            if "vol_str" in df.columns:
-                df["vol"] = pd.to_numeric(
-                    df["vol_str"].astype(str).str.replace(",", ""), errors="coerce"
-                ).fillna(0)
-            else:
-                df["vol"] = 0
+# ─── 新聞（鉅亨網台股新聞）───
 
-            # 只保留 4 碼普通股，排除 ETF（00 開頭）
-            df = df[df["stock_id"].astype(str).str.match(r"^\d{4}$")]
-            df = df[~df["stock_id"].astype(str).str.startswith("00")]
-            df = df.sort_values("vol", ascending=False).head(top_n)
+def _clean_text(text, limit=200):
+    text = html.unescape(re.sub(r"<[^>]+>", "", str(text or "")))
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:limit]
 
-            result = []
-            for _, row in df.iterrows():
-                sid  = str(row["stock_id"]).strip()
-                name = str(row.get("name", sid)).strip()
-                vol  = int(row["vol"]) // 1000  # 股 → 張
-                result.append((sid, name, vol))
 
-            time.sleep(1)
-            return result
+def get_tw_stock_news(limit=30, hours=24):
+    """回傳 (新聞清單, 錯誤訊息或 None)。每則有 id, title, summary, time, url。"""
+    try:
+        resp = requests.get(CNYES_NEWS_URL, params={"limit": limit}, timeout=20,
+                            headers={"User-Agent": USER_AGENT})
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as e:
+        _log_error(f"新聞抓取失敗: {e}")
+        return [], f"新聞抓不到（{type(e).__name__}）"
+    return parse_cnyes_news(data, hours=hours), None
 
-        except Exception as e:
-            if attempt < 2:
-                time.sleep(2 ** attempt)
-            else:
-                _log_error(f"get_top_volume_stocks 失敗: {e}")
-                return []
+
+def parse_cnyes_news(data, hours=24, now_ts=None):
+    items = (data.get("items") or {}).get("data") or []
+    now_ts = now_ts or time.time()
+    out = []
+    for item in items:
+        news_id = str(item.get("newsId", "")).strip()
+        title = _clean_text(item.get("title"), 120)
+        if not news_id or not title:
+            continue
+        ts = item.get("publishAt") or 0
+        if ts and now_ts - float(ts) > hours * 3600:
+            continue
+        out.append({
+            "id": f"N{len(out) + 1}",
+            "source_id": news_id,
+            "title": title,
+            "summary": _clean_text(item.get("summary"), 200),
+            # 一律用台北時間（雲端主機和 Actions 是 UTC）
+            "time": datetime.fromtimestamp(float(ts), ZoneInfo(TIMEZONE)).strftime("%m/%d %H:%M") if ts else "",
+            "url": f"https://news.cnyes.com/news/id/{news_id}",
+        })
+    return out
+
+
+def dump_json(path, obj):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=2, default=str)

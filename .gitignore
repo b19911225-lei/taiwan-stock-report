@@ -5,3 +5,7 @@ __pycache__/
 logs/
 reports/
 *.log
+
+# 每日紀錄是 claude/report-history 分支的 worktree，不進 main
+history/
+.pytest_cache/

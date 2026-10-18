@@ -1,14 +1,31 @@
-name: 台股選股日報
+name: 台股選股日報（備援）
+
+# 主要由 Claude Code Routine 每個交易日 17:53（台北）執行，見 docs/ROUTINE.md。
+# 這支是備援：晚上再跑一次，如果 Routine 已經發過（claude/report-history 分支有 sent.json）
+# 就直接結束；Routine 失敗時才由這裡補發，AI 文字改用 Claude API 撰寫。
+# GitHub 的排程常延遲好幾個小時，所以排在 Routine 之後，也不靠它準時。
 
 on:
   schedule:
-    - cron: '30 9 * * 1-5'   # UTC 09:30 = 台灣 17:30，週一至週五
-  workflow_dispatch:           # 允許手動觸發
+    - cron: '7 13 * * 1-5'   # UTC 13:07 = 台灣 21:07，週一至週五
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '已經發過也重發'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # 把每日紀錄推到 claude/report-history 分支
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
 
 jobs:
   run-report:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout 程式碼
@@ -22,23 +39,32 @@ jobs:
 
       - name: 安裝套件
         run: |
-          pip install --upgrade pip setuptools wheel
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 執行選股報告
+      - name: 執行每日流程
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
-        run: python main.py
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: |
+          # 排程常延遲到半夜，用「台北時間減 6 小時」當報告日期，跨過午夜也還是當天的報告
+          DATE=$(TZ=Asia/Taipei date -d '-6 hours' +%F)
+          rc=0
+          python run_daily.py all --ai api --date "$DATE" $FORCE || rc=$?
+          # 10 非交易日、11 已經發過（通常是 Routine 發的）、12 還沒收盤，都不算失敗
+          if [ "$rc" = 10 ] || [ "$rc" = 11 ] || [ "$rc" = 12 ]; then exit 0; fi
+          exit $rc
 
-      - name: 上傳報告為 Artifact
+      - name: 上傳紀錄為 Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: stock-report-${{ github.run_id }}
           path: |
-            reports/
+            history/
             logs/
           if-no-files-found: warn
           retention-days: 30
@@ -51,5 +77,5 @@ jobs:
         run: |
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
-            -d text="⚠️ 台股選股日報執行失敗！請至 GitHub Actions 查看詳情：https://github.com/b19911225-lei/taiwan-stock-report/actions" \
+            -d text="⚠️ 台股選股日報（備援）執行失敗！請至 GitHub Actions 查看詳情：https://github.com/b19911225-lei/taiwan-stock-report/actions" \
             -d parse_mode="HTML"
