@@ -4,9 +4,12 @@
 > （`.github/workflows/stock_report.yml`，一天排 5 次，第一個跑到的發報告），不扣訂閱用量也不扣雲端點數。
 > Claude 排程裡的「台股選股日報」已停用，想恢復時在排程列表打開即可。下面保留原本的設計供參考。
 >
-> 實測的計費方式：Routine 執行扣**訂閱用量**（計費類型 `five_hour`）；手動建立的雲端 session 扣**雲端點數**
-> （`ccr_promotional`）。用工具建立的 Routine 沒有掛 repo，拿不到 GitHub 工具，模式 B 無法觸發 Actions，
-> 要在 Routine 設定裡選這個 repo 才行。
+> 實測的計費方式：Routine 執行扣**訂閱用量**（計費類型 `five_hour`）；手動建立的雲端 session，
+> 包括之後被排程叫醒的每一輪，都扣**雲端點數**（`ccr_promotional`）。用工具建立的 Routine 沒有掛 repo，
+> 拿不到 GitHub 工具，模式 B 無法觸發 Actions，要在 Routine 設定裡選這個 repo 才行。
+>
+> 目前的「準時觸發」：雲端 session「台股選股日報（準時觸發・點數）」在交易日 17:52 被排程叫醒，
+> 用 GitHub 工具觸發 `stock_report.yml`，每次約 0.1 美元點數；排到 2026-11-04，當天 18:30 自動停用。
 
 每個交易日 17:53（台北時間），Claude Code 的 Routine 會開一個新的雲端 session。它有兩種跑法：
 
