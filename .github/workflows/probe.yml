@@ -45,8 +45,9 @@ jobs:
       - name: 檢查資料源
         id: probe
         run: |
+          set -o pipefail   # 沒有這行，管線的結束代碼是 tee 的，檢查失敗也會變成 0
           rc=0
-          python scripts/probe_sources.py ${{ inputs.date }} | tee probe.log || rc=${PIPESTATUS[0]}
+          python scripts/probe_sources.py ${{ inputs.date }} 2>&1 | tee probe.log || rc=$?
           echo "date=$(grep -m1 '檢查日期：' probe.log | sed 's/.*：//')" >> "$GITHUB_OUTPUT"
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
 

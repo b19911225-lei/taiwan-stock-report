@@ -9,6 +9,7 @@
 import html
 import json
 import re
+import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -88,7 +89,9 @@ def _fetch(dataset, stock_id=None, start_date=None, end_date=None, retries=3):
         finally:
             time.sleep(FINMIND_SLEEP_SEC)
 
-    _log_error(f"[{dataset}] {stock_id} 失敗（{retries}次重試後）: {last_error}")
+    msg = f"[{dataset}] {stock_id} 失敗（{retries}次重試後）: {last_error}"
+    _log_error(msg)
+    print(f"  [FinMind] {msg}", file=sys.stderr, flush=True)   # 讓 Routine / Actions 的 log 看得到原因
     return pd.DataFrame()
 
 
@@ -114,9 +117,18 @@ def normalize_price_df(df, days=65):
     return df.tail(days).reset_index(drop=True)
 
 
+# 個股三大法人買賣超。FinMind v4 的資料集名稱是 ...BuySell；
+# 原程式用的 TaiwanStockInstitutionalInvestors 實測回空，留著當備用（scripts/probe_sources.py 會檢查兩個）
+INSTITUTIONAL_DATASETS = ["TaiwanStockInstitutionalInvestorsBuySell", "TaiwanStockInstitutionalInvestors"]
+
+
 def get_institutional_investors(stock_id, end_date, days=10):
     start, end = _date_range(end_date, days)
-    df = _fetch("TaiwanStockInstitutionalInvestors", stock_id=stock_id, start_date=start, end_date=end)
+    df = pd.DataFrame()
+    for dataset in INSTITUTIONAL_DATASETS:
+        df = _fetch(dataset, stock_id=stock_id, start_date=start, end_date=end, retries=2)
+        if not df.empty:
+            break
     return normalize_institutional_df(df)
 
 

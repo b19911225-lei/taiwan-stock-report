@@ -19,7 +19,7 @@ import data_fetcher as f  # noqa: E402
 import verify  # noqa: E402
 from config import STOCK_UNIVERSE  # noqa: E402
 
-results = []   # (狀態, 項目, 說明)；狀態：OK / MISMATCH / UNREACHABLE
+results = []   # (狀態, 項目, 說明)；狀態：OK / MISMATCH / UNREACHABLE / INFO（只是資訊，不影響結果）
 
 
 def record(status, name, detail):
@@ -62,11 +62,35 @@ def p_price(date):
            f"正規化後 {len(df)} 筆，最新 {f.latest_date_of(df)}" if not df.empty else "正規化後是空的")
 
 
+def _finmind_raw(dataset, **params):
+    """直接呼叫 FinMind，印出 status 和 msg（_fetch 失敗時只會回空表）。"""
+    q = {"dataset": dataset, **params}
+    headers = {}
+    if f.FINMIND_TOKEN:
+        q["token"] = f.FINMIND_TOKEN
+        headers["Authorization"] = f"Bearer {f.FINMIND_TOKEN}"
+    r = requests.get(f.FINMIND_URL, params=q, headers=headers, timeout=30)
+    try:
+        body = r.json()
+    except ValueError:
+        body = {"status": None, "msg": r.text[:200]}
+    rows = body.get("data") or []
+    print(f"  {dataset}: HTTP {r.status_code} status={body.get('status')} msg={body.get('msg')!r} 筆數={len(rows)}")
+    return rows
+
+
 @probe("FinMind 法人買賣超")
 def p_inst(date):
-    raw = f._fetch("TaiwanStockInstitutionalInvestors", stock_id="2330", start_date="2026-10-01", end_date=date)
-    if raw.empty:
-        return record("UNREACHABLE", "法人買賣超", "沒有資料")
+    found = None
+    for ds in f.INSTITUTIONAL_DATASETS:
+        rows = _finmind_raw(ds, data_id="2330", start_date="2026-10-01", end_date=date)
+        record("INFO", f"法人資料集 {ds}", f"{len(rows)} 筆")
+        if rows and found is None:
+            found = ds
+    raw = f._fetch(found, stock_id="2330", start_date="2026-10-01", end_date=date) if found else None
+    if raw is None or raw.empty:
+        return record("UNREACHABLE", "法人買賣超", "所有資料集都沒有資料")
+    record("OK", "法人資料集", f"使用 {found}")
     print("原始欄位：", list(raw.columns))
     names = sorted(raw["name"].astype(str).unique().tolist()) if "name" in raw.columns else []
     print("name 欄的值：", names)

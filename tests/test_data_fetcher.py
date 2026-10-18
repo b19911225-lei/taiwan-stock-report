@@ -111,3 +111,18 @@ def test_twse_closes_returns_date(monkeypatch):
     monkeypatch.setattr(data_fetcher.requests, "get", lambda *a, **k: FakeResp(200, "[]", rows))
     closes, d, err = data_fetcher.get_twse_closes()
     assert err is None and d == "2026-10-16" and closes == {"2330": 2420.0}
+
+
+def test_institutional_falls_back_to_second_dataset(monkeypatch):
+    calls = []
+
+    def fake_fetch(dataset, stock_id=None, start_date=None, end_date=None, retries=3):
+        calls.append(dataset)
+        if dataset == data_fetcher.INSTITUTIONAL_DATASETS[0]:
+            return pd.DataFrame()
+        return pd.DataFrame([{"date": "2026-10-16", "stock_id": "2330", "name": "Foreign_Investor",
+                              "buy": 10, "sell": 1}])
+    monkeypatch.setattr(data_fetcher, "_fetch", fake_fetch)
+    daily, unknown = data_fetcher.get_institutional_investors("2330", "2026-10-16")
+    assert calls == data_fetcher.INSTITUTIONAL_DATASETS
+    assert daily.iloc[0]["foreign"] == 9 and unknown == []
