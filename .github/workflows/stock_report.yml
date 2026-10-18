@@ -18,6 +18,10 @@ on:
         description: '已經發過也重發'
         type: boolean
         default: false
+      date:
+        description: '報告日期 YYYY-MM-DD（留空：今天）。補發過去的報告用，通常要一起勾 force'
+        required: false
+        default: ''
 
 permissions:
   contents: write   # 把每日紀錄推到 claude/report-history 分支
@@ -40,9 +44,11 @@ jobs:
         id: precheck
         env:
           FORCE: ${{ inputs.force && 'true' || '' }}
+          INPUT_DATE: ${{ inputs.date }}
         run: |
           # 排程常延遲到半夜，用「台北時間減 6 小時」當報告日期，跨過午夜也還是當天的報告
-          DATE=$(TZ=Asia/Taipei date -d '-6 hours' +%F)
+          DATE=${INPUT_DATE:-$(TZ=Asia/Taipei date -d '-6 hours' +%F)}
+          if ! [[ "$DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then echo "日期格式要是 YYYY-MM-DD：$DATE"; exit 1; fi
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
           if [ -z "$FORCE" ] && git fetch -q --depth=1 origin claude/report-history 2>/dev/null; then
             if git show "FETCH_HEAD:$DATE/sent.json" 2>/dev/null | grep -q '"complete": true' \
@@ -74,11 +80,12 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FORCE: ${{ inputs.force && '--force' || '' }}
           DATE: ${{ steps.precheck.outputs.date }}
+          INPUT_DATE: ${{ inputs.date }}
         run: |
-          # 台北時間 21:00 前（且不是半夜補跑）還有下一次排程：資料不完整就先不發
+          # 台北時間 21:00 前（且不是半夜補跑、不是手動補發指定日期）還有下一次排程：資料不完整就先不發
           HOUR=$(TZ=Asia/Taipei date +%-H)
           DEFER=""
-          if [ "$HOUR" -ge 17 ] && [ "$HOUR" -lt 21 ]; then DEFER="--defer-incomplete"; fi
+          if [ -z "$INPUT_DATE" ] && [ "$HOUR" -ge 17 ] && [ "$HOUR" -lt 21 ]; then DEFER="--defer-incomplete"; fi
           rc=0
           # 法人資料常比股價晚更新，最多等 10 分鐘
           python run_daily.py all --ai api --wait-minutes 10 --date "$DATE" $DEFER $FORCE || rc=$?
