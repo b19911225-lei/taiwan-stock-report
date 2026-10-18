@@ -34,6 +34,7 @@
 
 | 日期 | 坑 | 處理 |
 |---|---|---|
+| 2026-10-18 | 「叫醒既有 session」的排程如果用排程頁面的 ▷ 或 `fire_trigger` 手動執行，不會叫醒那個 session，而是另開一個沒掛 repo 的新 session：扣**訂閱用量**、觸發不了 Actions，還會推播失敗通知到手機 | 測試準時觸發時實測發現。要測試就建一次性排程（`run_once_at` + `persistent_session_id`），照時間叫醒才會走原本的 session、扣點數；不要按 ▷ |
 | 2026-10-17 | 證交所請求寫死 `verify=certifi.where()`，雲端主機走代理、CA 由 `REQUESTS_CA_BUNDLE` 指定，寫死會 TLS 失敗 | 拿掉，用 requests 預設（會讀環境變數） |
 | 2026-10-17 | 雲端主機的 `python3` 可能是沒裝套件的 3.11（文章坑 3），預裝的 3.13 是 pandas 3 | Routine 一律用 `/usr/bin/python3.13`；程式改成 pandas 2、3 都能跑，CI 兩個版本都測 |
 | 2026-10-17 | 預設網路連不到 FinMind、證交所、Telegram | docs/ROUTINE.md 列出要加的網域 |
