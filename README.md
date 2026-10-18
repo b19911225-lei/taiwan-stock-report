@@ -14,8 +14,8 @@
 
 | 方式 | 時間 | 說明 |
 |---|---|---|
-| Claude Code Routine（主要） | 每個交易日 17:53 | 準時觸發 GitHub Actions（預設），或在雲端環境設好金鑰後自己跑；見 [docs/ROUTINE.md](docs/ROUTINE.md) |
-| GitHub Actions（備援） | 每個交易日 21:07 | 已經發過就跳過；沒發成或不完整才補發 |
+| GitHub Actions（主要） | 每個交易日 17:47、18:17、18:47、20:23、21:07 | 只用 GitHub 免費額度。第一個跑到的發報告，之後的看到已發過就跳過；21:07 前資料不完整先不發 |
+| Claude Code Routine | 目前停用 | 會扣訂閱用量；設計保留在 [docs/ROUTINE.md](docs/ROUTINE.md) |
 | 本機 | 隨時 | `python run_daily.py all --dry-run --no-git` 看報告不發送 |
 
 需要的環境變數：`FINMIND_TOKEN`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`；
