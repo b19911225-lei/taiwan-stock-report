@@ -40,6 +40,7 @@
 | 2026-10-18 | 雲端環境的金鑰和網路白名單只能由人在設定頁面填，Claude 沒有工具可以改 | 金鑰只放 GitHub Secrets，由 Actions 執行 |
 | 2026-10-18 | 用工具（create_trigger）建立的 Routine 沒有掛 repo，session 裡沒有 GitHub 工具、`GH_TOKEN` 也無效，觸發不了 Actions | 實測發現；要在 Routine 設定裡選 repo |
 | 2026-10-18 | Routine 扣**訂閱用量**（`five_hour`），不扣雲端點數；手動建立的雲端 session 才扣點數（`ccr_promotional`） | 用 get_session 看 rate_limit_info 實測。為了兩邊都省，每日報告改成只用 GitHub Actions |
+| 2026-10-18 | 舊排程「台股選股日報 - 每日觸發」的指令裡寫著 GitHub 個人存取權杖的明文，而且觸發的是不存在的 `daily_report.yml` | 新版改用 Claude 內建的 GitHub 工具觸發 `stock_report.yml`，不需要權杖；舊排程退休、權杖撤銷 |
 | 2026-10-18 | GitHub 排程延遲好幾個小時 | 一天排 5 次、避開整點半點；用 sent.json 去重，多跑的那幾次一分鐘內結束；21:07 前資料不完整先不發，避免一天兩份 |
 | 2026-10-18 | 開發用的雲端 session 連不到外部資料源，沒辦法驗證資料格式 | 改在 GitHub Actions 跑「資料源檢查」（`.github/workflows/probe.yml`），用 MCP 讀 log |
 | 2026-10-18 | 資料源檢查用 `cmd \| tee` 記錄輸出，沒有 `set -o pipefail`，檢查失敗也回報通過 | 加上 pipefail |

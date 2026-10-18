@@ -15,14 +15,14 @@
 | 方式 | 時間 | 說明 |
 |---|---|---|
 | GitHub Actions（主要） | 每個交易日 17:47、18:17、18:47、20:23、21:07 | 只用 GitHub 免費額度。第一個跑到的發報告，之後的看到已發過就跳過；21:07 前資料不完整先不發 |
-| 準時觸發（雲端點數） | 交易日 17:52，到 2026-11-04 | 一個手動建立的雲端 session 被排程叫醒，只負責觸發上面的 workflow（GitHub 排程常延遲）。扣雲端點數，點數 11/5 到期前自動停用 |
+| 準時觸發（雲端點數） | 交易日 17:52，到 2026-11-04 | 排程「台股選股日報 - 每日觸發（點數）」叫醒一個手動建立的雲端 session，只負責觸發上面的 workflow（GitHub 排程常延遲）。扣雲端點數，點數 11/5 到期前自動停用 |
 | Claude Code Routine | 目前停用 | 會扣訂閱用量；設計保留在 [docs/ROUTINE.md](docs/ROUTINE.md) |
-
-**用量優先順序**：GitHub Actions 免費額度 → 雲端點數 → 訂閱用量（目前不使用）。AI 文字用 `ANTHROPIC_API_KEY`，實測每天約 0.02 美元。
 | 本機 | 隨時 | `python run_daily.py all --dry-run --no-git` 看報告不發送 |
 
-需要的環境變數：`FINMIND_TOKEN`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`；
-備援模式另外需要 `ANTHROPIC_API_KEY`（模型可用 `CLAUDE_MODEL` 覆寫）。
+**用量優先順序**：GitHub Actions 免費額度 → 雲端點數 → 訂閱用量（目前不使用）。AI 文字用 `ANTHROPIC_API_KEY`，實測每天約 0.02 美元。
+
+需要的 GitHub Secrets：`FINMIND_TOKEN`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`、`ANTHROPIC_API_KEY`
+（AI 文字的模型可用 `CLAUDE_MODEL` 覆寫，預設 `claude-sonnet-5-5`）。不需要任何 GitHub 個人存取權杖。
 
 ## 文件
 
