@@ -53,7 +53,8 @@ jobs:
 
       - name: 用真實資料演練整個流程（不發送）
         if: always() && steps.probe.outputs.date != ''
-        run: python run_daily.py all --ai api --dry-run --no-git --date "${{ steps.probe.outputs.date }}"
+        # 自動觸發時不呼叫 Claude API（省錢）；手動執行才連 API 撰寫一起測
+        run: python run_daily.py all --ai ${{ github.event_name == 'workflow_dispatch' && 'api' || 'none' }} --dry-run --no-git --date "${{ steps.probe.outputs.date }}"
 
       - name: 上傳演練結果
         if: always()

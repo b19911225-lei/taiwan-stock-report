@@ -56,6 +56,7 @@
 
 ### 法人資料
 
+- 資料集是 FinMind `TaiwanStockInstitutionalInvestorsBuySell`（原本用的 `TaiwanStockInstitutionalInvestors` 不存在）。
 - FinMind 的 `name` 欄是英文代號（`Foreign_Investor`、`Investment_Trust`、`Dealer_self`、`Dealer_Hedging`、`Foreign_Dealer_Self`），證交所是中文，兩種都認得（`data_fetcher.INSTITUTION_ALIASES`）。
 - 外資 = 外資及陸資（不含外資自營商）；自營商 = 自行買賣 + 避險。
   **外資自營商不另外加**：證交所註明外資自營商的買賣已計入自營商，加了會重複計算。

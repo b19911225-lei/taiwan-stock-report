@@ -136,7 +136,13 @@ TELEGRAM_CHAT_ID=...
 
 repo 的 Secrets 已經有 `TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`、`FINMIND_TOKEN`、`ANTHROPIC_API_KEY`，不用改。備援跑的時候才會呼叫 Claude API（模型可用 `CLAUDE_MODEL` 環境變數覆寫，預設 `claude-sonnet-5-5`）。
 
-### 4. 手動測試
+### 4. 資料源有問題時
+
+GitHub Actions 的「資料源檢查」會對 FinMind、證交所、鉅亨網、Telegram 各抓一次真實資料，
+確認格式和程式的假設一致，再用最近一個交易日跑一次整個流程（不發送）。手動執行時也會測 Claude API 撰寫。
+改到 `data_fetcher.py` 時會自動跑。
+
+### 5. 手動測試
 
 - 在 Claude 的排程列表裡手動執行一次 Routine，點進那次執行看 session 最後的回報（綠燈只代表主機正常結束，不代表報告發成功，文章坑 10）。
 - 在那次執行裡輸入 `/usage` 可以看這次花了多少（文章坑 8）。

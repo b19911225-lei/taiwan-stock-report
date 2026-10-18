@@ -6,7 +6,8 @@
 
 | 日期 | 坑 | 怎麼發現 | 處理 |
 |---|---|---|---|
-| 2026-10-17 | 法人名稱用「外資」「投信」「自營商」比對，但 FinMind 回的是英文代號，**從上線起籌碼分一直是 0、M3/M4 從來沒觸發** | 翻 Actions log：所有入選股的訊號都沒有 M3/M4，用分數倒推籌碼分全是 0 | 中英文都認得；認不得的名稱寫進報告（`INSTITUTION_ALIASES`） |
+| 2026-10-18 | **法人資料集名稱錯了**：`TaiwanStockInstitutionalInvestors` 回 HTTP 422（不存在），`_fetch` 失敗只回空表，所以從上線起一筆法人資料都沒拿到，籌碼分一直是 0、M3/M4 從來沒觸發 | 在 GitHub Actions 跑 `scripts/probe_sources.py`，印出 FinMind 原始回應 | 改用 `TaiwanStockInstitutionalInvestorsBuySell`；FinMind 失敗原因同時印到 stderr |
+| 2026-10-17 | 就算拿到資料，法人名稱也是用中文比對，但 FinMind 回英文代號（實測：`Foreign_Investor`、`Foreign_Dealer_Self`、`Investment_Trust`、`Dealer_self`、`Dealer_Hedging`） | 翻 Actions log：所有入選股的訊號都沒有 M3/M4 | 中英文都認得；認不得的名稱寫進報告（`INSTITUTION_ALIASES`） |
 | 2026-10-17 | 外資自營商如果加進外資會重複計算（證交所註明已含在自營商） | 參考 iThome 文章作者的經驗 | 外資只算 `Foreign_Investor` |
 | 2026-10-17 | RR 篩選形同虛設：停損 -7%、目標至少 +15%，RR 最低 2.14 | log 裡入選股 RR 幾乎都是 2.1 | 停損改用 MA20、目標用 ATR（docs/SPEC.md） |
 | 2026-10-17 | 股票池代號錯：2325 矽品早已下市、6247/6288 抓不到資料、3703 是欣陸不是欣興、6456/6530 都標成創意但創意是 3443 | log 每天「無資料」、收盤價和公司對不上 | 修正代號，名稱改用官方清單，`verify.py universe` 可檢查 |
@@ -36,6 +37,8 @@
 | 2026-10-17 | 證交所請求寫死 `verify=certifi.where()`，雲端主機走代理、CA 由 `REQUESTS_CA_BUNDLE` 指定，寫死會 TLS 失敗 | 拿掉，用 requests 預設（會讀環境變數） |
 | 2026-10-17 | 雲端主機的 `python3` 可能是沒裝套件的 3.11（文章坑 3），預裝的 3.13 是 pandas 3 | Routine 一律用 `/usr/bin/python3.13`；程式改成 pandas 2、3 都能跑，CI 兩個版本都測 |
 | 2026-10-17 | 預設網路連不到 FinMind、證交所、Telegram | docs/ROUTINE.md 列出要加的網域 |
+| 2026-10-18 | 開發用的雲端 session 連不到外部資料源，沒辦法驗證資料格式 | 改在 GitHub Actions 跑「資料源檢查」（`.github/workflows/probe.yml`），用 MCP 讀 log |
+| 2026-10-18 | 資料源檢查用 `cmd \| tee` 記錄輸出，沒有 `set -o pipefail`，檢查失敗也回報通過 | 加上 pipefail |
 | 2026-10-17 | 證交所擋雲端主機時回 HTTP 200 擋頁或沒有目標的 307（文章坑 1） | `_twse_get_json` 檢查內容，被擋寫進報告 |
 | 2026-10-17 | 測試的 git 指令預設工作目錄寫成 `cwd=REPO_DIR` 預設參數，替換 `REPO_DIR` 沒用，結果在真正的 repo 執行，把一筆測試紀錄推到了 GitHub 的 `claude/report-history` | `_git` 改成呼叫時才決定目錄；測試先確認 git 指令跑在暫存 repo |
 

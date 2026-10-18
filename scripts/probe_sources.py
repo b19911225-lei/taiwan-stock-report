@@ -81,16 +81,10 @@ def _finmind_raw(dataset, **params):
 
 @probe("FinMind 法人買賣超")
 def p_inst(date):
-    found = None
-    for ds in f.INSTITUTIONAL_DATASETS:
-        rows = _finmind_raw(ds, data_id="2330", start_date="2026-10-01", end_date=date)
-        record("INFO", f"法人資料集 {ds}", f"{len(rows)} 筆")
-        if rows and found is None:
-            found = ds
-    raw = f._fetch(found, stock_id="2330", start_date="2026-10-01", end_date=date) if found else None
-    if raw is None or raw.empty:
-        return record("UNREACHABLE", "法人買賣超", "所有資料集都沒有資料")
-    record("OK", "法人資料集", f"使用 {found}")
+    rows = _finmind_raw(f.INSTITUTIONAL_DATASET, data_id="2330", start_date="2026-10-01", end_date=date)
+    if not rows:
+        return record("UNREACHABLE", "法人買賣超", f"{f.INSTITUTIONAL_DATASET} 沒有資料")
+    raw = f._fetch(f.INSTITUTIONAL_DATASET, stock_id="2330", start_date="2026-10-01", end_date=date)
     print("原始欄位：", list(raw.columns))
     names = sorted(raw["name"].astype(str).unique().tolist()) if "name" in raw.columns else []
     print("name 欄的值：", names)

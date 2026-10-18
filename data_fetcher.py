@@ -30,7 +30,8 @@ CNYES_NEWS_URL = "https://api.cnyes.com/media/api/v1/newslist/category/tw_stock"
 FINMIND_SLEEP_SEC = 0.5
 USER_AGENT = "Mozilla/5.0 (taiwan-stock-report)"
 
-# 法人名稱：FinMind 回英文代號，證交所和舊資料是中文，兩種都要認得。
+# 法人名稱：FinMind 回英文代號（實測：Foreign_Investor、Foreign_Dealer_Self、Investment_Trust、
+# Dealer_self、Dealer_Hedging），證交所是中文，兩種都要認得。
 # 外資自營商不另外計算：證交所註明「外資自營商買賣金額已計入自營商買賣金額」，
 # 加進來會重複計算。
 INSTITUTION_ALIASES = {
@@ -117,18 +118,14 @@ def normalize_price_df(df, days=65):
     return df.tail(days).reset_index(drop=True)
 
 
-# 個股三大法人買賣超。FinMind v4 的資料集名稱是 ...BuySell；
-# 原程式用的 TaiwanStockInstitutionalInvestors 實測回空，留著當備用（scripts/probe_sources.py 會檢查兩個）
-INSTITUTIONAL_DATASETS = ["TaiwanStockInstitutionalInvestorsBuySell", "TaiwanStockInstitutionalInvestors"]
+# 個股三大法人買賣超。原程式用的 TaiwanStockInstitutionalInvestors 實測回 HTTP 422（資料集不存在），
+# 所以從上線起一筆法人資料都沒拿到過（2026-10-18 scripts/probe_sources.py 確認）。
+INSTITUTIONAL_DATASET = "TaiwanStockInstitutionalInvestorsBuySell"
 
 
 def get_institutional_investors(stock_id, end_date, days=10):
     start, end = _date_range(end_date, days)
-    df = pd.DataFrame()
-    for dataset in INSTITUTIONAL_DATASETS:
-        df = _fetch(dataset, stock_id=stock_id, start_date=start, end_date=end, retries=2)
-        if not df.empty:
-            break
+    df = _fetch(INSTITUTIONAL_DATASET, stock_id=stock_id, start_date=start, end_date=end)
     return normalize_institutional_df(df)
 
 
