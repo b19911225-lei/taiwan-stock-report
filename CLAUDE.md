@@ -2,6 +2,7 @@
 
 台股盤後選股日報：程式抓資料、算好所有數字，AI 只寫文字，送到 Telegram。
 
+- 每日報告由 GitHub Actions（`.github/workflows/stock_report.yml`）執行，不用 Claude 的 Routine（會扣訂閱用量）。
 - **如果你是 Routine 排程的 session**：照 `docs/ROUTINE.md` 的「給 Routine session 的步驟」執行，不要修改程式碼。
 - 選股規則：`docs/SPEC.md`；AI 撰寫規則：`docs/AI_WRITING_RULES.md`；踩坑紀錄：`docs/PITFALLS.md`（遇到新坑就加一列）。
 

@@ -1,12 +1,17 @@
 name: 台股選股日報
 
-# 每個交易日 17:53（台北）由 Claude Code Routine 準時觸發（workflow_dispatch），見 docs/ROUTINE.md。
-# 21:07 的排程是備援：Routine 沒觸發成功或報告不完整時補發；已經發過（claude/report-history
-# 分支有 sent.json）就直接結束。GitHub 的排程常延遲好幾個小時，所以準時靠 Routine，不靠 cron。
+# 只用 GitHub Actions 的免費額度，不扣 Claude 訂閱用量或雲端點數（AI 文字用 ANTHROPIC_API_KEY，約 0.02 美元/天）。
+# GitHub 的排程常延遲好幾個小時，所以一天排好幾次、都避開整點和半點：
+# 第一個跑到的負責發報告，之後的看到 claude/report-history 分支已有 sent.json 就在一分鐘內結束。
+# 21:07 之前的執行如果資料不完整（例如法人還沒更新）先不發，留給下一次；21:07 那次照發並標示不完整。
 
 on:
   schedule:
-    - cron: '7 13 * * 1-5'   # UTC 13:07 = 台灣 21:07，週一至週五
+    - cron: '47 9 * * 1-5'    # 台灣 17:47
+    - cron: '17 10 * * 1-5'   # 台灣 18:17
+    - cron: '47 10 * * 1-5'   # 台灣 18:47
+    - cron: '23 12 * * 1-5'   # 台灣 20:23
+    - cron: '7 13 * * 1-5'    # 台灣 21:07（最後一次：資料不完整也照發）
   workflow_dispatch:
     inputs:
       force:
@@ -30,36 +35,58 @@ jobs:
       - name: Checkout 程式碼
         uses: actions/checkout@v4
 
+      # 快速檢查：今天已經發過（或休市通知已發）就跳過後面所有步驟，不裝套件、不抓資料
+      - name: 今天發過了嗎
+        id: precheck
+        env:
+          FORCE: ${{ inputs.force && 'true' || '' }}
+        run: |
+          # 排程常延遲到半夜，用「台北時間減 6 小時」當報告日期，跨過午夜也還是當天的報告
+          DATE=$(TZ=Asia/Taipei date -d '-6 hours' +%F)
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          if [ -z "$FORCE" ] && git fetch -q --depth=1 origin claude/report-history 2>/dev/null; then
+            if git show "FETCH_HEAD:$DATE/sent.json" 2>/dev/null | grep -q '"complete": true' \
+               || git show "FETCH_HEAD:closed/$DATE.json" >/dev/null 2>&1; then
+              echo "$DATE 已經發過，跳過"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
       - name: 設定 Python 3.11
+        if: steps.precheck.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
       - name: 安裝套件
+        if: steps.precheck.outputs.skip != 'true'
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: 執行每日流程
+        if: steps.precheck.outputs.skip != 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FORCE: ${{ inputs.force && '--force' || '' }}
+          DATE: ${{ steps.precheck.outputs.date }}
         run: |
-          # 排程常延遲到半夜，用「台北時間減 6 小時」當報告日期，跨過午夜也還是當天的報告
-          DATE=$(TZ=Asia/Taipei date -d '-6 hours' +%F)
+          # 台北時間 21:00 前（且不是半夜補跑）還有下一次排程：資料不完整就先不發
+          HOUR=$(TZ=Asia/Taipei date +%-H)
+          DEFER=""
+          if [ "$HOUR" -ge 17 ] && [ "$HOUR" -lt 21 ]; then DEFER="--defer-incomplete"; fi
           rc=0
-          # 法人資料常比股價晚更新，最多等 20 分鐘；等不到就先發並標示不完整，21:07 再補發完整版
-          python run_daily.py all --ai api --wait-minutes 20 --date "$DATE" $FORCE || rc=$?
-          # 10 非交易日、11 已經發過（通常是 Routine 發的）、12 還沒收盤，都不算失敗
-          if [ "$rc" = 10 ] || [ "$rc" = 11 ] || [ "$rc" = 12 ]; then exit 0; fi
-          exit $rc
+          # 法人資料常比股價晚更新，最多等 10 分鐘
+          python run_daily.py all --ai api --wait-minutes 10 --date "$DATE" $DEFER $FORCE || rc=$?
+          # 10 非交易日、11 已經發過、12 還沒收盤、13 資料不完整先不發，都不算失敗
+          case "$rc" in 0|10|11|12|13) exit 0 ;; *) exit $rc ;; esac
 
       - name: 上傳紀錄為 Artifact
-        if: always()
+        if: always() && steps.precheck.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: stock-report-${{ github.run_id }}

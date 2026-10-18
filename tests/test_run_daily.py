@@ -211,3 +211,27 @@ def test_git_pull_failure_stops_before_sending(env, monkeypatch):
     monkeypatch.setattr(history, "sync_pull", lambda: (False, "連不上 origin"))
     assert run_daily.main(["check-date"]) == run_daily.EXIT_ERROR
     assert env["sent"] == []
+
+
+def test_defer_incomplete_waits_for_a_later_run(env, monkeypatch):
+    calls = []
+    import ai_writer
+    monkeypatch.setattr(ai_writer, "write_with_api", lambda ai_input: calls.append(1) or (None, "skip", None))
+    env["inst_end"]["value"] = "2026-10-15"          # 法人資料還沒更新
+    assert run("all", "--ai", "api", "--defer-incomplete") == run_daily.EXIT_DEFERRED
+    assert env["sent"] == [] and calls == []          # 沒發，也沒有花 API 費用
+    assert history.sent_info(DATE) is None
+
+    # 最後一次執行（不加 --defer-incomplete）：照發並標示不完整
+    assert run("all") == run_daily.EXIT_OK
+    assert len(env["sent"]) == 1 and history.sent_info(DATE)["complete"] is False
+
+    # 之後資料齊了：補發完整版
+    env["inst_end"]["value"] = None
+    assert run("all", "--defer-incomplete") == run_daily.EXIT_OK
+    assert len(env["sent"]) == 2 and "完整版" in env["sent"][1][0]
+
+
+def test_defer_does_not_block_complete_data(env):
+    assert run("all", "--defer-incomplete") == run_daily.EXIT_OK
+    assert len(env["sent"]) == 1

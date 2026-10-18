@@ -15,6 +15,7 @@
 #
 # 結束代碼：0 成功｜1 AI 文字未通過檢查｜2 錯誤｜3 Telegram 發送失敗｜4 已發送但歷史紀錄沒存回 GitHub
 #           10 非交易日｜11 今天已經發過｜12 還沒到收盤資料更新的時間，不判定休市
+#           13 資料不完整、加了 --defer-incomplete，先不發（等下一次執行）
 
 import argparse
 import io
@@ -44,7 +45,7 @@ from config import (
 from quality import DataQuality
 
 EXIT_OK, EXIT_AI_INVALID, EXIT_ERROR, EXIT_SEND_FAILED, EXIT_PUSH_FAILED = 0, 1, 2, 3, 4
-EXIT_NOT_TRADING, EXIT_ALREADY_SENT, EXIT_NOT_READY = 10, 11, 12
+EXIT_NOT_TRADING, EXIT_ALREADY_SENT, EXIT_NOT_READY, EXIT_DEFERRED = 10, 11, 12, 13
 
 # 台北時間這個時刻之前，加權指數沒有今天的資料不代表休市（可能還沒收盤或還沒更新）
 CLOSED_DECISION_HOUR = 17
@@ -451,6 +452,10 @@ def cmd_finalize(args):
             log(f"ALREADY_SENT {date}：稍早已發過不完整的版本，資料仍不完整，不重發")
             return EXIT_ALREADY_SENT
         resend_note = "（資料更新後的完整版，取代稍早不完整的報告）"
+    if incomplete and prev is None and args.defer_incomplete and not args.force:
+        # 一天排了好幾次執行：前面幾次資料不完整就先不發，留給後面的執行，避免同一天收到兩份
+        log(f"DEFERRED {date}：資料不完整（{'；'.join(incomplete)}），這次先不發，等下一次執行")
+        return EXIT_DEFERRED
 
     ai_clean, ai_issues, ai_note = None, [], None
     ai_output, load_err = load_ai_output(date)
@@ -532,6 +537,13 @@ def cmd_all(args):
     rc = cmd_collect(args)
     if rc != EXIT_OK:
         return rc
+    date = args.date or today_tw()
+    payload = history.load_json(date, "picks.json") or {}
+    if (payload.get("incomplete") and args.defer_incomplete and not args.force
+            and history.sent_info(date) is None):
+        # 在呼叫 Claude API 之前就停，延後的執行不花 API 費用
+        log(f"DEFERRED {date}：資料不完整（{'；'.join(payload['incomplete'])}），這次先不發，等下一次執行")
+        return EXIT_DEFERRED
     if args.ai == "api":
         cmd_write_ai(args)
     return cmd_finalize(args)
@@ -548,6 +560,8 @@ def main(argv=None):
         p.add_argument("--no-git", action="store_true", help="不同步歷史分支（本機測試用）")
         p.add_argument("--wait-minutes", type=float, default=0, help="等資料更新的分鐘數")
         p.add_argument("--ai", choices=["api", "none"], default="none", help="all 指令的 AI 撰寫方式")
+        p.add_argument("--defer-incomplete", action="store_true",
+                       help="資料不完整時先不發（後面還有排程會再跑時使用）")
     args = parser.parse_args(argv)
     handler = {
         "check-date": cmd_check_date, "collect": cmd_collect, "validate-ai": cmd_validate_ai,
