@@ -1,0 +1,406 @@
+{
+  "date": "2026-10-20",
+  "generated_at": "2026-10-20T17:54:47+08:00",
+  "market": {
+    "close": 46292.93,
+    "chg": -529.15,
+    "chg_pct": -1.13,
+    "money_100m": 8029.0
+  },
+  "themes": [
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": -0.4
+    },
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": -0.9
+    },
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": -1.95
+    },
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": -2.35
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": -2.42
+    }
+  ],
+  "picks": [
+    {
+      "stock_id": "1802",
+      "name": "台玻",
+      "themes": [
+        "當日熱門"
+      ],
+      "close": 67.4,
+      "today_chg": 2.12,
+      "chg_5d": 9.06,
+      "score": 50,
+      "score_breakdown": {
+        "momentum": 20,
+        "chip": 5,
+        "tech": 25,
+        "theme": 0
+      },
+      "signals": [
+        "M1",
+        "M2",
+        "M5",
+        "M6"
+      ],
+      "momentum_count": 4,
+      "vol_vs_20d": 3.21,
+      "vol_vs_5d": 1.52,
+      "inst_available": true,
+      "foreign_buy_days": 1,
+      "foreign_net_5d_lots": 37182,
+      "sitc_net_5d_lots": 885,
+      "dealer_net_5d_lots": 1417,
+      "rsi14": 66.0,
+      "kd_cross": true,
+      "ma5": 66.0,
+      "ma20": 61.67,
+      "atr": 3.99,
+      "high_60d": 70.6,
+      "targets": {
+        "entry_low": 66.05,
+        "entry_high": 68.75,
+        "target1": 83.36,
+        "target_basis": "4倍ATR",
+        "stop_loss": 62.68,
+        "rr_ratio": 3.38
+      }
+    }
+  ],
+  "debate_ids": [
+    "1802"
+  ],
+  "stats": {
+    "universe": 47,
+    "fetched": 47,
+    "prefilter_passed": 3,
+    "scored_passed": 2,
+    "rr_ok": 1
+  },
+  "incomplete": [],
+  "exclude_counts": {
+    "趨勢不符": 19,
+    "X2": 8,
+    "X1": 10,
+    "X5": 3,
+    "動能不足": 1,
+    "X3": 4
+  },
+  "quality": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  },
+  "performance": {
+    "lookback_days": 20,
+    "days_with_history": 2,
+    "total": 4,
+    "hit": 0,
+    "stopped": 2,
+    "holding": 2,
+    "no_data": 0,
+    "win_rate_pct": 0.0,
+    "avg_return_pct": -3.2,
+    "items": [
+      {
+        "stock_id": "2379",
+        "date": "2026-10-19",
+        "entry": 779.0,
+        "target1": 871.0,
+        "stop_loss": 746.76,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.64
+      },
+      {
+        "stock_id": "6415",
+        "date": "2026-10-16",
+        "entry": 489.0,
+        "target1": 586.28,
+        "stop_loss": 454.77,
+        "status": "停損",
+        "exit": 454.77,
+        "exit_date": "2026-10-19",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2379",
+        "date": "2026-10-16",
+        "entry": 778.0,
+        "target1": 873.44,
+        "stop_loss": 743.84,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.51
+      },
+      {
+        "stock_id": "3014",
+        "date": "2026-10-16",
+        "entry": 148.0,
+        "target1": 163.84,
+        "stop_loss": 141.14,
+        "status": "停損",
+        "exit": 141.14,
+        "exit_date": "2026-10-20",
+        "return_pct": -4.64
+      }
+    ]
+  },
+  "news": [
+    {
+      "id": "N1",
+      "source_id": "6634263",
+      "title": "基隆市攜手中保科「智慧連線住警器3.0」 打造獨老居家安全防護網",
+      "summary": "",
+      "time": "10/20 17:39",
+      "url": "https://news.cnyes.com/news/id/6634263"
+    },
+    {
+      "id": "N2",
+      "source_id": "6634313",
+      "title": "欣興(3037)直擊AI高階HDI與光模組布局！60層板已有樣品，NPO成下一代技術焦點",
+      "summary": "",
+      "time": "10/20 17:30",
+      "url": "https://news.cnyes.com/news/id/6634313"
+    },
+    {
+      "id": "N3",
+      "source_id": "6634311",
+      "title": "臻鼎-KY(4958)直擊NPO光模組板設計！層數從22層朝18層收斂，內埋矽電容成新趨勢",
+      "summary": "",
+      "time": "10/20 17:30",
+      "url": "https://news.cnyes.com/news/id/6634311"
+    },
+    {
+      "id": "N4",
+      "source_id": "6634303",
+      "title": "震盪押回都是佈局時機、富喬、德宏⊕、建榮",
+      "summary": "台股量縮震盪拉回，終場跌529點收46,292點，成交值約7,625億元，短線仍待止穩。 外資今日賣超約795.4億元，今年累計賣超2.11兆元；融資餘額高、法人調節使籌碼偏弱。 台灣9月出口872.2億美元、年增60.9%，AI供應鏈與出口基本面仍支撐中長線。",
+      "time": "10/20 17:28",
+      "url": "https://news.cnyes.com/news/id/6634303"
+    },
+    {
+      "id": "N5",
+      "source_id": "6634271",
+      "title": "金管會：全台逾1.2萬人約定防詐「指定聯絡人」 玉山、北富銀推廣最積極",
+      "summary": "",
+      "time": "10/20 17:21",
+      "url": "https://news.cnyes.com/news/id/6634271"
+    },
+    {
+      "id": "N6",
+      "source_id": "6634269",
+      "title": "尖點(8021)直擊M9鑽針新挑戰！AI伺服器高階板鑽針壽命大減，抗磨耗技術成關鍵",
+      "summary": "",
+      "time": "10/20 17:00",
+      "url": "https://news.cnyes.com/news/id/6634269"
+    },
+    {
+      "id": "N7",
+      "source_id": "6634255",
+      "title": "聯茂中長期擴產腳步不停歇 高階產品產能持續提升",
+      "summary": "",
+      "time": "10/20 16:52",
+      "url": "https://news.cnyes.com/news/id/6634255"
+    },
+    {
+      "id": "N8",
+      "source_id": "6634243",
+      "title": "〈外銷訂單〉連19紅！9月1142億美元年增62% 全年可望破兆",
+      "summary": "9月外銷訂單1,142.1億美元，月增10.9%、年增62.4%，連2個月破千億、19連紅 AI、高效能運算與雲端需求帶動資訊通信438.8億、電子474.2億美元接單大增 美國接單453.8億美元年增79.4%；10月動向指數50.5，接單看升",
+      "time": "10/20 16:47",
+      "url": "https://news.cnyes.com/news/id/6634243"
+    },
+    {
+      "id": "N9",
+      "source_id": "6634242",
+      "title": "〈房產〉台中十大熱門交易生活圈揭曉 太平新光特區年成交以638件奪冠",
+      "summary": "",
+      "time": "10/20 16:39",
+      "url": "https://news.cnyes.com/news/id/6634242"
+    },
+    {
+      "id": "N10",
+      "source_id": "6634240",
+      "title": "台股融資維持率172%警戒！聰明控管水位，從容掌握3大族群",
+      "summary": "台股開低後一度翻紅，終場收46,292.93點，成交金額約7,500億元，量縮續跌。 新台幣盤中貶至32.61元附近、韓股重挫約3.6%，顯示外部市場仍牽制台股。 融資維持率降至約172%警戒，籌碼風險升高，建議保留現金、低水位持股。",
+      "time": "10/20 16:36",
+      "url": "https://news.cnyes.com/news/id/6634240"
+    },
+    {
+      "id": "N11",
+      "source_id": "6634197",
+      "title": "是方中科虎尾AI資料中心挑戰預約率8至9成 目標2031年獲利",
+      "summary": "是方中科虎尾AI資料中心今動土，預計2028年下半年商轉，目標2031年開始獲利。 邵泓嘉稱預約率已逾5成，客戶含國際大型CSP與FinTech，挑戰商轉前達8至9成。 中華電信與是方IDC市占率達78%，並將拓展中南部、台中AIDC與海外布局。",
+      "time": "10/20 16:05",
+      "url": "https://news.cnyes.com/news/id/6634197"
+    },
+    {
+      "id": "N12",
+      "source_id": "6634190",
+      "title": "〈星展投資展望〉美國經濟強勁 陳昱嘉：估Fed再升息2碼 金價上看5300美元",
+      "summary": "星展台灣看好黃金續升，估明年Q1可達5200至5300美元 陳昱嘉稱美國AI資本支出撐經濟，星展估Fed至2027年再升息兩碼、利率升至4.5% 星展維持股票建設性看法，看好金融、AI及AxJ，債券偏好5至7年期BBB/BB非投資等級債",
+      "time": "10/20 16:03",
+      "url": "https://news.cnyes.com/news/id/6634190"
+    },
+    {
+      "id": "N13",
+      "source_id": "6634187",
+      "title": "金居籌設在大馬檳城新建HVLP4高階銅箔 規劃年產3萬噸",
+      "summary": "",
+      "time": "10/20 15:40",
+      "url": "https://news.cnyes.com/news/id/6634187"
+    },
+    {
+      "id": "N14",
+      "source_id": "6634196",
+      "title": "證交所推「Power Up Plan 2.0」 29家優質上市公司開放揭露中長期預測",
+      "summary": "",
+      "time": "10/20 15:37",
+      "url": "https://news.cnyes.com/news/id/6634196"
+    },
+    {
+      "id": "N15",
+      "source_id": "6634150",
+      "title": "〈星展經濟展望〉看好台灣AI供應鏈護城河 估全年GDP年增率達11.6%",
+      "summary": "星展估台灣2026年GDP成長11.6%、2027年5.6%，Q4起回落至高個位數。 2026、2027年CPI維持2.0%、2.1%，能源漲價滯後效應與內需改善恐使通膨續高於2%。 AI出口與投資撐台灣成長，台股年初至今漲70%；但關稅、能源與高利率仍增添市場風險。",
+      "time": "10/20 15:32",
+      "url": "https://news.cnyes.com/news/id/6634150"
+    },
+    {
+      "id": "N16",
+      "source_id": "6634153",
+      "title": "製鞋廠鈺齊前3季營收143.69億元 自結EPS達2.46元",
+      "summary": "",
+      "time": "10/20 15:25",
+      "url": "https://news.cnyes.com/news/id/6634153"
+    },
+    {
+      "id": "N17",
+      "source_id": "6634151",
+      "title": "《價值型投資 最新產業研究報告》緯穎 (6669-TW) 人工智慧伺服器需求延續，液冷與整櫃交付擴大商機",
+      "summary": "緯穎9月營收1,726.20億元、第三季季增約56%，單月與單季同創新高，反映AI伺服器需求強勁 亞馬遜Trainium 3持續放量，液冷版本將成明年重點；緯穎亦參與NVIDIA Vera Rubin NVL72試產、展示AMD Helios",
+      "time": "10/20 14:57",
+      "url": "https://news.cnyes.com/news/id/6634151"
+    },
+    {
+      "id": "N18",
+      "source_id": "6634090",
+      "title": "是方虎尾AI資料中心動土 投資33億元2028年下半年正式營運",
+      "summary": "是方在中科虎尾舉辦AI資料中心動土，總投資33億元，預計2028年下半年正式營運。 虎尾AIDC基地1.56公頃、地上4樓、總樓地板面積約6500坪，規劃16MW、PUE≤1.4，參照Tier 4標準。 公司稱將串聯虎尾、聯雲、宏鼎、麗源與跨國海纜服務，打造台灣西部AI算力走廊與跨國AIDC鏈。",
+      "time": "10/20 14:35",
+      "url": "https://news.cnyes.com/news/id/6634090"
+    },
+    {
+      "id": "N19",
+      "source_id": "6634097",
+      "title": "掌握AI與去美元化雙引擎 貝萊德重磅推出黃金與世界礦業ETF",
+      "summary": "貝萊德iShares發行009834、009835兩檔全球主題ETF，發行價每單位15元。 009834追蹤全球黃金指數009835追蹤世界礦業指數；前者布局黃金避險，後者涵蓋開採、加工與供應鏈。 貝萊德指央行自2022年起每年買金800至1000公噸，且AI、電氣化與國防需求推升銅鋁鎳等礦產需求。",
+      "time": "10/20 14:31",
+      "url": "https://news.cnyes.com/news/id/6634097"
+    },
+    {
+      "id": "N20",
+      "source_id": "6634134",
+      "title": "〈台股盤後〉量縮震盪挫529點再度下探季線 電子代工、散熱逆勢抗跌",
+      "summary": "",
+      "time": "10/20 14:30",
+      "url": "https://news.cnyes.com/news/id/6634134"
+    },
+    {
+      "id": "N21",
+      "source_id": "6634107",
+      "title": "臻鼎-KY加速布局硬板及HDI高階產品 2028年HDI營收比重將超越軟板",
+      "summary": "",
+      "time": "10/20 14:29",
+      "url": "https://news.cnyes.com/news/id/6634107"
+    },
+    {
+      "id": "N22",
+      "source_id": "6634142",
+      "title": "安成生技AC-203 解盲部分療效指標為正向，明年持續與FDA、EMA 溝通藥證申請可能性",
+      "summary": "安成生技AC-203 EBS二/三期EBShield試驗主要指標未達統計顯著，但疼痛、搔癢改善達p＜0.05 62名非亞裔次族群第8週治療成功率46.4%優於安慰劑23.5%，p=0.049，與二期DELIVERS結果一致",
+      "time": "10/20 14:24",
+      "url": "https://news.cnyes.com/news/id/6634142"
+    },
+    {
+      "id": "N23",
+      "source_id": "6634109",
+      "title": "東元衝刺AIDC散熱與商用空調商機 明年業績比重拚超過6成",
+      "summary": "東元參與2026空冷凍空調綠能展，聚焦AI資料中心高效冷卻與低GWP冷媒減碳技術。 蔡尚育：明年AIDC與商用空調業績比重可望逾6成，家用空調降至4成。 東元布局台灣、東南亞及美日，目標打入CSP AI基礎建設專案。",
+      "time": "10/20 14:20",
+      "url": "https://news.cnyes.com/news/id/6634109"
+    },
+    {
+      "id": "N24",
+      "source_id": "6634126",
+      "title": "高盛再上調AI伺服器展望 點名鴻海、緯穎等供應鏈受惠",
+      "summary": "高盛將2027、2028年全球伺服器整體潛在市場規模分別上修31%、45%。 機架級AI伺服器與雲端業者自研ASIC需求攀升，推升AI晶片與伺服器出貨預估。 記憶體漲價與產品組合升級帶動整機售價，供應鏈多環節受惠。",
+      "time": "10/20 14:06",
+      "url": "https://news.cnyes.com/news/id/6634126"
+    },
+    {
+      "id": "N25",
+      "source_id": "6634132",
+      "title": "銅價大漲、玻纖布缺貨潮持續擴大！德宏(5475-TW)攻上漲停",
+      "summary": "",
+      "time": "10/20 14:00",
+      "url": "https://news.cnyes.com/news/id/6634132"
+    },
+    {
+      "id": "N26",
+      "source_id": "6634095",
+      "title": "〈房產〉公寓爬越高越省錢 部分縣市多爬3層樓價差逾百萬元",
+      "summary": "",
+      "time": "10/20 13:27",
+      "url": "https://news.cnyes.com/news/id/6634095"
+    },
+    {
+      "id": "N27",
+      "source_id": "6634089",
+      "title": "綠基雲端AI與港口智慧視覺應用雙引擎 帶動業務衝新高",
+      "summary": "",
+      "time": "10/20 13:13",
+      "url": "https://news.cnyes.com/news/id/6634089"
+    },
+    {
+      "id": "N28",
+      "source_id": "6634083",
+      "title": "〈星宇直飛布拉格〉搶啖歐洲半導體聚落新商機 成AI趨勢另類受惠者",
+      "summary": "星宇直飛布拉格帶動東歐旅遊熱潮，也看好台灣半導體、AI供應鏈帶來商務往來。 星宇加密鳳凰城每周4班增至5班、布拉格增至4班，吉隆坡改派A330因應需求。 i-TRANS Global進駐捷克烏斯季州，將建1.7萬平方公尺倉儲中心，服務德勒斯登Silicon Saxony與台積電歐洲新廠。",
+      "time": "10/20 13:11",
+      "url": "https://news.cnyes.com/news/id/6634083"
+    },
+    {
+      "id": "N29",
+      "source_id": "6634081",
+      "title": "〈星宇直飛布拉格〉細談三大洲航網規劃方向 這些航點均有機會直航",
+      "summary": "星宇10/25首航台中-名古屋，認為日本近程航網大致完成，後續主軸轉向美洲、歐洲與大洋洲。 美洲評估紐約、芝加哥、華盛頓；歐洲鎖定蘇黎世、巴塞隆納、赫爾辛基，最快明年見歐洲新航點。 總機隊38架，年底估42架、明年48架，並將依交機時間同步加大航班頻率。",
+      "time": "10/20 13:07",
+      "url": "https://news.cnyes.com/news/id/6634081"
+    },
+    {
+      "id": "N30",
+      "source_id": "6634079",
+      "title": "〈星宇直飛布拉格〉樂看Q4、明年上半年成長均達4成 惟憂心油價變數",
+      "summary": "星宇指第4季訂位維持高檔，貨運旺季帶動營運，全年營收有望成長4成 東北亞滑雪、歐洲耶誕需求熱，明年上半年訂位也維持年增4成 油價仍是最大變數，燃油成本占總成本已由2成升至約3成",
+      "time": "10/20 13:05",
+      "url": "https://news.cnyes.com/news/id/6634079"
+    }
+  ]
+}
