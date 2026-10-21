@@ -1,0 +1,503 @@
+{
+  "date": "2026-10-21",
+  "generated_at": "2026-10-21T17:55:50+08:00",
+  "market": {
+    "close": 46887.77,
+    "chg": 594.84,
+    "chg_pct": 1.28,
+    "money_100m": 8746.0
+  },
+  "themes": [
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": 4.27
+    },
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": 3.47
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": 2.09
+    },
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": 1.47
+    },
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": 0.93
+    }
+  ],
+  "picks": [
+    {
+      "stock_id": "2356",
+      "name": "英業達",
+      "themes": [
+        "AI伺服器CoWoS"
+      ],
+      "close": 61.3,
+      "today_chg": 2.17,
+      "chg_5d": 5.15,
+      "score": 61,
+      "score_breakdown": {
+        "momentum": 10,
+        "chip": 10,
+        "tech": 21,
+        "theme": 20
+      },
+      "signals": [
+        "M1",
+        "M2"
+      ],
+      "momentum_count": 2,
+      "vol_vs_20d": 1.91,
+      "vol_vs_5d": 1.48,
+      "inst_available": true,
+      "foreign_buy_days": 2,
+      "foreign_net_5d_lots": 11942,
+      "sitc_net_5d_lots": -2845,
+      "dealer_net_5d_lots": 4465,
+      "rsi14": 59.2,
+      "kd_cross": false,
+      "ma5": 59.4,
+      "ma20": 59.23,
+      "atr": 1.47,
+      "high_60d": 73.5,
+      "targets": {
+        "entry_low": 60.07,
+        "entry_high": 62.53,
+        "target1": 73.5,
+        "target_basis": "60日高點",
+        "stop_loss": 58.64,
+        "rr_ratio": 4.58
+      }
+    },
+    {
+      "stock_id": "2324",
+      "name": "仁寶",
+      "themes": [
+        "當日熱門"
+      ],
+      "close": 37.7,
+      "today_chg": 2.17,
+      "chg_5d": 1.89,
+      "score": 56,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 20,
+        "tech": 21,
+        "theme": 0
+      },
+      "signals": [
+        "M1",
+        "M2",
+        "M3"
+      ],
+      "momentum_count": 3,
+      "vol_vs_20d": 2.34,
+      "vol_vs_5d": 2.35,
+      "inst_available": true,
+      "foreign_buy_days": 4,
+      "foreign_net_5d_lots": 25128,
+      "sitc_net_5d_lots": -2823,
+      "dealer_net_5d_lots": 5017,
+      "rsi14": 53.4,
+      "kd_cross": false,
+      "ma5": 36.71,
+      "ma20": 36.51,
+      "atr": 0.98,
+      "high_60d": 44.95,
+      "targets": {
+        "entry_low": 36.95,
+        "entry_high": 38.45,
+        "target1": 44.95,
+        "target_basis": "60日高點",
+        "stop_loss": 36.14,
+        "rr_ratio": 4.66
+      }
+    },
+    {
+      "stock_id": "6415",
+      "name": "矽力*-KY",
+      "themes": [
+        "散熱電源"
+      ],
+      "close": 490.0,
+      "today_chg": 5.95,
+      "chg_5d": 4.03,
+      "score": 50,
+      "score_breakdown": {
+        "momentum": 10,
+        "chip": 5,
+        "tech": 25,
+        "theme": 10
+      },
+      "signals": [
+        "M5",
+        "M6"
+      ],
+      "momentum_count": 2,
+      "vol_vs_20d": 1.29,
+      "vol_vs_5d": 0.61,
+      "inst_available": true,
+      "foreign_buy_days": 1,
+      "foreign_net_5d_lots": -3039,
+      "sitc_net_5d_lots": 460,
+      "dealer_net_5d_lots": 252,
+      "rsi14": 69.2,
+      "kd_cross": true,
+      "ma5": 476.7,
+      "ma20": 444.93,
+      "atr": 29.5,
+      "high_60d": 513.0,
+      "targets": {
+        "entry_low": 480.2,
+        "entry_high": 499.8,
+        "target1": 608.0,
+        "target_basis": "4倍ATR",
+        "stop_loss": 455.7,
+        "rr_ratio": 3.44
+      }
+    }
+  ],
+  "debate_ids": [
+    "2356",
+    "2324",
+    "6415"
+  ],
+  "stats": {
+    "universe": 51,
+    "fetched": 51,
+    "prefilter_passed": 8,
+    "scored_passed": 5,
+    "rr_ok": 3
+  },
+  "incomplete": [],
+  "exclude_counts": {
+    "趨勢不符": 23,
+    "X2": 11,
+    "X1": 1,
+    "X5": 4,
+    "動能不足": 3,
+    "X3": 4
+  },
+  "quality": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  },
+  "performance": {
+    "lookback_days": 20,
+    "days_with_history": 3,
+    "total": 5,
+    "hit": 0,
+    "stopped": 2,
+    "holding": 3,
+    "no_data": 0,
+    "win_rate_pct": 0.0,
+    "avg_return_pct": -1.69,
+    "items": [
+      {
+        "stock_id": "1802",
+        "date": "2026-10-20",
+        "entry": 67.4,
+        "target1": 83.36,
+        "stop_loss": 62.68,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.3
+      },
+      {
+        "stock_id": "2379",
+        "date": "2026-10-19",
+        "entry": 779.0,
+        "target1": 871.0,
+        "stop_loss": 746.76,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 1.67
+      },
+      {
+        "stock_id": "6415",
+        "date": "2026-10-16",
+        "entry": 489.0,
+        "target1": 586.28,
+        "stop_loss": 454.77,
+        "status": "停損",
+        "exit": 454.77,
+        "exit_date": "2026-10-19",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2379",
+        "date": "2026-10-16",
+        "entry": 778.0,
+        "target1": 873.44,
+        "stop_loss": 743.84,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 1.8
+      },
+      {
+        "stock_id": "3014",
+        "date": "2026-10-16",
+        "entry": 148.0,
+        "target1": 163.84,
+        "stop_loss": 141.14,
+        "status": "停損",
+        "exit": 141.14,
+        "exit_date": "2026-10-20",
+        "return_pct": -4.64
+      }
+    ]
+  },
+  "news": [
+    {
+      "id": "N1",
+      "source_id": "6635118",
+      "title": "北上列車最後上車機會？建榮、金像電、華新科⊕、矽力、臻鼎",
+      "summary": "台股開高震盪反彈，盤中一度大漲962點至47,254點，終場上漲594點收46,887點，成交值約8,344億元。 短線尚未站穩10日線、月線，需留意44,210～45,169點支撐區；反彈若無量，仍恐再回測。",
+      "time": "10/21 17:49",
+      "url": "https://news.cnyes.com/news/id/6635118"
+    },
+    {
+      "id": "N2",
+      "source_id": "6635076",
+      "title": "外資中止連10賣！台股期現貨齊翻多 買超友達、鴻海及南亞各逾2萬張",
+      "summary": "",
+      "time": "10/21 17:17",
+      "url": "https://news.cnyes.com/news/id/6635076"
+    },
+    {
+      "id": "N3",
+      "source_id": "6635083",
+      "title": "外資連十賣後終轉多？主力甩籌碼成功？下一波反攻誰先起漲？",
+      "summary": "台股自10/6創49968點新高後短短10個交易日回跌近4000點，近日震盪加劇，法人資金方向分歧。 外資連10日大賣、投信逆勢買超；文中提醒，短線下跌不代表AI成長結束，勿恐慌殺低。 投信連買台積電、金像電、世芯-KY、台燿、臻鼎-KY、奇鋐，聚焦AI供應鏈與法人布局。",
+      "time": "10/21 17:14",
+      "url": "https://news.cnyes.com/news/id/6635083"
+    },
+    {
+      "id": "N4",
+      "source_id": "6635070",
+      "title": "工作20年為何還是不敢鬆口氣？ 中年家庭必做的財務盤點",
+      "summary": "中年上班族應盤點家庭收支、資產與保險，確認哪些費用靠薪水、哪些已有著落。 年費、稅費、學費與突發支出要攤開看，避免誤判每月有結餘卻年末存不下錢。 先算半年沒收入能否支付房貸與生活費，再依用錢時點調整投資與應急資金。",
+      "time": "10/21 16:44",
+      "url": "https://news.cnyes.com/news/id/6635070"
+    },
+    {
+      "id": "N5",
+      "source_id": "6635035",
+      "title": "臻鼎總經理簡禎富：AI高階PCB競爭升級 決勝點在全球量產能力",
+      "summary": "",
+      "time": "10/21 16:37",
+      "url": "https://news.cnyes.com/news/id/6635035"
+    },
+    {
+      "id": "N6",
+      "source_id": "6635025",
+      "title": "借鏡英國資安認證與AI政策 台英攜手助攻中小企數位及淨零轉型",
+      "summary": "中企署與英國在台辦事處今辦台英中小企業AI論壇，聚焦數位韌性、淨零轉型、女性企業領導力。 戴婉蓉指台英2025年簽署提升貿易夥伴關係三大支柱協議，強化投資、數位貿易、能源及淨零排放合作。 論壇吸引近100位業界專家，盼助台灣中小企業運用AI加速雙軸轉型、拓展國際市場。",
+      "time": "10/21 16:35",
+      "url": "https://news.cnyes.com/news/id/6635025"
+    },
+    {
+      "id": "N7",
+      "source_id": "6635064",
+      "title": "台股利空鈍化怎麼布局？看懂結算後籌碼指標，輕鬆掌握選股條件",
+      "summary": "美伊地緣衝突傳協議曙光，美股反彈、油價回落，市場出現利空鈍化。 台股早盤一度大漲逾900點，終場收46887.77點；外資終止連10賣，三大法人小買超5.68億元。 AI外銷訂單9月創單月新高，封測京元電、力成及智邦、貿聯-KY受惠AI伺服器需求。",
+      "time": "10/21 16:29",
+      "url": "https://news.cnyes.com/news/id/6635064"
+    },
+    {
+      "id": "N8",
+      "source_id": "6635020",
+      "title": "金居自結9月獲利年增89%、EPS 0.8元 擬再投資百億新建高階銅箔廠",
+      "summary": "金居規劃在馬來西亞檳城周邊設新廠，主產HVLP4高階銅箔，總產能達年產3萬噸。 新廠分兩期建置，首批產能估2028年Q3至Q4開出，第二期2029年下半年啟動，總投資約80億至100億元。 金居另擬在台發行CB籌資約70億元，並搭配雲林三廠逐季擴產，因應AI高速需求。",
+      "time": "10/21 16:16",
+      "url": "https://news.cnyes.com/news/id/6635020"
+    },
+    {
+      "id": "N9",
+      "source_id": "6635034",
+      "title": "台股結算殺尾盤！AI基本面未變，第四季反攻關鍵浮現",
+      "summary": "台股10月21日受台指期結算影響震盪，外資大幅賣超，市場關注空單回補與止跌訊號。 台灣9月外銷訂單1,142.1億美元、年增62.4%，連兩月破千億美元，AI與電子需求續強。 第四季看好台積電、鴻海、緯創等AI供應鏈，操作宜汰弱留強、分批布局。",
+      "time": "10/21 16:13",
+      "url": "https://news.cnyes.com/news/id/6635034"
+    },
+    {
+      "id": "N10",
+      "source_id": "6634976",
+      "title": "鑫創電子推液冷強固型邊緣AI電腦 獲美國軍工航太電子創新認可",
+      "summary": "",
+      "time": "10/21 15:56",
+      "url": "https://news.cnyes.com/news/id/6634976"
+    },
+    {
+      "id": "N11",
+      "source_id": "6634988",
+      "title": "勞資爭議現曙光！台灣美光與台中工會簽署協議 撤回10/22調解程序",
+      "summary": "",
+      "time": "10/21 15:19",
+      "url": "https://news.cnyes.com/news/id/6634988"
+    },
+    {
+      "id": "N12",
+      "source_id": "6634986",
+      "title": "台股強彈站回5日線 外資終結連10賣、三大法人買超5.68億元",
+      "summary": "",
+      "time": "10/21 15:04",
+      "url": "https://news.cnyes.com/news/id/6634986"
+    },
+    {
+      "id": "N13",
+      "source_id": "6634945",
+      "title": "桃機招募新進人員開跑 釋出64名職缺、起薪最高65K",
+      "summary": "",
+      "time": "10/21 14:37",
+      "url": "https://news.cnyes.com/news/id/6634945"
+    },
+    {
+      "id": "N14",
+      "source_id": "6634947",
+      "title": "〈台股盤後〉台指期結算甩尾漲594.84點 收46887.77點重新站回5日線",
+      "summary": "台股今早盤在電子股帶動強彈，終場漲594.84點收46887.77點，成交值8331.91億元，站上5日線 台積電收2420元、漲0.62%，貢獻大盤119點；鴻海、台達電、聯發科齊漲 新台幣盤中翻紅升值1.07角至32.510元；IC載板、CCL股走強，上游PCB材料多收黑",
+      "time": "10/21 14:33",
+      "url": "https://news.cnyes.com/news/id/6634947"
+    },
+    {
+      "id": "N15",
+      "source_id": "6634967",
+      "title": "產業前景很好，為什麼不一定值得買？如何找出新產業對公司獲利的真正貢獻",
+      "summary": "",
+      "time": "10/21 14:30",
+      "url": "https://news.cnyes.com/news/id/6634967"
+    },
+    {
+      "id": "N16",
+      "source_id": "6634931",
+      "title": "利率走高波及債市？櫃買：今年永續債發行檔數可望達標 金額規模仍需努力",
+      "summary": "櫃買中心截至10月20日永續發展債券流通在外256檔、餘額8270.33億元，今年已發行32檔、939.80億元。 今年目標為43檔、1300億元，估Q4可補足11檔，檔數可達標，但金額仍有360.2億元差距。 利率走高推升發行成本，企業若未及時取得永續債資格，常改發一般公司債；櫃買將續推永續金融。",
+      "time": "10/21 14:14",
+      "url": "https://news.cnyes.com/news/id/6634931"
+    },
+    {
+      "id": "N17",
+      "source_id": "6634958",
+      "title": "鉅亨速報 - Factset 最新調查：美利達(9914-TW)EPS預估下修至4.69元，預估目標價為94元",
+      "summary": "",
+      "time": "10/21 14:10",
+      "url": "https://news.cnyes.com/news/id/6634958"
+    },
+    {
+      "id": "N18",
+      "source_id": "6634957",
+      "title": "鉅亨速報 - Factset 最新調查：巨大(9921-TW)EPS預估下修至3.46元，預估目標價為118元",
+      "summary": "",
+      "time": "10/21 14:10",
+      "url": "https://news.cnyes.com/news/id/6634957"
+    },
+    {
+      "id": "N19",
+      "source_id": "6634941",
+      "title": "鑫創電子新專案數量暴增5倍 三大核心市場布局擴大",
+      "summary": "",
+      "time": "10/21 13:50",
+      "url": "https://news.cnyes.com/news/id/6634941"
+    },
+    {
+      "id": "N20",
+      "source_id": "6634937",
+      "title": "營收創新高，股價卻反轉？從半導體設備股看懂「營收週期」與「股價週期」的差別",
+      "summary": "",
+      "time": "10/21 13:30",
+      "url": "https://news.cnyes.com/news/id/6634937"
+    },
+    {
+      "id": "N21",
+      "source_id": "6634915",
+      "title": "〈焦點股〉CCL報價漲、外資調高目標價 南亞盤中奔漲停",
+      "summary": "",
+      "time": "10/21 13:21",
+      "url": "https://news.cnyes.com/news/id/6634915"
+    },
+    {
+      "id": "N22",
+      "source_id": "6634903",
+      "title": "AI熱潮推升大立光等科技業布局台中 產業園區工業地產最搶手",
+      "summary": "",
+      "time": "10/21 12:52",
+      "url": "https://news.cnyes.com/news/id/6634903"
+    },
+    {
+      "id": "N23",
+      "source_id": "6634902",
+      "title": "鉅亨速報 - Factset 最新調查：台化(1326-TW)EPS預估上修至3.76元，預估目標價為84元",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634902"
+    },
+    {
+      "id": "N24",
+      "source_id": "6634901",
+      "title": "鉅亨速報 - Factset 最新調查：聯茂(6213-TW)EPS預估上修至17.74元，預估目標價為665元",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634901"
+    },
+    {
+      "id": "N25",
+      "source_id": "6634900",
+      "title": "鉅亨速報 - Factset 最新調查：雙鴻(3324-TW)EPS預估下修至56.34元，預估目標價為1600元",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634900"
+    },
+    {
+      "id": "N26",
+      "source_id": "6634899",
+      "title": "鉅亨速報 - Factset 最新調查：弘塑(3131-TW)EPS預估上修至62.73元，預估目標價為3900元",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634899"
+    },
+    {
+      "id": "N27",
+      "source_id": "6634898",
+      "title": "鉅亨速報 - Factset 最新調查：文曄(3036-TW)EPS預估上修至26.62元，預估目標價為300元",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634898"
+    },
+    {
+      "id": "N28",
+      "source_id": "6634897",
+      "title": "鉅亨速報 - Factset 最新調查：台塑(1301-TW)目標價調升至80元，幅度約6.67%",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634897"
+    },
+    {
+      "id": "N29",
+      "source_id": "6634896",
+      "title": "鉅亨速報 - Factset 最新調查：元太(8069-TW)目標價調降至200元，幅度約4.76%",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634896"
+    },
+    {
+      "id": "N30",
+      "source_id": "6634895",
+      "title": "鉅亨速報 - Factset 最新調查：台塑化(6505-TW)目標價調升至120元，幅度約4.35%",
+      "summary": "",
+      "time": "10/21 12:10",
+      "url": "https://news.cnyes.com/news/id/6634895"
+    }
+  ]
+}
