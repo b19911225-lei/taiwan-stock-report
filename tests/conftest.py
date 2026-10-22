@@ -39,3 +39,14 @@ def make_inst_daily(end_date="2026-10-16", foreign=(-1, 1, 1, 1, 1), sitc=(1, 2,
 @pytest.fixture
 def price_df():
     return make_price_df()
+
+
+@pytest.fixture(autouse=True)
+def no_network(monkeypatch):
+    """測試不能連網路：沒有被測試換掉的 HTTP 呼叫一律直接失敗（不然會卡在重試和等待）。"""
+    import requests
+
+    def blocked(*args, **kwargs):
+        raise RuntimeError("測試不能連網路，請在測試裡換掉這個呼叫")
+    monkeypatch.setattr(requests, "get", blocked)
+    monkeypatch.setattr(requests, "post", blocked)

@@ -17,7 +17,7 @@ import requests  # noqa: E402
 
 import data_fetcher as f  # noqa: E402
 import verify  # noqa: E402
-from config import STOCK_UNIVERSE  # noqa: E402
+from config import STOCK_UNIVERSE, WATCHLIST  # noqa: E402
 
 results = []   # (狀態, 項目, 說明)；狀態：OK / MISMATCH / UNREACHABLE / INFO（只是資訊，不影響結果）
 
@@ -109,12 +109,12 @@ def p_info(date):
         return record("MISMATCH", "官方股票清單", "解析後是空的")
     not_found, mismatched = verify.verify_universe(info)
     record("OK", "官方股票清單", f"{len(info)} 檔")
-    for sid in sorted(STOCK_UNIVERSE):
+    for sid in sorted(set(STOCK_UNIVERSE) | set(WATCHLIST)):
         print(f"  {sid} {info.get(sid, '（查無）')}")
     if not_found or mismatched:
         record("MISMATCH", "股票池代號", f"查無 {not_found}；名稱不符 {mismatched}")
     else:
-        record("OK", "股票池代號", f"{len(STOCK_UNIVERSE)} 檔代號和名稱都一致")
+        record("OK", "股票池代號", f"{len(set(STOCK_UNIVERSE) | set(WATCHLIST))} 檔（含自選股）代號和名稱都一致")
 
 
 @probe("證交所成交量排行 MI_INDEX20")
@@ -160,6 +160,48 @@ def p_telegram(date):
     record("OK" if ok else "MISMATCH", "Telegram token", "有效" if ok else f"HTTP {r.status_code}")
 
 
+@probe("證交所全部收盤行情 MI_INDEX")
+def p_twse_daily(date):
+    quotes, breadth, err = f.get_twse_daily(date)
+    if err:
+        return record("UNREACHABLE", "全部收盤行情", err)
+    record("OK" if quotes.get("2330") else "MISMATCH", "全部收盤行情",
+           f"{len(quotes)} 檔，2330 = {quotes.get('2330')}")
+    record("OK" if breadth.get("up") is not None else "MISMATCH", "漲跌家數", str(breadth))
+
+
+@probe("FinMind 整體三大法人")
+def p_total_inst(date):
+    out, err = f.get_market_institutional(date)
+    record("OK" if out else "MISMATCH", "整體三大法人（億元）", str(out) if out else err)
+
+
+@probe("FinMind 個股新聞")
+def p_stock_news(date):
+    news = f.get_stock_news("2330", date)
+    for n in news:
+        print("  ", n)
+    record("OK" if news else "MISMATCH", "個股新聞", f"2330 有 {len(news)} 則")
+
+
+@probe("FinMind 美股")
+def p_us(date):
+    out, err = f.get_us_markets(date)
+    for u in out:
+        print("  ", u)
+    record("OK" if not err else "MISMATCH", "美股", err or f"{len(out)} 項，日期 {out[0]['date']}")
+
+
+@probe("鉅亨網各分類新聞")
+def p_news_categories(date):
+    news, err = f.get_tw_stock_news()
+    counts = {}
+    for n in news:
+        counts[n["category"]] = counts.get(n["category"], 0) + 1
+    record("OK" if not err and len(counts) == len(f.NEWS_CATEGORIES) else "MISMATCH", "新聞分類",
+           err or f"各分類則數 {counts}")
+
+
 def main():
     date = sys.argv[1] if len(sys.argv) > 1 else None
     if not date:
@@ -168,7 +210,8 @@ def main():
         today = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")
         date = f.latest_date_of(f.get_taiex_price(today)) or today
     print(f"檢查日期：{date}")
-    for p in (p_taiex, p_price, p_inst, p_info, p_top, p_day_all, p_news, p_telegram):
+    for p in (p_taiex, p_price, p_inst, p_info, p_top, p_day_all, p_news, p_telegram,
+              p_twse_daily, p_total_inst, p_stock_news, p_us, p_news_categories):
         p(date)
 
     print("\n=== 總結 ===")

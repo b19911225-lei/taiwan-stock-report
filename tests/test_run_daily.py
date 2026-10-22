@@ -48,7 +48,15 @@ def env(monkeypatch, tmp_path):
                         lambda: ([{"id": "N1", "source_id": "1", "title": "台積電法說會", "summary": "", "time": "",
                                    "url": "https://news.cnyes.com/news/id/1"}], None))
     monkeypatch.setattr(f, "get_twse_closes", lambda: ({}, None, "證交所收盤價抓不到（測試）"))
-    return {"sent": sent, "taiex_date": taiex_date, "inst_end": inst_end}
+    twse_daily = {"value": ({}, {}, "證交所全部收盤行情抓不到（測試）")}
+    monkeypatch.setattr(f, "get_twse_daily", lambda d: twse_daily["value"])
+    monkeypatch.setattr(f, "get_stock_news", lambda sid, d, limit=4: [])
+    monkeypatch.setattr(f, "get_market_institutional",
+                        lambda d: ({"foreign": 22.39, "sitc": 12.8, "dealer": -135.71}, None))
+    monkeypatch.setattr(f, "get_us_markets",
+                        lambda d: ([{"id": "^SOX", "name": "費城半導體", "date": "2026-10-15",
+                                     "close": 11505.56, "chg_pct": 1.2}], None))
+    return {"sent": sent, "taiex_date": taiex_date, "inst_end": inst_end, "twse_daily": twse_daily}
 
 
 def run(*args):
@@ -235,3 +243,49 @@ def test_defer_incomplete_waits_for_a_later_run(env, monkeypatch):
 def test_defer_does_not_block_complete_data(env):
     assert run("all", "--defer-incomplete") == run_daily.EXIT_OK
     assert len(env["sent"]) == 1
+
+
+def test_select_picks_fills_with_lower_tiers_and_labels_them():
+    def r(tier, score, rr):
+        return {"tier": tier, "score": score, "targets": {"rr_ratio": rr}}
+    results = {"A1": r("A", 60, 3.0), "B1": r("B", 70, 1.8), "B2": r("B", 50, 0.8),
+               "C1": r("C", 40, 2.5), "X": {"passed": False}}
+    assert run_daily.select_picks(results) == ["A1", "B1", "C1"]   # B2 的 RR 不到 MIN_FILL_RR
+    many = {f"A{i}": r("A", i, 3.0) for i in range(8)}
+    assert run_daily.select_picks({**many, **results}) == ["A1", "A7", "A6", "A5", "A4"]
+    assert run_daily.select_picks({}) == []
+
+
+def test_watchlist_stock_is_scored_even_when_filtered_out(env):
+    # 4577 在測試資料裡是下跌趨勢：不會入選，但要有分數和原因
+    assert run("collect") == run_daily.EXIT_OK
+    payload = history.load_json(DATE, "picks.json")
+    w = payload["watchlist"][0]
+    assert w["stock_id"] == "4577" and w["pick_rank"] is None
+    assert w["score"] is not None and w["fail_reasons"]
+    ai_input = history.load_json(DATE, "ai_input.json")
+    assert ai_input["watchlist"][0]["not_selected_reasons"] == w["fail_reasons"]
+    assert run("finalize") == run_daily.EXIT_OK
+    text = "\n".join(env["sent"][0])
+    assert "⭐ <b>4577" in text and "未入選：" in text
+
+
+def test_market_scan_and_breadth(env):
+    quotes = {"1802": {"name": "台玻", "close": 67.4, "change": 1.4, "chg_pct": 2.12, "volume_lots": 140000,
+                       "value_100m": 95.0},
+              "2330": {"name": "台積電", "close": 2420.0, "change": 25.0, "chg_pct": 1.04, "volume_lots": 30000,
+                       "value_100m": 726.0}}
+    env["twse_daily"]["value"] = (quotes, {"up": 600, "down": 380}, None)
+    assert run("collect") == run_daily.EXIT_OK
+    payload = history.load_json(DATE, "picks.json")
+    assert payload["stats"]["scan_added"] == 1                     # 2330 已經在主題股裡
+    assert payload["market"]["breadth"] == {"up": 600, "down": 380}
+    assert payload["market"]["top_turnover"][0]["stock_id"] == "2330"
+    assert payload["market"]["institutional_100m"]["foreign"] == 22.39
+    assert payload["us_markets"][0]["name"] == "費城半導體"
+
+
+def test_zero_signal_stock_is_not_a_fill_candidate():
+    results = {"A1": {"tier": "A", "score": 60, "targets": {"rr_ratio": 3.0}},
+               "Z": {"tier": None, "score": 21, "targets": {"rr_ratio": 5.0}, "momentum_count": 0}}
+    assert run_daily.select_picks(results) == ["A1"]

@@ -30,7 +30,7 @@ def test_report_contains_program_numbers_and_quality_section():
     assert verify_messages(msgs, PAYLOAD["picks"]) == []
     assert "今日缺少：價格 1 檔（6247）；法人 1 檔（6415" in text
     assert "新聞抓不到" in text
-    assert "47,111.26（▼0.82%）" in text
+    assert "加權指數 47,111.26（▼0.82%，-390.00 點）" in text
     assert "尚無歷史紀錄" in text
 
 
@@ -58,7 +58,7 @@ def test_verify_messages_catches_wrong_numbers():
 
 def test_verify_closes():
     r = verify_closes([PICK], {"6415": 489.0})
-    assert r["issues"] == [] and "1 檔收盤價與證交所一致" in r["ok"]
+    assert r["issues"] == [] and "推薦股 1 檔收盤價與證交所一致" in r["ok"]
     r = verify_closes([PICK], {"6415": 480.0})
     assert r["issues"] and r["ok"] is None
     r = verify_closes([PICK], {})
@@ -101,3 +101,70 @@ def test_send_does_not_leak_token_on_exception(monkeypatch, tmp_path):
     monkeypatch.setattr(reporter.requests, "post", boom)
     status = reporter.send_to_telegram(["x"])[0]
     assert "fake-bot-token" not in status
+
+
+def _broadcast_payload():
+    payload = copy.deepcopy(PAYLOAD)
+    payload["market"].update(
+        breadth={"up": 600, "limit_up": 24, "down": 380, "limit_down": 1, "flat": 100},
+        institutional_100m={"foreign": 22.39, "sitc": 12.8, "dealer": -135.71},
+        top_turnover=[{"stock_id": "2330", "name": "台積電", "close": 2420.0, "chg_pct": 1.03, "value_100m": 900.0}])
+    payload["us_markets"] = [{"id": "^SOX", "name": "費城半導體", "date": "2026-10-15", "close": 11505.56, "chg_pct": 1.2}]
+    second = copy.deepcopy(PICK)
+    second.update(stock_id="2377", name="微星", tier="B", tier_label="次選", tier_note="次選：RR 1.72 未達 2")
+    payload["picks"] = [dict(PICK, tier="A", tier_label="嚴選", tier_note=None), second]
+    payload["debate_ids"] = ["6415", "2377"]
+    payload["watchlist"] = [{
+        "stock_id": "4577", "name": "達航科技", "pick_rank": None, "close": 115.5, "today_chg": 10.0, "score": 45,
+        "signals": ["M1"], "rsi14": 70.1, "foreign_buy_days": 0, "inst_available": True,
+        "fail_reasons": ["動能訊號只有 1 個（要 2 個）"], "targets": None, "related_news": ["N1"]}]
+    return payload
+
+
+def test_broadcast_sections():
+    payload = _broadcast_payload()
+    ai = {"headline": "外資回補，台股量增", "market_commentary": "加權指數下跌 0.82%。", "watch_tomorrow": ["外資是否續買"],
+          "highlights": [], "stocks": {}, "watchlist": {"4577": {"comment": "動能訊號只有 1 個。", "news_ids": []}}}
+    msgs = build_messages(payload, ai)
+    text = "\n".join(msgs)
+    assert verify_messages(msgs, payload["picks"]) == []
+    assert "🎙️ <b>外資回補，台股量增</b>" in text
+    assert "上漲 600 家（漲停 24）｜下跌 380 家（跌停 1）" in text
+    assert "外資 +22.39 億｜投信 +12.80 億｜自營商 -135.71 億" in text
+    assert "國際股市（10/15 收盤）" in text and "費城半導體 ▲1.20%" in text
+    assert "🥈次選" in text and "嚴選（全部條件都符合）只有 1 檔" in text
+    assert "⭐ <b>4577 達航科技</b>｜115.5 ▲10.00%｜評分 45/100" in text
+    assert "未入選：動能訊號只有 1 個（要 2 個）" in text and "💬 動能訊號只有 1 個。" in text
+    assert "🔭 <b>明日觀察</b>" in text
+
+
+def test_watchlist_stock_without_data():
+    payload = _broadcast_payload()
+    payload["watchlist"] = [{"stock_id": "4577", "name": "達航科技", "unavailable": "沒有 2026-10-16 的價格資料"}]
+    assert "4577 達航科技</b>｜沒有 2026-10-16 的價格資料" in "\n".join(build_messages(payload))
+
+
+def test_rr_is_shown_with_two_decimals_like_the_tier_note():
+    payload = _broadcast_payload()
+    payload["picks"][1]["targets"] = dict(payload["picks"][1]["targets"], rr_ratio=1.96)
+    payload["picks"][1]["tier_note"] = "次選：RR 1.96 未達 2"
+    msgs = build_messages(payload)
+    text = "\n".join(msgs)
+    assert "RR 1.96" in text and "RR 2.0｜" not in text
+    assert verify_messages(msgs, payload["picks"]) == []
+
+
+def test_no_picks_message_depends_on_trend_results():
+    payload = copy.deepcopy(PAYLOAD)
+    payload.update(picks=[], debate_ids=[])
+    payload["stats"] = dict(payload["stats"], prefilter_passed=0)
+    assert "今日沒有符合趨勢條件的個股" in "\n".join(build_messages(payload))
+    payload["stats"]["prefilter_passed"] = 4
+    assert "4 檔符合趨勢條件，但 RR 都不到" in "\n".join(build_messages(payload))
+
+
+def test_news_url_quotes_are_escaped():
+    payload = _broadcast_payload()
+    payload["news"][0]["url"] = 'https://x.tw/a"b'
+    ai = {"highlights": [{"text": "t", "news_ids": ["N1"]}], "stocks": {}, "watchlist": {}}
+    assert 'href="https://x.tw/a&quot;b"' in "\n".join(build_messages(payload, ai))

@@ -1,7 +1,10 @@
 # 台股選股日報
 
-每個交易日盤後，從主題股（AI 伺服器、CPO、矽光子、HBM、散熱電源）和當日成交量前 10 名裡，
-用技術面、量能、法人籌碼篩出觀察清單，附上進場／目標／停損與多空辯證，送到 Telegram。
+每個交易日盤後，從主題股（AI 伺服器、CPO、矽光子、HBM、散熱電源）、當日成交量前 10 名和全市場掃描裡，
+用技術面、量能、法人籌碼選出 3～5 檔推薦，附上進場／目標／停損與多空辯證；
+再加上盤勢播報（大盤、三大法人、國際股市、焦點新聞）、自選股評分卡和明日觀察，送到 Telegram。
+
+想每天看某檔股票的評分：把代號加進 `config.py` 的 `WATCHLIST`（目前是 4577 達航科技）。
 
 **設計原則**（參考 iThome〈Claude Code 雲端實戰篇〉）：
 
@@ -20,7 +23,7 @@
 | Claude Code Routine | 目前停用 | 會扣訂閱用量；設計保留在 [docs/ROUTINE.md](docs/ROUTINE.md) |
 | 本機 | 隨時 | `python run_daily.py all --dry-run --no-git` 看報告不發送 |
 
-**用量優先順序**：GitHub Actions 免費額度 → 雲端點數 → 訂閱用量（目前不使用）。AI 文字用 `ANTHROPIC_API_KEY`，實測每天約 0.02 美元。
+**用量優先順序**：GitHub Actions 免費額度 → 雲端點數 → 訂閱用量（目前不使用）。AI 文字用 `ANTHROPIC_API_KEY`：加了盤勢播報和新聞後，每天一次約輸入 1.5 萬、輸出 2 千 tokens（原本約 6 千／1.2 千）。
 
 需要的 GitHub Secrets：`FINMIND_TOKEN`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`、`ANTHROPIC_API_KEY`
 （AI 文字的模型可用 `CLAUDE_MODEL` 覆寫，預設 `claude-sonnet-5-5`）。不需要任何 GitHub 個人存取權杖。

@@ -6,6 +6,10 @@
 
 | 日期 | 坑 | 怎麼發現 | 處理 |
 |---|---|---|---|
+| 2026-10-22 | 股票池只有約 50 檔，加上趨勢、動能、RR 層層篩選，10/19、10/20 都只剩 1 檔；使用者想看的 4577 達航科技（上櫃）不在任何主題裡，完全沒被評分 | 使用者回報 | 加全市場掃描（證交所當日上漲、成交金額前 30 檔）；嚴選不到 3 檔用次選／候補補足並標示；加自選股評分卡 |
+| 2026-10-22 | 證交所 `STOCK_DAY_ALL` 在 17:50 常常還是前一天的資料，收盤價核對常被跳過 | 10/20 報告「證交所收盤價資料日期是 2026-10-19」 | 改用可以指定日期的 `MI_INDEX`（全部收盤行情），抓不到才用 `STOCK_DAY_ALL` |
+| 2026-10-22 | AI 寫「下跌 380 家」被當成 -380，整段盤勢播報被拿掉 | 用真實資料演練 | 數字後面接「家／檔」是家數，不檢查漲跌方向 |
+| 2026-10-22 | 整體三大法人的 `total` 列和三項加總對不起來，新聞報的「三大法人買超」也不一樣 | 資料源檢查 | 報告只列外資、投信、自營商三項，不列合計 |
 | 2026-10-18 | **法人資料集名稱錯了**：`TaiwanStockInstitutionalInvestors` 回 HTTP 422（不存在），`_fetch` 失敗只回空表，所以從上線起一筆法人資料都沒拿到，籌碼分一直是 0、M3/M4 從來沒觸發 | 在 GitHub Actions 跑 `scripts/probe_sources.py`，印出 FinMind 原始回應 | 改用 `TaiwanStockInstitutionalInvestorsBuySell`；FinMind 失敗原因同時印到 stderr |
 | 2026-10-17 | 就算拿到資料，法人名稱也是用中文比對，但 FinMind 回英文代號（實測：`Foreign_Investor`、`Foreign_Dealer_Self`、`Investment_Trust`、`Dealer_self`、`Dealer_Hedging`） | 翻 Actions log：所有入選股的訊號都沒有 M3/M4 | 中英文都認得；認不得的名稱寫進報告（`INSTITUTION_ALIASES`） |
 | 2026-10-17 | 外資自營商如果加進外資會重複計算（證交所註明已含在自營商） | 參考 iThome 文章作者的經驗 | 外資只算 `Foreign_Investor` |
@@ -34,6 +38,8 @@
 
 | 日期 | 坑 | 處理 |
 |---|---|---|
+| 2026-10-22 | 測試的 `env` fixture 沒換掉新加的抓資料函式，pytest 真的去連網路，卡在重試和等待 | `tests/conftest.py` 加自動生效的 `no_network`：測試裡沒換掉的 HTTP 呼叫直接失敗 |
+| 2026-10-22 | 櫃買中心 openapi（`tpex_mainboard_daily_close_quotes`）在 Actions 上回 ChunkedEncodingError | 不用；上櫃股的價格只靠 FinMind，收盤價核對略過上櫃股 |
 | 2026-10-18 | 「叫醒既有 session」的排程如果用排程頁面的 ▷ 或 `fire_trigger` 手動執行，不會叫醒那個 session，而是另開一個沒掛 repo 的新 session：扣**訂閱用量**、觸發不了 Actions，還會推播失敗通知到手機 | 測試準時觸發時實測發現。要測試就建一次性排程（`run_once_at` + `persistent_session_id`），照時間叫醒才會走原本的 session、扣點數；不要按 ▷ |
 | 2026-10-17 | 證交所請求寫死 `verify=certifi.where()`，雲端主機走代理、CA 由 `REQUESTS_CA_BUNDLE` 指定，寫死會 TLS 失敗 | 拿掉，用 requests 預設（會讀環境變數） |
 | 2026-10-17 | 雲端主機的 `python3` 可能是沒裝套件的 3.11（文章坑 3），預裝的 3.13 是 pandas 3 | Routine 一律用 `/usr/bin/python3.13`；程式改成 pandas 2、3 都能跑，CI 兩個版本都測 |

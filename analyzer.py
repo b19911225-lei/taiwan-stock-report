@@ -3,6 +3,9 @@
 # 流程拆成兩段，減少對 FinMind 的請求：
 #   prefilter()：只用價量判斷排除條件 X1~X5 和趨勢條件 T1~T3
 #   score()：通過 prefilter 的股票才去抓法人資料，再算動能訊號和評分
+# score_card()：不管有沒有通過都打分數並列出沒入選的原因（自選股、次選名單）
+
+import re
 
 import numpy as np
 import pandas as pd
@@ -10,7 +13,7 @@ import pandas as pd
 from config import (
     VOLUME_RATIO_20D, VOLUME_RATIO_5D, FOREIGN_BUY_DAYS, RSI_PERIOD,
     MIN_VOLUME_LOT, MIN_PRICE, THEME_STOCKS, STOCK_UNIVERSE,
-    STOP_LOSS_PCT, MIN_STOP_PCT, STOP_BELOW_MA20, ATR_PERIOD, ATR_TARGET_MULT,
+    STOP_LOSS_PCT, MIN_STOP_PCT, STOP_BELOW_MA20, ATR_PERIOD, ATR_TARGET_MULT, MIN_RR_RATIO,
 )
 
 
@@ -119,10 +122,28 @@ def _fail(reason, signals=None):
     return {"passed": False, "score": 0, "signals": signals or [], "exclude_reason": reason, "momentum_count": 0}
 
 
-def prefilter(price_df):
-    """排除條件與趨勢條件（只用價量）。通過時回傳 passed=True 和計算好的指標。"""
+# 沒入選原因的白話說明（自選股評分卡、次選名單用）
+EXCLUDE_TEXT = {
+    "X1": "今日跌幅超過 3%",
+    "X2": "近 5 日跌幅超過 8%",
+    "X3": f"今日成交量少於 {MIN_VOLUME_LOT} 張",
+    "X4": f"股價低於 {MIN_PRICE:g} 元",
+    "X5": "近 5 日出現爆量長黑",
+}
+TREND_TEXT = {
+    "T1": "收盤沒有站上 MA20",
+    "T2": "MA5 沒有在 MA20 之上",
+    "T3": "收盤沒有比前一日高",
+}
+
+
+def evaluate(price_df):
+    """
+    算好指標，並逐一檢查排除條件 X1~X5 和趨勢條件 T1~T3（不在第一個不符時就停）。
+    回傳 (結果, None)；資料不夠時回 (None, 原因)。
+    """
     if price_df is None or price_df.empty or len(price_df) < 25:
-        return _fail("資料不足")
+        return None, "資料不足"
 
     df = calc_indicators(price_df)
     latest = df.iloc[-1]
@@ -130,40 +151,34 @@ def prefilter(price_df):
     close, prev_close = float(latest["close"]), float(prev["close"])
     ma5, ma20 = latest["MA5"], latest["MA20"]
     if pd.isna(ma20) or pd.isna(ma5):
-        return _fail("指標計算不足")
+        return None, "指標計算不足"
 
-    # ─── 排除條件 ───
     today_chg = (close - prev_close) / prev_close if prev_close else 0.0
-    if today_chg < -0.03:
-        return _fail("X1")
-
     close_5d_ago = float(df.iloc[-6]["close"])
     chg_5d = (close - close_5d_ago) / close_5d_ago if close_5d_ago else 0.0
+
+    # ─── 排除條件 ───
+    exclusions = []
+    if today_chg < -0.03:
+        exclusions.append("X1")
     if chg_5d < -0.08:
-        return _fail("X2")
-
+        exclusions.append("X2")
     if latest["volume"] < MIN_VOLUME_LOT:
-        return _fail("X3")
-
+        exclusions.append("X3")
     if close < MIN_PRICE:
-        return _fail("X4")
-
+        exclusions.append("X4")
     # X5：近 5 日內爆量長黑
     avg_vol = df["volume"].iloc[-21:-1].mean() if len(df) >= 21 else latest["volume"]
     for _, row in df.tail(6).iloc[:-1].iterrows():
         day_chg = (row["close"] - row["open"]) / row["open"] if row["open"] else 0.0
         if row["volume"] >= avg_vol * 1.5 and day_chg <= -0.03:
-            return _fail("X5")
+            exclusions.append("X5")
+            break
 
     # ─── 趨勢條件（全部須滿足）───
-    t1 = close > ma20
-    t2 = ma5 > ma20
-    t3 = close > prev_close
-    if not (t1 and t2 and t3):
-        return _fail("趨勢不符")
+    trend = {"T1": bool(close > ma20), "T2": bool(ma5 > ma20), "T3": bool(close > prev_close)}
 
     return {
-        "passed": True,
         "df": df,
         "close": close,
         "today_chg": today_chg,
@@ -175,7 +190,21 @@ def prefilter(price_df):
         "rsi_cross": bool(latest["RSI_cross50"]),
         "atr": latest["ATR"],
         "high_60d": float(df["high"].tail(60).max()),
-    }
+        "exclusions": exclusions,
+        "trend": trend,
+    }, None
+
+
+def prefilter(price_df):
+    """排除條件與趨勢條件（只用價量）。通過時回傳 passed=True 和計算好的指標。"""
+    ev, reason = evaluate(price_df)
+    if ev is None:
+        return _fail(reason)
+    if ev["exclusions"]:
+        return _fail(ev["exclusions"][0])
+    if not all(ev["trend"].values()):
+        return _fail("趨勢不符")
+    return {"passed": True, **ev}
 
 
 def calc_theme_score(stock_id, theme_avg_chg, stock_themes):
@@ -190,10 +219,8 @@ def calc_theme_score(stock_id, theme_avg_chg, stock_themes):
     return 0
 
 
-def score(stock_id, pre, inst_signals, theme_avg_chg=None, stock_themes=None):
-    """prefilter 通過後，計算動能訊號 M1~M6 與評分（滿分 100）。"""
-    if stock_themes is None:
-        stock_themes = STOCK_UNIVERSE
+def _momentum(pre, inst_signals):
+    """動能訊號 M1~M6 和共用欄位。"""
     df = pre["df"]
     vol_vs_20d, vol_vs_5d = calc_volume_signals(df)
     rsi14 = pre["rsi14"]
@@ -207,10 +234,9 @@ def score(stock_id, pre, inst_signals, theme_avg_chg=None, stock_themes=None):
     if pre["kd_cross"]:                                        signals.append("M5")
     if rsi_strong:                                             signals.append("M6")
 
-    momentum_count = len(signals)
     base = {
         "signals": signals,
-        "momentum_count": momentum_count,
+        "momentum_count": len(signals),
         "vol_vs_20d": round(vol_vs_20d, 2),
         "vol_vs_5d": round(vol_vs_5d, 2),
         "inst_available": inst_signals["available"],
@@ -228,22 +254,62 @@ def score(stock_id, pre, inst_signals, theme_avg_chg=None, stock_themes=None):
         "atr": _f(pre["atr"]),
         "high_60d": _f(pre["high_60d"]),
     }
-    if momentum_count < 2:
-        return {**base, "passed": False, "score": 0, "exclude_reason": "動能不足"}
+    return base, rsi_strong
 
-    momentum_score = momentum_count * 5                                   # 30 分
-    chip_score = min(inst_signals["foreign_buy_days"], 5) * 5             # 25 分
-    tech_score = 21 + (2 if pre["kd_cross"] else 0) + (2 if rsi_strong else 0)  # 25 分（T1~T3 各 7 分）
+
+def _score_parts(stock_id, pre, inst_signals, rsi_strong, momentum_count, trend_count,
+                 theme_avg_chg, stock_themes):
+    momentum_score = momentum_count * 5                                    # 30 分
+    chip_score = min(inst_signals["foreign_buy_days"], 5) * 5              # 25 分
+    tech_score = (7 * trend_count + (2 if pre["kd_cross"] else 0)          # 25 分（T1~T3 各 7 分）
+                  + (2 if rsi_strong else 0))
     theme_score = calc_theme_score(stock_id, theme_avg_chg, stock_themes)  # 20 分
     total = min(momentum_score + chip_score + tech_score + theme_score, 100)
+    return total, {"momentum": momentum_score, "chip": chip_score, "tech": tech_score, "theme": theme_score}
 
+
+def score(stock_id, pre, inst_signals, theme_avg_chg=None, stock_themes=None):
+    """prefilter 通過後，計算動能訊號 M1~M6 與評分（滿分 100）。"""
+    if stock_themes is None:
+        stock_themes = STOCK_UNIVERSE
+    base, rsi_strong = _momentum(pre, inst_signals)
+    if base["momentum_count"] < 2:
+        return {**base, "passed": False, "score": 0, "exclude_reason": "動能不足"}
+    total, breakdown = _score_parts(stock_id, pre, inst_signals, rsi_strong, base["momentum_count"], 3,
+                                    theme_avg_chg, stock_themes)
+    return {**base, "passed": True, "score": total, "score_breakdown": breakdown, "exclude_reason": None}
+
+
+def score_card(stock_id, ev, inst_signals, theme_avg_chg=None, stock_themes=None):
+    """
+    不管有沒有通過篩選都打分數（自選股評分卡、次選名單用）。
+    分數算法和 score() 一樣，只是技術分照實際符合的趨勢條件給（每個 7 分）；
+    三個趨勢條件都符合、動能訊號 2 個以上時，分數和 score() 相同。
+    ev：evaluate() 的結果。
+    """
+    if stock_themes is None:
+        stock_themes = STOCK_UNIVERSE
+    base, rsi_strong = _momentum(ev, inst_signals)
+    trend_count = sum(ev["trend"].values())
+    total, breakdown = _score_parts(stock_id, ev, inst_signals, rsi_strong, base["momentum_count"],
+                                    trend_count, theme_avg_chg, stock_themes)
+    targets = calc_price_targets(base["close"], base["high_60d"], base["ma20"], base["atr"])
+    reasons = [EXCLUDE_TEXT[x] for x in ev["exclusions"]]
+    reasons += [TREND_TEXT[t] for t, ok in ev["trend"].items() if not ok]
+    if base["momentum_count"] < 2:
+        reasons.append(f"動能訊號只有 {base['momentum_count']} 個（要 2 個）")
+    if targets is None:
+        reasons.append("ATR 算不出來，沒有進出場價位")
+    elif targets["rr_ratio"] < MIN_RR_RATIO:
+        reasons.append(f"RR {targets['rr_ratio']:.2f} 未達 {MIN_RR_RATIO:g}")
     return {
         **base,
-        "passed": True,
         "score": total,
-        "score_breakdown": {"momentum": momentum_score, "chip": chip_score,
-                            "tech": tech_score, "theme": theme_score},
-        "exclude_reason": None,
+        "score_breakdown": breakdown,
+        "trend": dict(ev["trend"]),
+        "exclusions": list(ev["exclusions"]),
+        "fail_reasons": reasons,
+        "targets": targets,
     }
 
 
@@ -284,6 +350,28 @@ def calc_price_targets(close, high_60d, ma20, atr):
         "stop_loss": round(stop, 2),
         "rr_ratio": round(rr, 2),
     }
+
+
+def pick_market_scan(quotes, exclude, top_n):
+    """
+    證交所全部收盤行情裡，當日上漲、成交金額最大的普通股（排除 ETF、已在股票池的、量價太小的）。
+    quotes：data_fetcher.get_twse_daily() 的結果。回傳 [(代號, 名稱), ...]。
+    """
+    rows = [(sid, q) for sid, q in quotes.items()
+            if re.fullmatch(r"[1-9]\d{3}", sid) and sid not in exclude
+            and q.get("chg_pct") is not None and q["chg_pct"] > 0
+            and q["close"] >= MIN_PRICE and q.get("volume_lots", 0) >= MIN_VOLUME_LOT]
+    rows.sort(key=lambda x: x[1].get("value_100m", 0), reverse=True)
+    return [(sid, q["name"]) for sid, q in rows[:top_n]]
+
+
+def top_turnover(quotes, top_n=5):
+    """成交金額最大的普通股（報告「成交重心」）。"""
+    rows = [{"stock_id": sid, "name": q["name"], "close": q["close"], "chg_pct": q.get("chg_pct"),
+             "value_100m": q.get("value_100m", 0)}
+            for sid, q in quotes.items() if re.fullmatch(r"[1-9]\d{3}", sid)]
+    rows.sort(key=lambda r: r["value_100m"], reverse=True)
+    return rows[:top_n]
 
 
 def calc_theme_avg_chg(raw_results):

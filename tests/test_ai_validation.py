@@ -70,7 +70,7 @@ def test_wrong_date_rejects_everything():
     bad = copy.deepcopy(GOOD)
     bad["date"] = "2026-10-15"
     clean, issues = validate(bad, AI_INPUT)
-    assert clean == {"highlights": [], "stocks": {}}
+    assert not clean["highlights"] and not clean["stocks"] and clean["headline"] is None
     assert issues
 
 
@@ -138,3 +138,77 @@ def test_wrong_types_do_not_crash():
     bad["stocks"][1]["bull_points"] = [1, 2]
     clean, issues = validate(bad, AI_INPUT)
     assert clean["highlights"] == [] and clean["stocks"] == {}
+
+
+BROADCAST_INPUT = {**AI_INPUT, "watchlist": [{"stock_id": "4577", "name": "達航科技", "close": 115.5, "score": 45,
+                                               "not_selected_reasons": ["動能訊號只有 1 個（要 2 個）"]}]}
+BROADCAST = {
+    **GOOD,
+    "headline": "台股收 47,111.26 點，散熱電源逆勢 +1.23%",
+    "market_commentary": "加權指數下跌 0.82%，散熱電源主題平均 +1.23% 逆勢走強。",
+    "watch_tomorrow": ["矽力-KY 能否守住程式停損 470", "散熱電源是否延續強勢"],
+    "watchlist": [{"stock_id": "4577", "comment": "達航科技收 115.5、評分 45，動能訊號只有 1 個，暫不入選。",
+                   "news_ids": []}],
+}
+
+
+def test_broadcast_fields_pass():
+    clean, issues = validate(BROADCAST, BROADCAST_INPUT)
+    assert issues == []
+    assert clean["headline"].startswith("台股收") and clean["market_commentary"]
+    assert len(clean["watch_tomorrow"]) == 2
+    assert clean["watchlist"]["4577"]["comment"].startswith("達航科技")
+
+
+def test_broadcast_fields_with_made_up_numbers_are_dropped():
+    bad = copy.deepcopy(BROADCAST)
+    bad["headline"] = "台股明天上看 48,000 點"
+    bad["market_commentary"] = "保證明天上漲 2%。"
+    bad["watch_tomorrow"].append("目標價 600 元")
+    bad["watchlist"][0]["comment"] = "達航科技目標 150 元。"
+    clean, issues = validate(bad, BROADCAST_INPUT)
+    assert clean["headline"] is None and clean["market_commentary"] is None
+    assert clean["watch_tomorrow"] == BROADCAST["watch_tomorrow"]
+    assert clean["watchlist"] == {}
+    assert any("標題" in i for i in issues) and any("自選股 4577" in i for i in issues)
+
+
+def test_missing_watchlist_comment_is_reported():
+    out = copy.deepcopy(BROADCAST)
+    out["watchlist"] = []
+    _, issues = validate(out, BROADCAST_INPUT)
+    assert "自選股 4577：AI 沒有寫評論" in issues
+
+
+def test_lower_tier_cannot_be_strong_buy():
+    ai_input = copy.deepcopy(AI_INPUT)
+    ai_input["candidates"][1]["tier"] = "次選"
+    out = copy.deepcopy(GOOD)
+    out["stocks"][1]["verdict"] = "強力做多"
+    clean, issues = validate(out, ai_input)
+    assert "3034" not in clean["stocks"] and any("次選不能給「強力做多」" in i for i in issues)
+
+
+def test_stock_counts_after_up_down_words_are_not_signed():
+    # 「下跌 380 家」是 380 家股票下跌，不是 -380（10/21 的盤勢播報因此被誤判拿掉）
+    allowed = collect_allowed_numbers({"market": {"breadth": {"up": 600, "down": 380}, "chg": -529.15}})
+    assert check_text("上漲 600 家、下跌 380 家", allowed, 100) == []
+    assert check_text("下跌 529.15 點", allowed, 100) == []
+    assert check_text("上漲 529.15 點", allowed, 100) != []       # 點數還是要檢查方向
+
+
+def test_buy_sell_direction_is_checked():
+    allowed = collect_allowed_numbers({"market": {"institutional_100m": {"foreign": 22.39, "dealer": -135.72}},
+                                       "sitc_net_5d_lots": -2845})
+    assert check_text("外資買超 22.39 億元，自營商賣超 135.72 億元", allowed, 100) == []
+    assert check_text("投信近 5 日淨賣超 2845 張", allowed, 100) == []
+    assert check_text("外資賣超 22.39 億元", allowed, 100) != []
+    assert check_text("自營商買超 135.72 億元", allowed, 100) != []
+
+
+def test_unavailable_watchlist_stock_needs_no_comment():
+    ai_input = {**BROADCAST_INPUT, "watchlist": [{"stock_id": "4577", "name": "達航科技", "unavailable": "沒有價格"}]}
+    out = copy.deepcopy(BROADCAST)
+    out["watchlist"] = []
+    _, issues = validate(out, ai_input)
+    assert not any("4577" in i for i in issues)
