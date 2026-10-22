@@ -17,7 +17,7 @@ import requests  # noqa: E402
 
 import data_fetcher as f  # noqa: E402
 import verify  # noqa: E402
-from config import STOCK_UNIVERSE  # noqa: E402
+from config import STOCK_UNIVERSE, WATCHLIST  # noqa: E402
 
 results = []   # (狀態, 項目, 說明)；狀態：OK / MISMATCH / UNREACHABLE / INFO（只是資訊，不影響結果）
 
@@ -109,12 +109,12 @@ def p_info(date):
         return record("MISMATCH", "官方股票清單", "解析後是空的")
     not_found, mismatched = verify.verify_universe(info)
     record("OK", "官方股票清單", f"{len(info)} 檔")
-    for sid in sorted(STOCK_UNIVERSE):
+    for sid in sorted(set(STOCK_UNIVERSE) | set(WATCHLIST)):
         print(f"  {sid} {info.get(sid, '（查無）')}")
     if not_found or mismatched:
         record("MISMATCH", "股票池代號", f"查無 {not_found}；名稱不符 {mismatched}")
     else:
-        record("OK", "股票池代號", f"{len(STOCK_UNIVERSE)} 檔代號和名稱都一致")
+        record("OK", "股票池代號", f"{len(set(STOCK_UNIVERSE) | set(WATCHLIST))} 檔（含自選股）代號和名稱都一致")
 
 
 @probe("證交所成交量排行 MI_INDEX20")
@@ -160,86 +160,46 @@ def p_telegram(date):
     record("OK" if ok else "MISMATCH", "Telegram token", "有效" if ok else f"HTTP {r.status_code}")
 
 
-def _explore(name, fn):
-    """評估中的資料源：只印出格式，失敗記 INFO，不影響檢查結果。"""
-    print(f"\n=== （評估）{name} ===", flush=True)
-    try:
-        record("INFO", name, fn())
-    except Exception as e:
-        record("INFO", name, f"失敗 {type(e).__name__}: {e}")
+@probe("證交所全部收盤行情 MI_INDEX")
+def p_twse_daily(date):
+    quotes, breadth, err = f.get_twse_daily(date)
+    if err:
+        return record("UNREACHABLE", "全部收盤行情", err)
+    record("OK" if quotes.get("2330") else "MISMATCH", "全部收盤行情",
+           f"{len(quotes)} 檔，2330 = {quotes.get('2330')}")
+    record("OK" if breadth.get("up") is not None else "MISMATCH", "漲跌家數", str(breadth))
 
 
-def p_explore(date):
-    from datetime import datetime, timedelta
-    week_ago = (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
+@probe("FinMind 整體三大法人")
+def p_total_inst(date):
+    out, err = f.get_market_institutional(date)
+    record("OK" if out else "MISMATCH", "整體三大法人（億元）", str(out) if out else err)
 
-    def mi_index():
-        data = f._twse_get_json("https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX",
-                                {"response": "json", "date": date.replace("-", ""), "type": "ALLBUT0999"})
-        print("stat：", data.get("stat"), "最上層欄位：", list(data))
-        for i, t in enumerate(data.get("tables") or []):
-            print(f"  table[{i}] title={t.get('title')!r} fields={t.get('fields')} 筆數={len(t.get('data') or [])}")
-            for row in (t.get("data") or [])[:2]:
-                print("     ", row)
-        return f"stat={data.get('stat')} tables={len(data.get('tables') or [])}"
 
-    def total_inst():
-        rows = _finmind_raw("TaiwanStockTotalInstitutionalInvestors", start_date=week_ago, end_date=date)
-        for r in rows[-8:]:
-            print("     ", r)
-        return f"{len(rows)} 筆"
+@probe("FinMind 個股新聞")
+def p_stock_news(date):
+    news = f.get_stock_news("2330", date)
+    for n in news:
+        print("  ", n)
+    record("OK" if news else "MISMATCH", "個股新聞", f"2330 有 {len(news)} 則")
 
-    def stock_news():
-        rows = _finmind_raw("TaiwanStockNews", data_id="2330", start_date=date)
-        for r in rows[:3]:
-            print("     ", r)
-        return f"{len(rows)} 筆"
 
-    def us_index():
-        out = []
-        for sid in ("^GSPC", "^IXIC", "^SOX", "^DJI", "TSM", "SPY"):
-            rows = _finmind_raw("USStockPrice", data_id=sid, start_date=week_ago, end_date=date)
-            if rows:
-                print(f"  {sid} 最後一筆：", rows[-1])
-            out.append(f"{sid}:{len(rows)}")
-        return " ".join(out)
+@probe("FinMind 美股")
+def p_us(date):
+    out, err = f.get_us_markets(date)
+    for u in out:
+        print("  ", u)
+    record("OK" if not err else "MISMATCH", "美股", err or f"{len(out)} 項，日期 {out[0]['date']}")
 
-    def info_4577():
-        raw = f._fetch("TaiwanStockInfo")
-        rows = raw[raw["stock_id"].astype(str) == "4577"].to_dict("records") if not raw.empty else []
-        print("  4577：", rows)
-        df = f.get_stock_price("4577", date)
-        print(df.tail(2).to_string() if not df.empty else "  4577 沒有價格")
-        return f"官方清單 {len(rows)} 筆，價格 {len(df)} 筆"
 
-    def cnyes_categories():
-        out = []
-        for cat in ("headline", "tw_stock", "wd_stock", "us_stock", "tw_quo", "tw_macro"):
-            r = requests.get(f"https://api.cnyes.com/media/api/v1/newslist/category/{cat}",
-                             params={"limit": 5}, timeout=20, headers={"User-Agent": f.USER_AGENT})
-            items = (r.json().get("items") or {}).get("data") or [] if r.ok else []
-            print(f"  {cat}: HTTP {r.status_code}", [i.get("title", "")[:30] for i in items[:3]])
-            if items:
-                print("    第一則欄位：", sorted(items[0]))
-            out.append(f"{cat}:{r.status_code}/{len(items)}")
-        return " ".join(out)
-
-    def tpex_quotes():
-        r = requests.get("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
-                         timeout=30, headers={"User-Agent": f.USER_AGENT, "Accept": "application/json"})
-        data = r.json() if r.ok else []
-        print(f"  HTTP {r.status_code} 筆數 {len(data)}")
-        for row in data[:2]:
-            print("     ", row)
-        hit = [row for row in data if str(row.get("SecuritiesCompanyCode", "")).strip() == "4577"]
-        print("  4577：", hit)
-        return f"HTTP {r.status_code} {len(data)} 筆"
-
-    for name, fn in (("證交所全部收盤行情 MI_INDEX", mi_index), ("FinMind 整體三大法人", total_inst),
-                     ("FinMind 個股新聞", stock_news), ("FinMind 美股指數", us_index),
-                     ("4577 基本資料", info_4577), ("鉅亨網其他分類", cnyes_categories),
-                     ("櫃買中心收盤行情", tpex_quotes)):
-        _explore(name, fn)
+@probe("鉅亨網各分類新聞")
+def p_news_categories(date):
+    news, err = f.get_tw_stock_news()
+    counts = {}
+    for n in news:
+        counts[n["category"]] = counts.get(n["category"], 0) + 1
+    record("OK" if not err and len(counts) == len(f.NEWS_CATEGORIES) else "MISMATCH", "新聞分類",
+           err or f"各分類則數 {counts}")
 
 
 def main():
@@ -250,9 +210,9 @@ def main():
         today = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")
         date = f.latest_date_of(f.get_taiex_price(today)) or today
     print(f"檢查日期：{date}")
-    for p in (p_taiex, p_price, p_inst, p_info, p_top, p_day_all, p_news, p_telegram):
+    for p in (p_taiex, p_price, p_inst, p_info, p_top, p_day_all, p_news, p_telegram,
+              p_twse_daily, p_total_inst, p_stock_news, p_us, p_news_categories):
         p(date)
-    p_explore(date)
 
     print("\n=== 總結 ===")
     for status, name, detail in results:

@@ -14,7 +14,7 @@
 import re
 import sys
 
-from config import STOCK_UNIVERSE, STOCK_NAMES
+from config import STOCK_UNIVERSE, STOCK_NAMES, WATCHLIST
 from reporter import pick_number_strings
 
 
@@ -75,7 +75,7 @@ def names_match(expected, official):
 def verify_universe(stock_info):
     """回傳 (官方查無的代號, [(代號, 設定名稱, 官方名稱), ...])。"""
     not_found, mismatched = [], []
-    for sid in sorted(STOCK_UNIVERSE):
+    for sid in sorted(set(STOCK_UNIVERSE) | set(WATCHLIST)):
         official = stock_info.get(sid)
         expected = STOCK_NAMES.get(sid)
         if not official:
@@ -97,7 +97,7 @@ def _cli_universe():
     for sid, exp, off in mismatched:
         print(f"[不符] {sid}：設定「{exp}」，官方「{off}」")
     if not (not_found or mismatched):
-        print(f"股票池 {len(STOCK_UNIVERSE)} 檔，代號和名稱都一致")
+        print(f"股票池 {len(set(STOCK_UNIVERSE) | set(WATCHLIST))} 檔（含自選股），代號和名稱都一致")
     return 1 if (not_found or mismatched) else 0
 
 

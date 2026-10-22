@@ -89,3 +89,33 @@ def test_target_uses_higher_of_60d_high_and_atr():
 
 def test_targets_need_valid_atr():
     assert calc_price_targets(close=100, high_60d=110, ma20=96, atr=None) is None
+
+
+def test_score_card_matches_score_for_passing_stock(price_df):
+    pre = prefilter(price_df)
+    inst = analyzer.calc_institutional_signals(make_inst_daily(), "2026-10-16")
+    ev, _ = analyzer.evaluate(price_df)
+    card = analyzer.score_card("2330", ev, inst)
+    res = score("2330", pre, inst)
+    assert card["score"] == res["score"] and card["score_breakdown"] == res["score_breakdown"]
+    assert card["targets"] == calc_price_targets(res["close"], res["high_60d"], res["ma20"], res["atr"])
+
+
+def test_score_card_explains_why_a_stock_was_not_picked():
+    # 自選股沒通過篩選也要有分數和原因（例如 4577 不在股票池、趨勢不符）
+    df = make_price_df(drift=-0.004, last_chg=-0.05, last_vol_mult=1.0)
+    ev, _ = analyzer.evaluate(df)
+    assert "X1" in ev["exclusions"] and not ev["trend"]["T1"]
+    card = analyzer.score_card("4577", ev, analyzer.calc_institutional_signals(None, "2026-10-16"))
+    assert card["score"] < 50
+    assert 7 * sum(ev["trend"].values()) <= card["score_breakdown"]["tech"] <= 7 * sum(ev["trend"].values()) + 4
+    assert "今日跌幅超過 3%" in card["fail_reasons"]
+    assert "收盤沒有站上 MA20" in card["fail_reasons"]
+    assert any("動能訊號只有" in r for r in card["fail_reasons"])
+
+
+def test_evaluate_lists_every_exclusion_but_prefilter_reports_the_first():
+    df = make_price_df(drift=-0.02, last_chg=-0.05, base_vol=100)
+    ev, _ = analyzer.evaluate(df)
+    assert ev["exclusions"][:3] == ["X1", "X2", "X3"]
+    assert prefilter(df)["exclude_reason"] == "X1"

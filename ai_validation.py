@@ -20,6 +20,11 @@ MAX_POINT_LEN = 80
 MAX_SUMMARY_LEN = 150
 MAX_HIGHLIGHTS = 3
 MAX_HIGHLIGHT_LEN = 150
+MAX_HEADLINE_LEN = 40
+MAX_COMMENTARY_LEN = 300
+MAX_WATCH_TOMORROW = 3
+MAX_WATCH_TOMORROW_LEN = 60
+MAX_WATCH_COMMENT_LEN = 120
 
 UNITS = "%|％|倍|元|張|億|萬|成"
 # 正負號只在前面不是數字或英文字母時才算（避免把「2026-10-16」的「-10」當成負數）
@@ -32,10 +37,23 @@ DIRECTION_RE = re.compile(r"(漲|升|跌|降)\s*$")
 CJK_NUMBER_RE = re.compile(rf"[零〇一二兩三四五六七八九十][零〇一二兩三四五六七八九十百千萬億]*\s*(?:{UNITS})")
 
 # 給 Claude API 結構化輸出（output_config.format）用的 schema；長度、範圍由下面的程式檢查
+_NEWS_IDS = {"type": "array", "items": {"type": "string"}}
 AI_OUTPUT_SCHEMA = {
     "type": "object",
     "properties": {
         "date": {"type": "string"},
+        "headline": {"type": "string"},
+        "market_commentary": {"type": "string"},
+        "watch_tomorrow": {"type": "array", "items": {"type": "string"}},
+        "watchlist": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"stock_id": {"type": "string"}, "comment": {"type": "string"}, "news_ids": _NEWS_IDS},
+                "required": ["stock_id", "comment", "news_ids"],
+                "additionalProperties": False,
+            },
+        },
         "highlights": {
             "type": "array",
             "items": {
@@ -67,7 +85,7 @@ AI_OUTPUT_SCHEMA = {
             },
         },
     },
-    "required": ["date", "highlights", "stocks"],
+    "required": ["date", "headline", "market_commentary", "watch_tomorrow", "highlights", "stocks", "watchlist"],
     "additionalProperties": False,
 }
 
@@ -174,12 +192,26 @@ def _str_list(x):
     return None
 
 
+def _refs(value, news_ids, problems):
+    """news_ids 欄位：要是字串陣列、而且每個編號都存在；有問題就記進 problems。"""
+    refs = _str_list(value or [])
+    if refs is None:
+        problems.append("news_ids 要是字串陣列")
+        return []
+    unknown = [r for r in refs if r not in news_ids]
+    if unknown:
+        problems.append(f"引用不存在的新聞 {', '.join(unknown)}")
+    return refs
+
+
 def validate(ai_output, ai_input):
     """
     回傳 (合格內容, 問題清單)。
-    合格內容格式：{"highlights": [...], "stocks": {代號: {...}}}；不合格的段落被拿掉。
+    合格內容格式：{"headline", "market_commentary", "watch_tomorrow": [...], "highlights": [...],
+                   "stocks": {代號: {...}}, "watchlist": {代號: {...}}}；不合格的段落被拿掉。
     """
-    clean = {"highlights": [], "stocks": {}}
+    clean = {"headline": None, "market_commentary": None, "watch_tomorrow": [], "highlights": [],
+             "stocks": {}, "watchlist": {}}
     issues = []
     if not isinstance(ai_output, dict):
         return clean, ["AI 輸出不是 JSON 物件"]
@@ -189,6 +221,30 @@ def validate(ai_output, ai_input):
     allowed = collect_allowed_numbers(ai_input)
     news_ids = {n["id"] for n in ai_input.get("news", [])}
     candidates = {c["stock_id"] for c in ai_input.get("candidates", [])}
+    tiers = {c["stock_id"]: c.get("tier", "嚴選") for c in ai_input.get("candidates", [])}
+
+    for key, label, max_len in (("headline", "標題", MAX_HEADLINE_LEN),
+                                ("market_commentary", "盤勢播報", MAX_COMMENTARY_LEN)):
+        if ai_output.get(key) is None:
+            continue
+        problems = check_text(ai_output[key], allowed, max_len)
+        if problems:
+            issues.append(f"{label}：{'；'.join(problems)}")
+        else:
+            clean[key] = ai_output[key].strip()
+
+    watch_tomorrow = ai_output.get("watch_tomorrow") or []
+    if _str_list(watch_tomorrow) is None:
+        issues.append("watch_tomorrow 要是字串陣列")
+        watch_tomorrow = []
+    for i, text in enumerate(watch_tomorrow[:MAX_WATCH_TOMORROW], 1):
+        problems = check_text(text, allowed, MAX_WATCH_TOMORROW_LEN)
+        if problems:
+            issues.append(f"明日觀察 {i}：{'；'.join(problems)}")
+        else:
+            clean["watch_tomorrow"].append(text.strip())
+    if len(watch_tomorrow) > MAX_WATCH_TOMORROW:
+        issues.append(f"明日觀察超過 {MAX_WATCH_TOMORROW} 點，只取前 {MAX_WATCH_TOMORROW} 點")
 
     highlights = ai_output.get("highlights") or []
     if not isinstance(highlights, list):
@@ -199,13 +255,7 @@ def validate(ai_output, ai_input):
             issues.append(f"今日重點 {i}：格式錯誤")
             continue
         problems = check_text(h.get("text"), allowed, MAX_HIGHLIGHT_LEN)
-        refs = _str_list(h.get("news_ids") or [])
-        if refs is None:
-            problems.append("news_ids 要是字串陣列")
-            refs = []
-        unknown = [r for r in refs if r not in news_ids]
-        if unknown:
-            problems.append(f"引用不存在的新聞 {', '.join(unknown)}")
+        refs = _refs(h.get("news_ids"), news_ids, problems)
         if problems:
             issues.append(f"今日重點 {i}：{'；'.join(problems)}")
         else:
@@ -241,18 +291,14 @@ def validate(ai_output, ai_input):
                     problems.append(f"{label}第 {j} 點{prob}")
         if s.get("verdict") not in VERDICTS:
             problems.append(f"判決「{s.get('verdict')}」不在四個選項裡")
+        elif s.get("verdict") == "強力做多" and tiers.get(sid, "嚴選") != "嚴選":
+            problems.append(f"{tiers[sid]}不能給「強力做多」")
         conf = s.get("confidence")
         if isinstance(conf, bool) or not isinstance(conf, int) or not (1 <= conf <= 10):
             problems.append("信心分數要是 1~10 的整數")
         for prob in check_text(s.get("summary"), allowed, MAX_SUMMARY_LEN):
             problems.append(f"摘要{prob}")
-        refs = _str_list(s.get("news_ids") or [])
-        if refs is None:
-            problems.append("news_ids 要是字串陣列")
-            refs = []
-        unknown = [r for r in refs if r not in news_ids]
-        if unknown:
-            problems.append(f"引用不存在的新聞 {', '.join(unknown)}")
+        refs = _refs(s.get("news_ids"), news_ids, problems)
         if problems:
             issues.append(f"{sid}：{'；'.join(problems)}")
         else:
@@ -266,4 +312,27 @@ def validate(ai_output, ai_input):
             }
     for sid in sorted(candidates - seen):
         issues.append(f"{sid}：AI 沒有寫這檔")
+
+    watch_ids = {w["stock_id"] for w in ai_input.get("watchlist", [])}
+    watch_out = ai_output.get("watchlist") or []
+    if not isinstance(watch_out, list):
+        issues.append("watchlist 不是陣列")
+        watch_out = []
+    seen_watch = set()
+    for w in watch_out:
+        sid = str(w.get("stock_id", "")) if isinstance(w, dict) else ""
+        if sid not in watch_ids:
+            issues.append(f"自選股 {sid}：不在自選股清單裡，忽略")
+            continue
+        if sid in seen_watch:
+            continue
+        seen_watch.add(sid)
+        problems = check_text(w.get("comment"), allowed, MAX_WATCH_COMMENT_LEN)
+        refs = _refs(w.get("news_ids"), news_ids, problems)
+        if problems:
+            issues.append(f"自選股 {sid}：{'；'.join(problems)}")
+        else:
+            clean["watchlist"][sid] = {"comment": w["comment"].strip(), "news_ids": refs}
+    for sid in sorted(watch_ids - seen_watch):
+        issues.append(f"自選股 {sid}：AI 沒有寫評論")
     return clean, issues

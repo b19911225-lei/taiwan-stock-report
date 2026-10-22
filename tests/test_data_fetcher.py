@@ -125,3 +125,98 @@ def test_institutional_uses_buysell_dataset(monkeypatch):
     daily, unknown = data_fetcher.get_institutional_investors("2330", "2026-10-16")
     assert calls == ["TaiwanStockInstitutionalInvestorsBuySell"]
     assert daily.iloc[0]["foreign"] == 9 and unknown == []
+
+
+# 2026-10-22 資料源檢查印出來的實際格式（節錄）
+MI_INDEX = {"stat": "OK", "tables": [
+    {"title": "115年10月21日 價格指數(臺灣證券交易所)", "fields": ["指數", "收盤指數"], "data": [["發行量加權股價指數", "46,887.77"]]},
+    {"title": "漲跌證券數合計", "fields": ["類型", "整體市場", "股票"],
+     "data": [["上漲(漲停)", "10,182(111)", "600(24)"], ["下跌(跌停)", "5,341(61)", "380(1)"], ["持平", "900", "52"]]},
+    {"title": "115年10月21日 每日收盤行情(全部(不含權證、牛熊證、可展延牛熊證))",
+     "fields": ["證券代號", "證券名稱", "成交股數", "成交筆數", "成交金額", "開盤價", "最高價", "最低價", "收盤價",
+                "漲跌(+/-)", "漲跌價差", "最後揭示買價", "最後揭示買量", "最後揭示賣價", "最後揭示賣量", "本益比"],
+     "data": [
+         ["00400A", "主動國泰動能高息", "22,140,198", "6,089", "330,823,580", "14.95", "15.12", "14.76", "14.84",
+          "<p style= color:red>+</p>", "0.23", "14.83", "110", "14.84", "486", "0.00"],
+         ["2330", "台積電", "30,000,000", "1", "72,600,000,000", "2400", "2430", "2390", "2,420.00",
+          "<p style= color:red>+</p>", "25.00", "", "", "", "", ""],
+         ["2409", "友達", "305,682,000", "1", "5,000,000,000", "16", "16.5", "15.8", "16.00",
+          "<p style= color:green>-</p>", "0.40", "", "", "", "", ""],
+         ["1101", "台泥", "1,000", "1", "30,000", "--", "--", "--", "--", " ", "0.00", "", "", "", "", ""],
+         ["2884", "玉山金", "10,000,000", "1", "300,000,000", "30", "30", "29.5", "30.00", "X", "0.00", "", "", "", "", ""],
+     ]},
+]}
+
+
+def test_parse_twse_daily_quotes_and_breadth():
+    quotes, breadth = data_fetcher.parse_twse_daily(MI_INDEX)
+    assert breadth == {"up": 600, "limit_up": 24, "down": 380, "limit_down": 1, "flat": 52}
+    assert quotes["2330"]["close"] == 2420.0 and quotes["2330"]["change"] == 25.0
+    assert quotes["2330"]["chg_pct"] == round(25 / 2395 * 100, 2) and quotes["2330"]["value_100m"] == 726.0
+    assert quotes["2409"]["change"] == -0.4 and quotes["2409"]["volume_lots"] == 305682
+    assert "1101" not in quotes                     # 「--」沒有成交
+    assert quotes["2884"]["chg_pct"] is None        # 「X」除權息，漲跌幅不能和前一天收盤比
+
+
+def test_market_scan_picks_liquid_gainers_only():
+    import analyzer
+    quotes, _ = data_fetcher.parse_twse_daily(MI_INDEX)
+    assert analyzer.pick_market_scan(quotes, set(), 10) == [("2330", "台積電")]   # ETF、下跌、除權息都不要
+    assert analyzer.pick_market_scan(quotes, {"2330"}, 10) == []
+    assert [r["stock_id"] for r in analyzer.top_turnover(quotes, 2)] == ["2330", "2409"]
+
+
+def test_market_institutional(monkeypatch):
+    rows = [{"date": "2026-10-21", "name": n, "buy": b, "sell": s} for n, b, s in [
+        ("Foreign_Investor", 347069351600, 344830441784), ("Foreign_Dealer_Self", 0, 0),
+        ("Dealer_self", 8827306626, 15014776691), ("Dealer_Hedging", 31790923805, 39175157607),
+        ("Investment_Trust", 30398904149, 17600366911), ("total", 418086486180, 416620742993)]]
+    rows.append({"date": "2026-10-20", "name": "Foreign_Investor", "buy": 1, "sell": 999})
+    monkeypatch.setattr(data_fetcher, "_fetch", lambda *a, **k: pd.DataFrame(rows))
+    out, err = data_fetcher.get_market_institutional("2026-10-21")
+    assert err is None and out == {"foreign": 22.39, "sitc": 127.99, "dealer": -135.72}
+    out, err = data_fetcher.get_market_institutional("2026-10-22")
+    assert out is None and "還沒有 2026-10-22" in err
+
+
+def test_us_markets_use_the_session_before_the_report_date(monkeypatch):
+    # 台股 10/21 收盤時，美股 10/21 還沒開盤：要用 10/20 的收盤
+    def fake(dataset, stock_id=None, start_date=None, end_date=None, retries=3):
+        return pd.DataFrame({"date": ["2026-10-19", "2026-10-20", "2026-10-21"], "Close": [100.0, 102.0, 200.0]})
+    monkeypatch.setattr(data_fetcher, "_fetch", fake)
+    out, err = data_fetcher.get_us_markets("2026-10-21")
+    assert err is None and len(out) == len(data_fetcher.US_MARKETS)
+    assert out[0]["date"] == "2026-10-20" and out[0]["chg_pct"] == 2.0
+
+
+def test_stock_news_strips_source_and_dedupes(monkeypatch):
+    df = pd.DataFrame([
+        {"date": "2026-10-21 01:02:00", "title": "台積電漲25元 - ETtoday財經雲", "source": "ETtoday財經雲", "link": "https://a"},
+        {"date": "2026-10-21 01:03:00", "title": "台積電漲25元 - ETtoday財經雲", "source": "ETtoday財經雲", "link": "https://b"},
+        {"date": "2026-10-23 01:00:00", "title": "之後的新聞", "source": "UDN", "link": "https://c"},
+    ])
+    monkeypatch.setattr(data_fetcher, "_fetch", lambda *a, **k: df)
+    news = data_fetcher.get_stock_news("2330", "2026-10-21")
+    assert [n["title"] for n in news] == ["台積電漲25元"] and news[0]["source"] == "ETtoday財經雲"
+
+
+def test_cnyes_items_merge_categories_and_skip_analyst_estimates():
+    items = [
+        ("台股", {"newsId": 1, "title": "台積電(2330)法說", "publishAt": 1_000_000, "stock": ["2330"]}),
+        ("盤勢", {"newsId": 1, "title": "台積電(2330)法說", "publishAt": 1_000_000}),
+        ("台股", {"newsId": 2, "title": "鉅亨速報 - Factset 最新調查：台積電目標價", "publishAt": 1_000_050}),
+        ("國際", {"newsId": 3, "title": "費半大漲", "publishAt": 1_000_090}),
+    ]
+    news = data_fetcher.parse_cnyes_items(items, hours=24, now_ts=1_000_100)
+    assert [n["title"] for n in news] == ["費半大漲", "台積電(2330)法說"]
+    assert news[0]["id"] == "N1" and news[0]["category"] == "國際" and news[1]["stocks"] == ["2330"]
+
+
+def test_related_news_ids():
+    news = [{"id": "N1", "title": "矽力營收創新高", "stocks": []},
+            {"id": "N2", "title": "盤後焦點", "stocks": ["6415"]},
+            {"id": "N3", "title": "全新推出新品", "stocks": []},
+            {"id": "N4", "title": "全新(2455)接單", "stocks": []},
+            {"id": "N5", "title": "加權指數 64155 點", "stocks": []}]
+    assert data_fetcher.related_news_ids(news, "6415", "矽力*-KY") == ["N1", "N2"]
+    assert data_fetcher.related_news_ids(news, "2455", "全新") == ["N4"]    # 名稱是常見詞，只認代號

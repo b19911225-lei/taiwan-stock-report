@@ -41,6 +41,7 @@ from ai_validation import validate
 from config import (
     STOCK_UNIVERSE, STOCK_NAMES, TIMEZONE, TOP_VOLUME_COUNT, HOT_THEME, MIN_RR_RATIO,
     TARGET_STOCK_COUNT, DEBATE_STOCK_COUNT, PERFORMANCE_LOOKBACK_DAYS, DATA_WAIT_INTERVAL_SEC,
+    WATCHLIST, WATCH_THEME, MARKET_SCAN_COUNT, SCAN_THEME, MIN_PICK_COUNT, MIN_FILL_RR,
 )
 from quality import DataQuality
 
@@ -66,6 +67,9 @@ PICK_FIELDS = [
     "vol_vs_20d", "vol_vs_5d", "inst_available", "foreign_buy_days", "foreign_net_5d_lots",
     "sitc_net_5d_lots", "dealer_net_5d_lots", "rsi14", "kd_cross", "ma5", "ma20", "atr", "high_60d",
 ]
+
+# 推薦分級（見 config.py 的 TARGET_STOCK_COUNT／MIN_PICK_COUNT）
+TIER_LABELS = {"A": "嚴選", "B": "次選", "C": "候補"}
 
 
 def log(msg):
@@ -138,6 +142,29 @@ def market_summary(taiex):
     return out
 
 
+def _tier_note(r):
+    if r["tier"] == "B":
+        return f"次選：RR {r['targets']['rr_ratio']:.2f} 未達 {MIN_RR_RATIO:g}"
+    if r["tier"] == "C":
+        return f"候補：動能訊號只有 {r['momentum_count']} 個"
+    return None
+
+
+def select_picks(results):
+    """嚴選依評分取前 TARGET_STOCK_COUNT 檔；不到 MIN_PICK_COUNT 檔時用次選、候補補足（RR 至少 MIN_FILL_RR）。"""
+    def ranked(tier, min_rr=None):
+        ids = [s for s, r in results.items() if r.get("tier") == tier
+               and (min_rr is None or (r.get("targets") and r["targets"]["rr_ratio"] >= min_rr))]
+        return sorted(ids, key=lambda s: results[s]["score"], reverse=True)
+
+    pick_ids = ranked("A")[:TARGET_STOCK_COUNT]
+    for tier in ("B", "C"):
+        if len(pick_ids) >= MIN_PICK_COUNT:
+            break
+        pick_ids += ranked(tier, MIN_FILL_RR)[:MIN_PICK_COUNT - len(pick_ids)]
+    return pick_ids
+
+
 def collect(date, taiex):
     q = DataQuality()
 
@@ -164,8 +191,24 @@ def collect(date, taiex):
             universe[sid] = [HOT_THEME]
         log(f"  量排行: {sid} {name} {vol:,}張")
 
+    # 全市場掃描：當日上漲、成交金額最大的普通股（同一份資料也拿來算漲跌家數、成交重心）
+    quotes, breadth, err = fetch.get_twse_daily(date)
+    if err:
+        q.add_note(err)
+    scan = analyzer.pick_market_scan(quotes, set(universe), MARKET_SCAN_COUNT)
+    for sid, _ in scan:
+        universe[sid] = [SCAN_THEME]
+    if scan:
+        log(f"  市場掃描加入 {len(scan)} 檔：{'、'.join(f'{s} {n}' for s, n in scan)}")
+
+    for sid in WATCHLIST:
+        themes = universe.setdefault(sid, [])
+        if WATCH_THEME not in themes:
+            themes.append(WATCH_THEME)
+
     def name_of(sid):
-        return stock_info.get(sid) or hot_names.get(sid) or STOCK_NAMES.get(sid) or sid
+        return (stock_info.get(sid) or hot_names.get(sid) or (quotes.get(sid) or {}).get("name")
+                or STOCK_NAMES.get(sid) or sid)
 
     # 過去推薦的股票也要抓價格，才能追蹤績效
     past = history.past_picks(date, PERFORMANCE_LOOKBACK_DAYS)
@@ -192,29 +235,37 @@ def collect(date, taiex):
                     "today_chg": round((close - prev) / prev * 100, 2) if prev else 0.0}
 
     theme_avg = analyzer.calc_theme_avg_chg(raw)
-    results, unknown_inst = {}, set()
-    stats = {"universe": len(universe), "fetched": len(raw), "prefilter_passed": 0,
+    results, cards, unknown_inst = {}, {}, set()
+    stats = {"universe": len(universe), "fetched": len(raw), "scan_added": len(scan), "prefilter_passed": 0,
              "scored_passed": 0, "rr_ok": 0}
     for sid, r in raw.items():
-        pre = analyzer.prefilter(r["df"])
-        if not pre["passed"]:
-            results[sid] = {"passed": False, "exclude_reason": pre["exclude_reason"]}
-            continue
-        stats["prefilter_passed"] += 1
+        ev, reason = analyzer.evaluate(r["df"])
+        pre_ok = ev is not None and not ev["exclusions"] and all(ev["trend"].values())
+        if not pre_ok:
+            results[sid] = {"passed": False,
+                            "exclude_reason": reason or (ev["exclusions"] or ["趨勢不符"])[0]}
+            if sid not in WATCHLIST or ev is None:
+                continue          # 自選股沒通過也要打分數（評分卡寫原因），其他的就不抓法人了
+        else:
+            stats["prefilter_passed"] += 1
         inst_daily, unknown = fetch.get_institutional_investors(sid, date, days=10)
         unknown_inst.update(unknown)
         inst = analyzer.calc_institutional_signals(inst_daily, date)
-        if not inst["available"]:
+        if not inst["available"] and pre_ok:
             q.missing_inst.append(sid)
-        res = analyzer.score(sid, pre, inst, theme_avg, universe)
-        if res["passed"]:
+        card = analyzer.score_card(sid, ev, inst, theme_avg, universe)
+        cards[sid] = card
+        if not pre_ok:
+            continue
+        rr = card["targets"]["rr_ratio"] if card["targets"] else None
+        strong = card["momentum_count"] >= 2
+        if strong:
             stats["scored_passed"] += 1
-            res["targets"] = analyzer.calc_price_targets(res["close"], res["high_60d"], res["ma20"], res["atr"])
-            res["rr_ok"] = bool(res["targets"]) and res["targets"]["rr_ratio"] >= MIN_RR_RATIO
-            stats["rr_ok"] += int(res["rr_ok"])
-            rr = res["targets"]["rr_ratio"] if res["targets"] else None
-            log(f"  [{'++' if res['rr_ok'] else '~ '}] {sid} 評分:{res['score']} RR:{rr} 訊號:{res['signals']}")
-        results[sid] = res
+        tier = ("A" if rr is not None and rr >= MIN_RR_RATIO else "B") if strong else "C"
+        stats["rr_ok"] += int(tier == "A")
+        results[sid] = {**card, "passed": strong, "exclude_reason": None if strong else "動能不足", "tier": tier}
+        mark = {"A": "++", "B": "~ ", "C": ". "}[tier]
+        log(f"  [{mark}] {sid} 評分:{card['score']} RR:{rr} 訊號:{card['signals']}")
 
     if unknown_inst:
         q.add_note(f"法人資料有無法辨識的類別：{'、'.join(sorted(unknown_inst))}（請更新 INSTITUTION_ALIASES）")
@@ -226,15 +277,31 @@ def collect(date, taiex):
     if incomplete:
         q.add_note("資料不完整：" + "；".join(incomplete) + "。晚上的備援會在資料齊全後補發完整版")
 
-    pick_ids = sorted((s for s, r in results.items() if r.get("rr_ok")),
-                      key=lambda s: results[s]["score"], reverse=True)[:TARGET_STOCK_COUNT]
+    pick_ids = select_picks(results)
     picks = [{
         "stock_id": sid,
         "name": name_of(sid),
         "themes": [t.split("_", 1)[1] for t in universe[sid]],
         **{k: results[sid].get(k) for k in PICK_FIELDS},
         "targets": results[sid]["targets"],
+        "tier": results[sid]["tier"],
+        "tier_label": TIER_LABELS[results[sid]["tier"]],
+        "tier_note": _tier_note(results[sid]),
     } for sid in pick_ids]
+
+    watchlist = []
+    for sid in WATCHLIST:
+        entry = {"stock_id": sid, "name": name_of(sid),
+                 "pick_rank": pick_ids.index(sid) + 1 if sid in pick_ids else None}
+        if sid in cards:
+            c = cards[sid]
+            entry.update({k: c.get(k) for k in PICK_FIELDS})
+            entry.update(trend=c["trend"], fail_reasons=c["fail_reasons"], targets=c["targets"])
+        elif sid in q.missing_price:
+            entry["unavailable"] = f"沒有 {date} 的價格資料"
+        else:
+            entry["unavailable"] = "歷史價格資料不足，算不出指標"
+        watchlist.append(entry)
 
     themes = sorted(
         ({"theme": t, "name": t.split("_", 1)[1], "avg_chg_pct": None if v is None else round(v * 100, 2)}
@@ -244,14 +311,41 @@ def collect(date, taiex):
     news, err = fetch.get_tw_stock_news()
     if err:
         q.add_note(err)
+    # 推薦股和自選股的個股新聞（FinMind），接在鉅亨網新聞後面、編號連續
+    titles = {n["title"][:20] for n in news}
+    for sid in dict.fromkeys(pick_ids + list(WATCHLIST)):
+        for item in fetch.get_stock_news(sid, date):
+            if item["title"][:20] in titles:
+                continue
+            titles.add(item["title"][:20])
+            news.append({"id": f"N{len(news) + 1}", "source_id": "", "title": item["title"], "summary": "",
+                         "time": "", "url": item["url"], "category": "個股", "source": item["source"],
+                         "stocks": [sid]})
+    related = {sid: fetch.related_news_ids(news, sid, name_of(sid)) for sid in dict.fromkeys(pick_ids + list(WATCHLIST))}
+    for p in picks:
+        p["related_news"] = related.get(p["stock_id"], [])
+    for w in watchlist:
+        w["related_news"] = related.get(w["stock_id"], [])
+
+    market = market_summary(taiex)
+    market["breadth"] = breadth or None
+    market["top_turnover"] = analyzer.top_turnover(quotes, 5)
+    market["institutional_100m"], err = fetch.get_market_institutional(date)
+    if err:
+        q.add_note(err)
+    us_markets, err = fetch.get_us_markets(date)
+    if err:
+        q.add_note(err)
 
     payload = {
         "date": date,
         "generated_at": datetime.now(ZoneInfo(TIMEZONE)).isoformat(timespec="seconds"),
-        "market": market_summary(taiex),
+        "market": market,
+        "us_markets": us_markets,
         "themes": themes,
         "picks": picks,
         "debate_ids": pick_ids[:DEBATE_STOCK_COUNT],
+        "watchlist": watchlist,
         "stats": stats,
         "incomplete": incomplete,
         "exclude_counts": dict(Counter(r["exclude_reason"] for r in results.values() if not r.get("passed"))),
@@ -262,42 +356,66 @@ def collect(date, taiex):
     return payload, build_ai_input(payload)
 
 
+def _levels(t):
+    if not t:
+        return None
+    return {"entry_low": t["entry_low"], "entry_high": t["entry_high"], "target1": t["target1"],
+            "target_basis": t["target_basis"], "stop_loss": t["stop_loss"], "rr_ratio": t["rr_ratio"]}
+
+
+def _stock_numbers(p):
+    return {
+        "close": p.get("close"), "today_chg_pct": p.get("today_chg"), "chg_5d_pct": p.get("chg_5d"),
+        "score": p.get("score"), "score_breakdown": p.get("score_breakdown"),
+        "signals": {s: SIGNAL_MEANINGS[s] for s in p.get("signals") or []},
+        "vol_vs_20d": p.get("vol_vs_20d"), "vol_vs_5d": p.get("vol_vs_5d"),
+        "rsi14": p.get("rsi14"), "kd_cross": p.get("kd_cross"),
+        "ma5": p.get("ma5"), "ma20": p.get("ma20"), "atr14": p.get("atr"), "high_60d": p.get("high_60d"),
+        "institutional": {
+            "available": p.get("inst_available"),
+            "foreign_buy_days": p.get("foreign_buy_days"),
+            "foreign_net_5d_lots": p.get("foreign_net_5d_lots"),
+            "sitc_net_5d_lots": p.get("sitc_net_5d_lots"),
+            "dealer_net_5d_lots": p.get("dealer_net_5d_lots"),
+        },
+        "program_levels": _levels(p.get("targets")),
+    }
+
+
 def build_ai_input(payload):
     candidates = []
     for p in payload["picks"]:
         if p["stock_id"] not in payload["debate_ids"]:
             continue
-        t = p["targets"]
         candidates.append({
             "stock_id": p["stock_id"], "name": p["name"], "themes": p["themes"],
-            "close": p["close"], "today_chg_pct": p["today_chg"], "chg_5d_pct": p["chg_5d"],
-            "score": p["score"], "score_breakdown": p["score_breakdown"],
-            "signals": {s: SIGNAL_MEANINGS[s] for s in p["signals"]},
-            "vol_vs_20d": p["vol_vs_20d"], "vol_vs_5d": p["vol_vs_5d"],
-            "rsi14": p["rsi14"], "kd_cross": p["kd_cross"],
-            "ma5": p["ma5"], "ma20": p["ma20"], "atr14": p["atr"], "high_60d": p["high_60d"],
-            "institutional": {
-                "available": p["inst_available"],
-                "foreign_buy_days": p["foreign_buy_days"],
-                "foreign_net_5d_lots": p["foreign_net_5d_lots"],
-                "sitc_net_5d_lots": p["sitc_net_5d_lots"],
-                "dealer_net_5d_lots": p["dealer_net_5d_lots"],
-            },
-            "program_levels": {
-                "entry_low": t["entry_low"], "entry_high": t["entry_high"],
-                "target1": t["target1"], "target_basis": t["target_basis"],
-                "stop_loss": t["stop_loss"], "rr_ratio": t["rr_ratio"],
-            },
+            "tier": p.get("tier_label", "嚴選"), "tier_note": p.get("tier_note"),
+            **_stock_numbers(p),
+            "related_news": p.get("related_news", []),
         })
+    watchlist = []
+    for w in payload.get("watchlist", []):
+        item = {"stock_id": w["stock_id"], "name": w["name"], "pick_rank": w.get("pick_rank")}
+        if w.get("unavailable"):
+            item["unavailable"] = w["unavailable"]
+        else:
+            item.update(_stock_numbers(w))
+            item.update(trend_ok={k: bool(v) for k, v in (w.get("trend") or {}).items()},
+                        not_selected_reasons=w.get("fail_reasons", []))
+        item["related_news"] = w.get("related_news", [])
+        watchlist.append(item)
     return {
         "date": payload["date"],
         "instructions": "依 docs/AI_WRITING_RULES.md 撰寫 history/<date>/ai_output.json；數字只能照抄本檔。",
         "market": payload["market"],
+        "us_markets": payload.get("us_markets", []),
         "themes": payload["themes"],
         "candidates": candidates,
         "other_picks": [{"stock_id": p["stock_id"], "name": p["name"]}
                         for p in payload["picks"] if p["stock_id"] not in payload["debate_ids"]],
-        "news": [{k: n[k] for k in ("id", "title", "summary", "time")} for n in payload["news"]],
+        "watchlist": watchlist,
+        "news": [{k: n.get(k, "") for k in ("id", "category", "title", "summary", "time")}
+                 for n in payload["news"]],
         "missing": payload["quality"],
     }
 
@@ -419,10 +537,7 @@ def cmd_write_ai(args):
     if ai_input is None:
         log(f"ERROR 找不到 history/{date}/ai_input.json")
         return EXIT_ERROR
-    if not ai_input["candidates"]:
-        history.save_json(date, "ai_output.json", {"date": date, "highlights": [], "stocks": []})
-        log("沒有辯證名單，只寫空的 ai_output.json")
-        return EXIT_OK
+    # 沒有推薦股也照樣呼叫：盤勢播報、焦點新聞、自選股評論還是要寫
     out, err, usage = write_with_api(ai_input)
     if usage:
         log(f"  API 用量：{usage}")
@@ -431,6 +546,15 @@ def cmd_write_ai(args):
         return EXIT_AI_INVALID
     history.save_json(date, "ai_output.json", out)
     return cmd_validate_ai(args)
+
+
+def twse_closes_for(date):
+    """證交所收盤價（核對用）：先抓指定日期的全部收盤行情，抓不到再用 STOCK_DAY_ALL（只有最新一天）。"""
+    quotes, _, err = fetch.get_twse_daily(date)
+    if quotes:
+        return {sid: q["close"] for sid, q in quotes.items()}, date, None
+    closes, twse_date, err2 = fetch.get_twse_closes()
+    return closes, twse_date, (err2 if not closes else None)
 
 
 def cmd_finalize(args):
@@ -476,7 +600,7 @@ def cmd_finalize(args):
     q = DataQuality.from_dict(payload.get("quality"))
     verify_issues = []
     if payload["picks"]:
-        twse, twse_date, err = fetch.get_twse_closes()
+        twse, twse_date, err = twse_closes_for(date)
         if err:
             q.add_note(f"核對：{err}")
         elif twse_date and twse_date != date:

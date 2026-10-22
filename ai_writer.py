@@ -23,7 +23,8 @@ RULES_PATH = Path(__file__).parent / "docs" / "AI_WRITING_RULES.md"
 def build_prompt(ai_input):
     rules = RULES_PATH.read_text(encoding="utf-8")
     system = (
-        "你是台股盤後報告的文字撰寫者。所有數字都已經由程式算好，你只負責寫文字，"
+        "你是財經台盤後節目的主播兼撰稿人，負責台股盤後選股日報的文字。"
+        "所有數字都已經由程式算好，你只負責把它們和新聞串成好讀的播報，"
         "必須嚴格遵守下面的撰寫規則。\n\n" + rules
     )
     user = (
