@@ -142,3 +142,29 @@ def test_watchlist_stock_without_data():
     payload = _broadcast_payload()
     payload["watchlist"] = [{"stock_id": "4577", "name": "達航科技", "unavailable": "沒有 2026-10-16 的價格資料"}]
     assert "4577 達航科技</b>｜沒有 2026-10-16 的價格資料" in "\n".join(build_messages(payload))
+
+
+def test_rr_is_shown_with_two_decimals_like_the_tier_note():
+    payload = _broadcast_payload()
+    payload["picks"][1]["targets"] = dict(payload["picks"][1]["targets"], rr_ratio=1.96)
+    payload["picks"][1]["tier_note"] = "次選：RR 1.96 未達 2"
+    msgs = build_messages(payload)
+    text = "\n".join(msgs)
+    assert "RR 1.96" in text and "RR 2.0｜" not in text
+    assert verify_messages(msgs, payload["picks"]) == []
+
+
+def test_no_picks_message_depends_on_trend_results():
+    payload = copy.deepcopy(PAYLOAD)
+    payload.update(picks=[], debate_ids=[])
+    payload["stats"] = dict(payload["stats"], prefilter_passed=0)
+    assert "今日沒有符合趨勢條件的個股" in "\n".join(build_messages(payload))
+    payload["stats"]["prefilter_passed"] = 4
+    assert "4 檔符合趨勢條件，但 RR 都不到" in "\n".join(build_messages(payload))
+
+
+def test_news_url_quotes_are_escaped():
+    payload = _broadcast_payload()
+    payload["news"][0]["url"] = 'https://x.tw/a"b'
+    ai = {"highlights": [{"text": "t", "news_ids": ["N1"]}], "stocks": {}, "watchlist": {}}
+    assert 'href="https://x.tw/a&quot;b"' in "\n".join(build_messages(payload, ai))

@@ -1,6 +1,6 @@
 name: 台股選股日報
 
-# 只用 GitHub Actions 的免費額度，不扣 Claude 訂閱用量或雲端點數（AI 文字用 ANTHROPIC_API_KEY，約 0.02 美元/天）。
+# 只用 GitHub Actions 的免費額度，不扣 Claude 訂閱用量或雲端點數（AI 文字用 ANTHROPIC_API_KEY，每天一次）。
 # GitHub 的排程常延遲好幾個小時，所以一天排好幾次、都避開整點和半點：
 # 第一個跑到的負責發報告，之後的看到 claude/report-history 分支已有 sent.json 就在一分鐘內結束。
 # 21:07 之前的執行如果資料不完整（例如法人還沒更新）先不發，留給下一次；21:07 那次照發並標示不完整。

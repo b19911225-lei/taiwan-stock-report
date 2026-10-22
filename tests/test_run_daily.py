@@ -283,3 +283,9 @@ def test_market_scan_and_breadth(env):
     assert payload["market"]["top_turnover"][0]["stock_id"] == "2330"
     assert payload["market"]["institutional_100m"]["foreign"] == 22.39
     assert payload["us_markets"][0]["name"] == "費城半導體"
+
+
+def test_zero_signal_stock_is_not_a_fill_candidate():
+    results = {"A1": {"tier": "A", "score": 60, "targets": {"rr_ratio": 3.0}},
+               "Z": {"tier": None, "score": 21, "targets": {"rr_ratio": 5.0}, "momentum_count": 0}}
+    assert run_daily.select_picks(results) == ["A1"]

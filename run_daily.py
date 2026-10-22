@@ -195,7 +195,7 @@ def collect(date, taiex):
     quotes, breadth, err = fetch.get_twse_daily(date)
     if err:
         q.add_note(err)
-    scan = analyzer.pick_market_scan(quotes, set(universe), MARKET_SCAN_COUNT)
+    scan = analyzer.pick_market_scan(quotes, set(universe) | set(WATCHLIST), MARKET_SCAN_COUNT)
     for sid, _ in scan:
         universe[sid] = [SCAN_THEME]
     if scan:
@@ -264,7 +264,7 @@ def collect(date, taiex):
         if card["targets"] is None:
             tier = None           # 算不出進出場價位（ATR 不足）就不推薦
         else:
-            tier = ("A" if rr >= MIN_RR_RATIO else "B") if strong else "C"
+            tier = ("A" if rr >= MIN_RR_RATIO else "B") if strong else ("C" if card["momentum_count"] == 1 else None)
         stats["rr_ok"] += int(tier == "A")
         results[sid] = {**card, "passed": strong, "exclude_reason": None if strong else "動能不足", "tier": tier}
         mark = {"A": "++", "B": "~ ", "C": ". ", None: "x "}[tier]
@@ -324,7 +324,9 @@ def collect(date, taiex):
             news.append({"id": f"N{len(news) + 1}", "source_id": "", "title": item["title"], "summary": "",
                          "time": "", "url": item["url"], "category": "個股", "source": item["source"],
                          "stocks": [sid]})
-    related = {sid: fetch.related_news_ids(news, sid, name_of(sid)) for sid in dict.fromkeys(pick_ids + list(WATCHLIST))}
+    all_names = set(stock_info.values()) | {q["name"] for q in quotes.values()}
+    related = {sid: fetch.related_news_ids(news, sid, name_of(sid), all_names)
+               for sid in dict.fromkeys(pick_ids + list(WATCHLIST))}
     for p in picks:
         p["related_news"] = related.get(p["stock_id"], [])
     for w in watchlist:

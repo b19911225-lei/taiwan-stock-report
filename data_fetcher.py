@@ -185,10 +185,15 @@ def get_market_institutional(date):
         return None, f"整體三大法人買賣超還沒有 {date} 的資料"
     lookup = _institution_lookup()
     out = {"foreign": 0.0, "sitc": 0.0, "dealer": 0.0}
+    matched = set()
     for _, row in df.iterrows():
         cat = lookup.get(str(row["name"]).strip().lower())
         if cat in out:
             out[cat] += float(row["buy"] or 0) - float(row["sell"] or 0)
+            matched.add(cat)
+    if matched != set(out):
+        names = sorted(df["name"].astype(str).unique())
+        return None, f"整體三大法人類別認不得（{'、'.join(names)}），請更新 INSTITUTION_ALIASES"
     return {k: round(v / 1e8, 2) for k, v in out.items()}, None
 
 
@@ -231,7 +236,8 @@ def get_stock_news(stock_id, date, limit=4):
         if not title or title[:20] in seen:
             continue
         seen.add(title[:20])
-        out.append({"title": title, "source": source, "url": str(row.get("link") or "")})
+        link = row.get("link")
+        out.append({"title": title, "source": source, "url": str(link) if pd.notna(link) and link else ""})
         if len(out) >= limit:
             break
     return out
@@ -509,16 +515,25 @@ def parse_cnyes_items(items, hours=24, now_ts=None):
     return out
 
 
-def related_news_ids(news, stock_id, name):
+def related_news_ids(news, stock_id, name, all_names=()):
     """
     和這檔股票有關的新聞編號：新聞的股票標籤有這個代號、標題有代號，或標題有股票名稱
-    （名稱去掉 *-KY；名稱是常見詞的只認代號）。
+    （名稱去掉 *-KY；名稱是常見詞的只認代號；標題裡的「南亞科」不算「南亞」）。
+    all_names：所有股票名稱，用來排除包含這個名稱的其他股票。
     """
     short = re.sub(r"\*?-KY$|\*", "", str(name or "")).strip()
     use_name = len(short) >= 2 and short not in COMMON_WORD_NAMES
+    longer = sorted({re.sub(r"\*?-KY$|\*", "", str(n)).strip() for n in all_names} - {short}, key=len, reverse=True)
+    longer = [n for n in longer if short and short in n]
     code = re.compile(rf"(?<!\d){re.escape(stock_id)}(?!\d)")
+
+    def name_hit(title):
+        for n in longer:
+            title = title.replace(n, "")
+        return short in title
+
     return [n["id"] for n in news
-            if stock_id in n.get("stocks", []) or code.search(n["title"]) or (use_name and short in n["title"])]
+            if stock_id in n.get("stocks", []) or code.search(n["title"]) or (use_name and name_hit(n["title"]))]
 
 
 def dump_json(path, obj):

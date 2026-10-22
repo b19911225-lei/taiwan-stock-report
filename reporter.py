@@ -10,7 +10,7 @@ from pathlib import Path
 
 import requests
 
-from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, MIN_RR_RATIO, MIN_PICK_COUNT
+from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, MIN_RR_RATIO, MIN_PICK_COUNT, MIN_FILL_RR
 
 LOG_DIR = Path(__file__).parent / "logs"
 TELEGRAM_LIMIT = 4000
@@ -23,6 +23,11 @@ WEEKDAYS = "一二三四五六日"
 
 def esc(text):
     return html.escape(str(text), quote=False)
+
+
+def esc_url(url):
+    """href 裡的網址：連引號一起跳脫，避免新聞網址裡的 " 弄壞整則訊息（Telegram 會整則拒收）。"""
+    return html.escape(str(url), quote=True)
 
 
 def fmt_num(x, nd=2):
@@ -61,7 +66,7 @@ def pick_number_strings(pick):
         "進場上緣": fmt_num(t["entry_high"]),
         "目標": fmt_num(t["target1"]),
         "停損": fmt_num(t["stop_loss"]),
-        "RR": f"{t['rr_ratio']:.1f}",
+        "RR": f"{t['rr_ratio']:.2f}",
     }
 
 
@@ -76,7 +81,9 @@ def _brief_comment(p):
         parts.append(f"RSI強勢({p['rsi14']:.0f})")
     if "M1" in sigs:
         parts.append(f"量能放大{p.get('vol_vs_20d', 0):.1f}倍")
-    return "、".join(parts[:2]) if parts else "多訊號共振"
+    if parts:
+        return "、".join(parts[:2])
+    return "多訊號共振" if len(sigs) >= 2 else ""
 
 
 def _signed(x, nd=2):
@@ -115,8 +122,9 @@ def _market_lines(m):
 def _us_lines(us):
     if not us:
         return []
-    last = max(u["date"] for u in us)
-    return [f"🌎 <b>國際股市（{last[5:].replace('-', '/')} 收盤）</b>",
+    dates = sorted({u["date"][5:].replace("-", "/") for u in us})
+    label = dates[0] if len(dates) == 1 else f"{dates[0]}～{dates[-1]}"
+    return [f"🌎 <b>國際股市（{label} 收盤）</b>",
             "｜".join(f"{esc(u['name'])} {fmt_pct(u.get('chg_pct'))}" for u in us)]
 
 
@@ -131,7 +139,7 @@ def _broadcast_lines(ai_clean):
 
 def _news_links(payload, ids):
     news = {n["id"]: n for n in payload.get("news", [])}
-    return " ".join(f'<a href="{esc(news[i]["url"])}">[{esc(i)}]</a>' for i in ids if i in news and news[i].get("url"))
+    return " ".join(f'<a href="{esc_url(news[i]["url"])}">[{esc(i)}]</a>' for i in ids if i in news and news[i].get("url"))
 
 
 def _theme_lines(themes):
@@ -152,12 +160,9 @@ def _pick_lines(rank, p):
              f"{nums['收盤']} {fmt_pct(p.get('today_chg'))}｜評分{p['score']}｜{' '.join(p.get('signals', []))}")
     line2 = (f"   進場 {nums['進場下緣']}~{nums['進場上緣']}｜目標 {nums['目標']}（{esc(t['target_basis'])}）"
              f"｜停損 {nums['停損']}｜RR {nums['RR']}")
-    extra = _brief_comment(p)
-    if p.get("tier_note"):
-        extra += f"｜{p['tier_note']}"
-    if not p.get("inst_available", True):
-        extra += "｜法人資料缺"
-    return f"{line1}\n{line2}\n   {esc(extra)}"
+    extra = [x for x in (_brief_comment(p), p.get("tier_note"),
+                         "" if p.get("inst_available", True) else "法人資料缺") if x]
+    return f"{line1}\n{line2}" + (f"\n   {esc('｜'.join(extra))}" if extra else "")
 
 
 def _tier_summary(picks):
@@ -191,7 +196,7 @@ def _watch_lines(payload, ai_clean):
             reasons = w.get("fail_reasons") or ["條件都符合，但評分不在今日推薦名單內"]
             lines.append(f"   未入選：{esc('；'.join(reasons))}")
         t = w.get("targets")
-        levels = (f"｜參考停損 {fmt_num(t['stop_loss'])}｜目標 {fmt_num(t['target1'])}｜RR {t['rr_ratio']:.1f}"
+        levels = (f"｜參考停損 {fmt_num(t['stop_loss'])}｜目標 {fmt_num(t['target1'])}｜RR {t['rr_ratio']:.2f}"
                   if t else "")
         rsi = w.get("rsi14")
         lines.append(f"   訊號 {' '.join(w.get('signals') or []) or '無'}｜RSI {rsi if rsi is not None else 'N/A'}"
@@ -203,7 +208,7 @@ def _watch_lines(payload, ai_clean):
         for nid in (w.get("related_news") or [])[:2]:
             n = news.get(nid)
             if n and n.get("url"):
-                lines.append(f'   📰 <a href="{esc(n["url"])}">{esc(n["title"][:40])}</a>')
+                lines.append(f'   📰 <a href="{esc_url(n["url"])}">{esc(n["title"][:40])}</a>')
     return lines
 
 
@@ -328,7 +333,9 @@ def build_messages(payload, ai_clean=None, ai_note=None, verify_issues=None, res
         if note:
             msg1.append(f"<i>{esc(note)}</i>")
     else:
-        msg1.append("（今日沒有符合趨勢條件的個股）")
+        passed = payload.get("stats", {}).get("prefilter_passed")
+        msg1.append("（今日沒有符合趨勢條件的個股）" if not passed
+                    else f"（{passed} 檔符合趨勢條件，但 RR 都不到 {MIN_FILL_RR:g} 或算不出價位，今日不推薦）")
     watch = _watch_lines(payload, ai_clean)
     if watch:
         msg1 += [""] + watch

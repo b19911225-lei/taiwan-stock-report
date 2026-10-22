@@ -220,3 +220,15 @@ def test_related_news_ids():
             {"id": "N5", "title": "加權指數 64155 點", "stocks": []}]
     assert data_fetcher.related_news_ids(news, "6415", "矽力*-KY") == ["N1", "N2"]
     assert data_fetcher.related_news_ids(news, "2455", "全新") == ["N4"]    # 名稱是常見詞，只認代號
+
+
+def test_related_news_does_not_confuse_longer_names():
+    news = [{"id": "N1", "title": "南亞科法說亮眼", "stocks": []}, {"id": "N2", "title": "南亞漲停", "stocks": []}]
+    assert data_fetcher.related_news_ids(news, "1303", "南亞", {"南亞", "南亞科"}) == ["N2"]
+
+
+def test_market_institutional_unknown_names_is_an_error(monkeypatch):
+    rows = [{"date": "2026-10-21", "name": "外資新名稱", "buy": 10, "sell": 1}]
+    monkeypatch.setattr(data_fetcher, "_fetch", lambda *a, **k: pd.DataFrame(rows))
+    out, err = data_fetcher.get_market_institutional("2026-10-21")
+    assert out is None and "認不得" in err          # 不能默默回 0

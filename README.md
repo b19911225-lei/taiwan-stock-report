@@ -23,7 +23,7 @@
 | Claude Code Routine | 目前停用 | 會扣訂閱用量；設計保留在 [docs/ROUTINE.md](docs/ROUTINE.md) |
 | 本機 | 隨時 | `python run_daily.py all --dry-run --no-git` 看報告不發送 |
 
-**用量優先順序**：GitHub Actions 免費額度 → 雲端點數 → 訂閱用量（目前不使用）。AI 文字用 `ANTHROPIC_API_KEY`，實測每天約 0.02 美元。
+**用量優先順序**：GitHub Actions 免費額度 → 雲端點數 → 訂閱用量（目前不使用）。AI 文字用 `ANTHROPIC_API_KEY`：加了盤勢播報和新聞後，每天一次約輸入 1.5 萬、輸出 2 千 tokens（原本約 6 千／1.2 千）。
 
 需要的 GitHub Secrets：`FINMIND_TOKEN`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`、`ANTHROPIC_API_KEY`
 （AI 文字的模型可用 `CLAUDE_MODEL` 覆寫，預設 `claude-sonnet-5-5`）。不需要任何 GitHub 個人存取權杖。

@@ -30,8 +30,10 @@ UNITS = "%|％|倍|元|張|億|萬|成"
 # 正負號只在前面不是數字或英文字母時才算（避免把「2026-10-16」的「-10」當成負數）
 NUMBER_RE = re.compile(rf"(?:(?<![0-9A-Za-z])([+\-−＋－▲▼]))?(\d[\d,]*(?:\.\d+)?)\s*({UNITS})?")
 NEGATIVE_SIGNS = set("-−－▼")
-# 數字前面緊接著「漲／跌」時，方向要和資料的正負號一致（例如資料是 -0.82，不能寫「上漲 0.82%」）
-DIRECTION_RE = re.compile(r"(漲|升|跌|降)\s*$")
+# 數字前面緊接著「漲／跌」「買超／賣超」時，方向要和資料的正負號一致
+# （例如資料是 -0.82，不能寫「上漲 0.82%」；外資是 +22.39 億，不能寫「外資賣超 22.39 億」）
+DIRECTION_RE = re.compile(r"(漲|升|跌|降|買超|賣超|淨買|淨賣)\s*$")
+NEGATIVE_WORDS = ("跌", "降", "賣超", "淨賣")
 # 但後面接「家／檔」的是家數（「下跌 380 家」是 380 家下跌，不是 -380）
 COUNT_RE = re.compile(r"\s*(家|檔)")
 # 中文數字 + 單位（例如「六百元」「兩成」）沒辦法核對，一律不允許
@@ -115,7 +117,7 @@ def _numbers_in_text(text):
             d = DIRECTION_RE.search(text[:m.start()])
             if d:
                 signed = True
-                if d.group(1) in ("跌", "降"):
+                if d.group(1) in NEGATIVE_WORDS:
                     value = -value
         out.append({"value": value, "decimals": len(tok.split(".")[1]) if "." in tok else 0,
                     "token": (sign or "") + raw + unit, "unit": bool(unit), "signed": signed})
@@ -316,6 +318,7 @@ def validate(ai_output, ai_input):
         issues.append(f"{sid}：AI 沒有寫這檔")
 
     watch_ids = {w["stock_id"] for w in ai_input.get("watchlist", [])}
+    watch_required = {w["stock_id"] for w in ai_input.get("watchlist", []) if not w.get("unavailable")}
     watch_out = ai_output.get("watchlist") or []
     if not isinstance(watch_out, list):
         issues.append("watchlist 不是陣列")
@@ -335,6 +338,6 @@ def validate(ai_output, ai_input):
             issues.append(f"自選股 {sid}：{'；'.join(problems)}")
         else:
             clean["watchlist"][sid] = {"comment": w["comment"].strip(), "news_ids": refs}
-    for sid in sorted(watch_ids - seen_watch):
+    for sid in sorted(watch_required - seen_watch):
         issues.append(f"自選股 {sid}：AI 沒有寫評論")
     return clean, issues

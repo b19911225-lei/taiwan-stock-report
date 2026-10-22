@@ -195,3 +195,20 @@ def test_stock_counts_after_up_down_words_are_not_signed():
     assert check_text("上漲 600 家、下跌 380 家", allowed, 100) == []
     assert check_text("下跌 529.15 點", allowed, 100) == []
     assert check_text("上漲 529.15 點", allowed, 100) != []       # 點數還是要檢查方向
+
+
+def test_buy_sell_direction_is_checked():
+    allowed = collect_allowed_numbers({"market": {"institutional_100m": {"foreign": 22.39, "dealer": -135.72}},
+                                       "sitc_net_5d_lots": -2845})
+    assert check_text("外資買超 22.39 億元，自營商賣超 135.72 億元", allowed, 100) == []
+    assert check_text("投信近 5 日淨賣超 2845 張", allowed, 100) == []
+    assert check_text("外資賣超 22.39 億元", allowed, 100) != []
+    assert check_text("自營商買超 135.72 億元", allowed, 100) != []
+
+
+def test_unavailable_watchlist_stock_needs_no_comment():
+    ai_input = {**BROADCAST_INPUT, "watchlist": [{"stock_id": "4577", "name": "達航科技", "unavailable": "沒有價格"}]}
+    out = copy.deepcopy(BROADCAST)
+    out["watchlist"] = []
+    _, issues = validate(out, ai_input)
+    assert not any("4577" in i for i in issues)
