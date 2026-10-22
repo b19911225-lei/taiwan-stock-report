@@ -187,3 +187,11 @@ def test_lower_tier_cannot_be_strong_buy():
     out["stocks"][1]["verdict"] = "強力做多"
     clean, issues = validate(out, ai_input)
     assert "3034" not in clean["stocks"] and any("次選不能給「強力做多」" in i for i in issues)
+
+
+def test_stock_counts_after_up_down_words_are_not_signed():
+    # 「下跌 380 家」是 380 家股票下跌，不是 -380（10/21 的盤勢播報因此被誤判拿掉）
+    allowed = collect_allowed_numbers({"market": {"breadth": {"up": 600, "down": 380}, "chg": -529.15}})
+    assert check_text("上漲 600 家、下跌 380 家", allowed, 100) == []
+    assert check_text("下跌 529.15 點", allowed, 100) == []
+    assert check_text("上漲 529.15 點", allowed, 100) != []       # 點數還是要檢查方向

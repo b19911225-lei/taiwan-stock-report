@@ -58,7 +58,7 @@ def test_verify_messages_catches_wrong_numbers():
 
 def test_verify_closes():
     r = verify_closes([PICK], {"6415": 489.0})
-    assert r["issues"] == [] and "1 檔收盤價與證交所一致" in r["ok"]
+    assert r["issues"] == [] and "推薦股 1 檔收盤價與證交所一致" in r["ok"]
     r = verify_closes([PICK], {"6415": 480.0})
     assert r["issues"] and r["ok"] is None
     r = verify_closes([PICK], {})

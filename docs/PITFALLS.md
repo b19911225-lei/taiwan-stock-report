@@ -8,6 +8,7 @@
 |---|---|---|---|
 | 2026-10-22 | 股票池只有約 50 檔，加上趨勢、動能、RR 層層篩選，10/19、10/20 都只剩 1 檔；使用者想看的 4577 達航科技（上櫃）不在任何主題裡，完全沒被評分 | 使用者回報 | 加全市場掃描（證交所當日上漲、成交金額前 30 檔）；嚴選不到 3 檔用次選／候補補足並標示；加自選股評分卡 |
 | 2026-10-22 | 證交所 `STOCK_DAY_ALL` 在 17:50 常常還是前一天的資料，收盤價核對常被跳過 | 10/20 報告「證交所收盤價資料日期是 2026-10-19」 | 改用可以指定日期的 `MI_INDEX`（全部收盤行情），抓不到才用 `STOCK_DAY_ALL` |
+| 2026-10-22 | AI 寫「下跌 380 家」被當成 -380，整段盤勢播報被拿掉 | 用真實資料演練 | 數字後面接「家／檔」是家數，不檢查漲跌方向 |
 | 2026-10-22 | 整體三大法人的 `total` 列和三項加總對不起來，新聞報的「三大法人買超」也不一樣 | 資料源檢查 | 報告只列外資、投信、自營商三項，不列合計 |
 | 2026-10-18 | **法人資料集名稱錯了**：`TaiwanStockInstitutionalInvestors` 回 HTTP 422（不存在），`_fetch` 失敗只回空表，所以從上線起一筆法人資料都沒拿到，籌碼分一直是 0、M3/M4 從來沒觸發 | 在 GitHub Actions 跑 `scripts/probe_sources.py`，印出 FinMind 原始回應 | 改用 `TaiwanStockInstitutionalInvestorsBuySell`；FinMind 失敗原因同時印到 stderr |
 | 2026-10-17 | 就算拿到資料，法人名稱也是用中文比對，但 FinMind 回英文代號（實測：`Foreign_Investor`、`Foreign_Dealer_Self`、`Investment_Trust`、`Dealer_self`、`Dealer_Hedging`） | 翻 Actions log：所有入選股的訊號都沒有 M3/M4 | 中英文都認得；認不得的名稱寫進報告（`INSTITUTION_ALIASES`） |

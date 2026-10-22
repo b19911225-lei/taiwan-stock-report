@@ -161,12 +161,14 @@ def _pick_lines(rank, p):
 
 
 def _tier_summary(picks):
-    """有用次選／候補補足時，說明為什麼。"""
+    """有用次選／候補補足，或檔數不到 MIN_PICK_COUNT 時，說明為什麼。"""
     strict = sum(1 for p in picks if p.get("tier_label", "嚴選") == "嚴選")
-    if strict == len(picks):
-        return None
-    return (f"嚴選（全部條件都符合）只有 {strict} 檔，用次選（RR 未達 {MIN_RR_RATIO:g}）、"
-            f"候補（動能訊號只有 1 個）補到 {MIN_PICK_COUNT} 檔，風險較高，請搭配停損")
+    if strict < len(picks):
+        return (f"嚴選（全部條件都符合）只有 {strict} 檔，用次選（RR 未達 {MIN_RR_RATIO:g}）、"
+                f"候補（動能訊號只有 1 個）補到 {len(picks)} 檔，風險較高，請搭配停損")
+    if len(picks) < MIN_PICK_COUNT:
+        return f"今天符合條件的只有 {len(picks)} 檔，寧缺勿濫，不硬湊到 {MIN_PICK_COUNT} 檔"
+    return None
 
 
 def _watch_lines(payload, ai_clean):
@@ -224,8 +226,9 @@ def _quality_lines(payload, verify_issues=None):
     for check in q.get("checks", []):
         lines.append(f"✅ {esc(check)}")
     if stats:
+        scan = f"（含市場掃描 {stats['scan_added']}）" if stats.get("scan_added") else ""
         lines.append(
-            f"篩選：股票池 {stats.get('universe', 0)}｜有資料 {stats.get('fetched', 0)}｜"
+            f"篩選：股票池 {stats.get('universe', 0)}{scan}｜有資料 {stats.get('fetched', 0)}｜"
             f"趨勢通過 {stats.get('prefilter_passed', 0)}｜評分通過 {stats.get('scored_passed', 0)}｜"
             f"RR≥{MIN_RR_RATIO:g} {stats.get('rr_ok', 0)}")
     return lines

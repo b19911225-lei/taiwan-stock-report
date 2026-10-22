@@ -35,7 +35,7 @@ def verify_closes(picks, twse_closes):
         else:
             matched += 1
     return {
-        "ok": f"觀察清單 {matched} 檔收盤價與證交所一致" if matched else None,
+        "ok": f"推薦股 {matched} 檔收盤價與證交所一致" if matched else None,
         "skipped": f"{len(skipped)} 檔上櫃股不在證交所清單，未核對收盤價" if skipped else None,
         "issues": issues,
     }

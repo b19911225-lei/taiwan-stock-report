@@ -32,6 +32,8 @@ NUMBER_RE = re.compile(rf"(?:(?<![0-9A-Za-z])([+\-−＋－▲▼]))?(\d[\d,]*(?
 NEGATIVE_SIGNS = set("-−－▼")
 # 數字前面緊接著「漲／跌」時，方向要和資料的正負號一致（例如資料是 -0.82，不能寫「上漲 0.82%」）
 DIRECTION_RE = re.compile(r"(漲|升|跌|降)\s*$")
+# 但後面接「家／檔」的是家數（「下跌 380 家」是 380 家下跌，不是 -380）
+COUNT_RE = re.compile(r"\s*(家|檔)")
 # 中文數字 + 單位（例如「六百元」「兩成」）沒辦法核對，一律不允許
 # （開頭一定要是數字字，「5,123 億元」的「億元」不算）
 CJK_NUMBER_RE = re.compile(rf"[零〇一二兩三四五六七八九十][零〇一二兩三四五六七八九十百千萬億]*\s*(?:{UNITS})")
@@ -109,7 +111,7 @@ def _numbers_in_text(text):
             signed = True
             if sign in NEGATIVE_SIGNS:
                 value = -value
-        else:
+        elif not COUNT_RE.match(text, m.end()):
             d = DIRECTION_RE.search(text[:m.start()])
             if d:
                 signed = True

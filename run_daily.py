@@ -261,10 +261,13 @@ def collect(date, taiex):
         strong = card["momentum_count"] >= 2
         if strong:
             stats["scored_passed"] += 1
-        tier = ("A" if rr is not None and rr >= MIN_RR_RATIO else "B") if strong else "C"
+        if card["targets"] is None:
+            tier = None           # 算不出進出場價位（ATR 不足）就不推薦
+        else:
+            tier = ("A" if rr >= MIN_RR_RATIO else "B") if strong else "C"
         stats["rr_ok"] += int(tier == "A")
         results[sid] = {**card, "passed": strong, "exclude_reason": None if strong else "動能不足", "tier": tier}
-        mark = {"A": "++", "B": "~ ", "C": ". "}[tier]
+        mark = {"A": "++", "B": "~ ", "C": ". ", None: "x "}[tier]
         log(f"  [{mark}] {sid} 評分:{card['score']} RR:{rr} 訊號:{card['signals']}")
 
     if unknown_inst:
