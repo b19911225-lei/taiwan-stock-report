@@ -1,0 +1,1436 @@
+{
+  "date": "2026-10-30",
+  "generated_at": "2026-10-30T17:56:04+08:00",
+  "market": {
+    "close": 45211.83,
+    "chg": -1156.5,
+    "chg_pct": -2.49,
+    "money_100m": 9396.0,
+    "breadth": {
+      "up": 92,
+      "limit_up": 4,
+      "down": 941,
+      "limit_down": 11,
+      "flat": 45
+    },
+    "top_turnover": [
+      {
+        "stock_id": "2330",
+        "name": "台積電",
+        "close": 2370.0,
+        "chg_pct": -1.86,
+        "value_100m": 868.33
+      },
+      {
+        "stock_id": "2454",
+        "name": "聯發科",
+        "close": 3915.0,
+        "chg_pct": -3.21,
+        "value_100m": 507.27
+      },
+      {
+        "stock_id": "2308",
+        "name": "台達電",
+        "close": 1335.0,
+        "chg_pct": -9.8,
+        "value_100m": 310.38
+      },
+      {
+        "stock_id": "2303",
+        "name": "聯電",
+        "close": 111.5,
+        "chg_pct": -3.46,
+        "value_100m": 260.2
+      },
+      {
+        "stock_id": "2327",
+        "name": "國巨*",
+        "close": 502.0,
+        "chg_pct": -7.55,
+        "value_100m": 239.73
+      }
+    ],
+    "institutional_100m": {
+      "foreign": -1124.67,
+      "sitc": 239.93,
+      "dealer": -513.7
+    }
+  },
+  "us_markets": [
+    {
+      "id": "^DJI",
+      "name": "道瓊",
+      "date": "2026-10-29",
+      "close": 52342.56,
+      "chg_pct": -0.25
+    },
+    {
+      "id": "^GSPC",
+      "name": "S&P 500",
+      "date": "2026-10-29",
+      "close": 7720.39,
+      "chg_pct": -0.3
+    },
+    {
+      "id": "^IXIC",
+      "name": "那斯達克",
+      "date": "2026-10-29",
+      "close": 26184.72,
+      "chg_pct": -1.38
+    },
+    {
+      "id": "^SOX",
+      "name": "費城半導體",
+      "date": "2026-10-29",
+      "close": 11518.2,
+      "chg_pct": -1.42
+    },
+    {
+      "id": "TSM",
+      "name": "台積電 ADR",
+      "date": "2026-10-29",
+      "close": 431.81,
+      "chg_pct": -1.75
+    }
+  ],
+  "themes": [
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": -3.46
+    },
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": -3.65
+    },
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": -3.74
+    },
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": -4.17
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": -5.46
+    }
+  ],
+  "picks": [
+    {
+      "stock_id": "2603",
+      "name": "長榮",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 271.5,
+      "today_chg": 4.02,
+      "chg_5d": 5.44,
+      "score": 80,
+      "score_breakdown": {
+        "momentum": 30,
+        "chip": 25,
+        "tech": 25,
+        "theme": 0
+      },
+      "signals": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6"
+      ],
+      "momentum_count": 6,
+      "vol_vs_20d": 1.76,
+      "vol_vs_5d": 2.8,
+      "inst_available": true,
+      "foreign_buy_days": 7,
+      "foreign_net_5d_lots": 14137,
+      "sitc_net_5d_lots": 1524,
+      "dealer_net_5d_lots": 1806,
+      "rsi14": 76.7,
+      "kd_cross": true,
+      "ma5": 263.4,
+      "ma20": 252.72,
+      "atr": 9.64,
+      "high_60d": 271.5,
+      "targets": {
+        "entry_low": 266.07,
+        "entry_high": 276.93,
+        "target1": 310.06,
+        "target_basis": "4倍ATR",
+        "stop_loss": 252.49,
+        "rr_ratio": 2.03
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N5",
+        "N41",
+        "N42",
+        "N43",
+        "N44"
+      ]
+    },
+    {
+      "stock_id": "2609",
+      "name": "陽明",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 63.5,
+      "today_chg": 2.42,
+      "chg_5d": 2.25,
+      "score": 63,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": [
+        "M2",
+        "M3",
+        "M6"
+      ],
+      "momentum_count": 3,
+      "vol_vs_20d": 1.17,
+      "vol_vs_5d": 2.42,
+      "inst_available": true,
+      "foreign_buy_days": 5,
+      "foreign_net_5d_lots": 27016,
+      "sitc_net_5d_lots": -151,
+      "dealer_net_5d_lots": 266,
+      "rsi14": 64.3,
+      "kd_cross": false,
+      "ma5": 62.66,
+      "ma20": 61.84,
+      "atr": 2.15,
+      "high_60d": 67.3,
+      "targets": {
+        "entry_low": 62.23,
+        "entry_high": 64.77,
+        "target1": 72.1,
+        "target_basis": "4倍ATR",
+        "stop_loss": 61.22,
+        "rr_ratio": 3.77
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N44",
+        "N45",
+        "N46"
+      ]
+    },
+    {
+      "stock_id": "2912",
+      "name": "統一超",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 225.5,
+      "today_chg": 1.58,
+      "chg_5d": 0.45,
+      "score": 63,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": [
+        "M2",
+        "M3",
+        "M6"
+      ],
+      "momentum_count": 3,
+      "vol_vs_20d": 1.26,
+      "vol_vs_5d": 1.51,
+      "inst_available": true,
+      "foreign_buy_days": 17,
+      "foreign_net_5d_lots": 4470,
+      "sitc_net_5d_lots": -81,
+      "dealer_net_5d_lots": -76,
+      "rsi14": 70.7,
+      "kd_cross": false,
+      "ma5": 224.6,
+      "ma20": 219.3,
+      "atr": 4.36,
+      "high_60d": 229.5,
+      "targets": {
+        "entry_low": 220.99,
+        "entry_high": 230.01,
+        "target1": 242.94,
+        "target_basis": "4倍ATR",
+        "stop_loss": 217.11,
+        "rr_ratio": 2.08
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N47",
+        "N48",
+        "N49"
+      ]
+    },
+    {
+      "stock_id": "2834",
+      "name": "臺企銀",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 18.05,
+      "today_chg": 0.28,
+      "chg_5d": 0.84,
+      "score": 60,
+      "score_breakdown": {
+        "momentum": 20,
+        "chip": 15,
+        "tech": 25,
+        "theme": 0
+      },
+      "signals": [
+        "M2",
+        "M3",
+        "M5",
+        "M6"
+      ],
+      "momentum_count": 4,
+      "vol_vs_20d": 1.35,
+      "vol_vs_5d": 1.78,
+      "inst_available": true,
+      "foreign_buy_days": 3,
+      "foreign_net_5d_lots": 13304,
+      "sitc_net_5d_lots": -26,
+      "dealer_net_5d_lots": 228,
+      "rsi14": 67.9,
+      "kd_cross": true,
+      "ma5": 17.97,
+      "ma20": 17.73,
+      "atr": 0.28,
+      "high_60d": 18.8,
+      "targets": {
+        "entry_low": 17.69,
+        "entry_high": 18.41,
+        "target1": 19.17,
+        "target_basis": "4倍ATR",
+        "stop_loss": 17.51,
+        "rr_ratio": 2.07
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N50"
+      ]
+    },
+    {
+      "stock_id": "4526",
+      "name": "東台",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 56.0,
+      "today_chg": 6.06,
+      "chg_5d": 47.17,
+      "score": 58,
+      "score_breakdown": {
+        "momentum": 10,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": [
+        "M3",
+        "M6"
+      ],
+      "momentum_count": 2,
+      "vol_vs_20d": 0.81,
+      "vol_vs_5d": 0.24,
+      "inst_available": true,
+      "foreign_buy_days": 6,
+      "foreign_net_5d_lots": 26728,
+      "sitc_net_5d_lots": 0,
+      "dealer_net_5d_lots": 857,
+      "rsi14": 89.5,
+      "kd_cross": false,
+      "ma5": 48.93,
+      "ma20": 37.8,
+      "atr": 2.9,
+      "high_60d": 56.0,
+      "targets": {
+        "entry_low": 54.88,
+        "entry_high": 57.12,
+        "target1": 67.6,
+        "target_basis": "4倍ATR",
+        "stop_loss": 52.08,
+        "rr_ratio": 2.96
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N51",
+        "N52",
+        "N53",
+        "N54"
+      ]
+    }
+  ],
+  "debate_ids": [
+    "2603",
+    "2609",
+    "2912",
+    "2834",
+    "4526"
+  ],
+  "watchlist": [
+    {
+      "stock_id": "4577",
+      "name": "達航科技",
+      "pick_rank": null,
+      "close": 127.5,
+      "today_chg": -2.3,
+      "chg_5d": 10.39,
+      "score": 26,
+      "score_breakdown": {
+        "momentum": 5,
+        "chip": 5,
+        "tech": 16,
+        "theme": 0
+      },
+      "signals": [
+        "M6"
+      ],
+      "momentum_count": 1,
+      "vol_vs_20d": 0.74,
+      "vol_vs_5d": 0.33,
+      "inst_available": true,
+      "foreign_buy_days": 1,
+      "foreign_net_5d_lots": -70,
+      "sitc_net_5d_lots": 0,
+      "dealer_net_5d_lots": 51,
+      "rsi14": 73.2,
+      "kd_cross": false,
+      "ma5": 125.0,
+      "ma20": 101.67,
+      "atr": 8.66,
+      "high_60d": 138.0,
+      "trend": {
+        "T1": true,
+        "T2": true,
+        "T3": false
+      },
+      "fail_reasons": [
+        "近 5 日出現爆量長黑",
+        "收盤沒有比前一日高",
+        "動能訊號只有 1 個（要 2 個）"
+      ],
+      "targets": {
+        "entry_low": 124.95,
+        "entry_high": 130.05,
+        "target1": 162.14,
+        "target_basis": "4倍ATR",
+        "stop_loss": 118.57,
+        "rr_ratio": 3.88
+      },
+      "related_news": [
+        "N55"
+      ]
+    }
+  ],
+  "stats": {
+    "universe": 78,
+    "fetched": 78,
+    "scan_added": 30,
+    "prefilter_passed": 27,
+    "scored_passed": 22,
+    "rr_ok": 13
+  },
+  "incomplete": [],
+  "exclude_counts": {
+    "趨勢不符": 14,
+    "X1": 31,
+    "X5": 2,
+    "X2": 2,
+    "X3": 2,
+    "動能不足": 5
+  },
+  "quality": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  },
+  "performance": {
+    "lookback_days": 20,
+    "days_with_history": 8,
+    "total": 28,
+    "hit": 3,
+    "stopped": 17,
+    "holding": 8,
+    "no_data": 0,
+    "win_rate_pct": 15.0,
+    "avg_return_pct": -0.53,
+    "items": [
+      {
+        "stock_id": "4526",
+        "date": "2026-10-29",
+        "entry": 52.8,
+        "target1": 62.56,
+        "stop_loss": 49.1,
+        "status": "停損",
+        "exit": 49.1,
+        "exit_date": "2026-10-30",
+        "return_pct": -7.01
+      },
+      {
+        "stock_id": "2881",
+        "date": "2026-10-29",
+        "entry": 162.0,
+        "target1": 179.84,
+        "stop_loss": 155.05,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.31
+      },
+      {
+        "stock_id": "2885",
+        "date": "2026-10-29",
+        "entry": 73.4,
+        "target1": 80.64,
+        "stop_loss": 69.85,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -1.09
+      },
+      {
+        "stock_id": "7750",
+        "date": "2026-10-29",
+        "entry": 2090.0,
+        "target1": 2565.0,
+        "stop_loss": 1943.7,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -2.63
+      },
+      {
+        "stock_id": "2466",
+        "date": "2026-10-29",
+        "entry": 322.0,
+        "target1": 414.56,
+        "stop_loss": 299.46,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 9.94
+      },
+      {
+        "stock_id": "2356",
+        "date": "2026-10-28",
+        "entry": 63.8,
+        "target1": 73.5,
+        "stop_loss": 59.33,
+        "status": "停損",
+        "exit": 59.33,
+        "exit_date": "2026-10-30",
+        "return_pct": -7.01
+      },
+      {
+        "stock_id": "4526",
+        "date": "2026-10-28",
+        "entry": 49.65,
+        "target1": 58.45,
+        "stop_loss": 46.17,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 12.79
+      },
+      {
+        "stock_id": "6278",
+        "date": "2026-10-28",
+        "entry": 285.5,
+        "target1": 376.5,
+        "stop_loss": 265.51,
+        "status": "停損",
+        "exit": 261.0,
+        "exit_date": "2026-10-30",
+        "return_pct": -8.58
+      },
+      {
+        "stock_id": "3406",
+        "date": "2026-10-28",
+        "entry": 1330.0,
+        "target1": 1750.0,
+        "stop_loss": 1236.9,
+        "status": "停損",
+        "exit": 1236.9,
+        "exit_date": "2026-10-29",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "4958",
+        "date": "2026-10-28",
+        "entry": 550.0,
+        "target1": 705.16,
+        "stop_loss": 533.5,
+        "status": "停損",
+        "exit": 533.5,
+        "exit_date": "2026-10-29",
+        "return_pct": -3.0
+      },
+      {
+        "stock_id": "2356",
+        "date": "2026-10-27",
+        "entry": 63.0,
+        "target1": 73.5,
+        "stop_loss": 58.66,
+        "status": "停損",
+        "exit": 58.66,
+        "exit_date": "2026-10-30",
+        "return_pct": -6.89
+      },
+      {
+        "stock_id": "2379",
+        "date": "2026-10-27",
+        "entry": 793.0,
+        "target1": 884.44,
+        "stop_loss": 756.36,
+        "status": "停損",
+        "exit": 755.0,
+        "exit_date": "2026-10-30",
+        "return_pct": -4.79
+      },
+      {
+        "stock_id": "2324",
+        "date": "2026-10-27",
+        "entry": 37.6,
+        "target1": 44.95,
+        "stop_loss": 36.15,
+        "status": "停損",
+        "exit": 36.0,
+        "exit_date": "2026-10-30",
+        "return_pct": -4.26
+      },
+      {
+        "stock_id": "2881",
+        "date": "2026-10-27",
+        "entry": 162.0,
+        "target1": 179.56,
+        "stop_loss": 154.06,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.31
+      },
+      {
+        "stock_id": "4526",
+        "date": "2026-10-27",
+        "entry": 45.15,
+        "target1": 52.99,
+        "stop_loss": 41.99,
+        "status": "達標",
+        "exit": 52.99,
+        "exit_date": "2026-10-29",
+        "return_pct": 17.36
+      },
+      {
+        "stock_id": "4720",
+        "date": "2026-10-22",
+        "entry": 30.95,
+        "target1": 40.19,
+        "stop_loss": 28.78,
+        "status": "停損",
+        "exit": 27.9,
+        "exit_date": "2026-10-30",
+        "return_pct": -9.85
+      },
+      {
+        "stock_id": "4526",
+        "date": "2026-10-22",
+        "entry": 41.05,
+        "target1": 47.97,
+        "stop_loss": 38.18,
+        "status": "達標",
+        "exit": 47.97,
+        "exit_date": "2026-10-28",
+        "return_pct": 16.86
+      },
+      {
+        "stock_id": "6456",
+        "date": "2026-10-22",
+        "entry": 102.0,
+        "target1": 133.08,
+        "stop_loss": 94.86,
+        "status": "停損",
+        "exit": 94.86,
+        "exit_date": "2026-10-30",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "4989",
+        "date": "2026-10-22",
+        "entry": 71.0,
+        "target1": 91.6,
+        "stop_loss": 66.03,
+        "status": "停損",
+        "exit": 66.03,
+        "exit_date": "2026-10-27",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2466",
+        "date": "2026-10-22",
+        "entry": 261.0,
+        "target1": 341.56,
+        "stop_loss": 242.73,
+        "status": "達標",
+        "exit": 341.56,
+        "exit_date": "2026-10-29",
+        "return_pct": 30.87
+      },
+      {
+        "stock_id": "2356",
+        "date": "2026-10-21",
+        "entry": 61.3,
+        "target1": 73.5,
+        "stop_loss": 58.64,
+        "status": "停損",
+        "exit": 58.64,
+        "exit_date": "2026-10-30",
+        "return_pct": -4.34
+      },
+      {
+        "stock_id": "2324",
+        "date": "2026-10-21",
+        "entry": 37.7,
+        "target1": 44.95,
+        "stop_loss": 36.14,
+        "status": "停損",
+        "exit": 36.0,
+        "exit_date": "2026-10-30",
+        "return_pct": -4.51
+      },
+      {
+        "stock_id": "6415",
+        "date": "2026-10-21",
+        "entry": 490.0,
+        "target1": 608.0,
+        "stop_loss": 455.7,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 2.45
+      },
+      {
+        "stock_id": "1802",
+        "date": "2026-10-20",
+        "entry": 67.4,
+        "target1": 83.36,
+        "stop_loss": 62.68,
+        "status": "停損",
+        "exit": 62.68,
+        "exit_date": "2026-10-29",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2379",
+        "date": "2026-10-19",
+        "entry": 779.0,
+        "target1": 871.0,
+        "stop_loss": 746.76,
+        "status": "停損",
+        "exit": 746.76,
+        "exit_date": "2026-10-30",
+        "return_pct": -4.14
+      },
+      {
+        "stock_id": "6415",
+        "date": "2026-10-16",
+        "entry": 489.0,
+        "target1": 586.28,
+        "stop_loss": 454.77,
+        "status": "停損",
+        "exit": 454.77,
+        "exit_date": "2026-10-19",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2379",
+        "date": "2026-10-16",
+        "entry": 778.0,
+        "target1": 873.44,
+        "stop_loss": 743.84,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 3.21
+      },
+      {
+        "stock_id": "3014",
+        "date": "2026-10-16",
+        "entry": 148.0,
+        "target1": 163.84,
+        "stop_loss": 141.14,
+        "status": "停損",
+        "exit": 141.14,
+        "exit_date": "2026-10-20",
+        "return_pct": -4.64
+      }
+    ]
+  },
+  "news": [
+    {
+      "id": "N1",
+      "source_id": "6641958",
+      "title": "〈光寶科法說〉AI摘要2026 10/30",
+      "summary": "",
+      "time": "10/30 17:53",
+      "url": "https://news.cnyes.com/news/id/6641958",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N2",
+      "source_id": "6641948",
+      "title": "〈鴻海科技日〉劉揚偉：明年景氣仍呈K型發展 營運續雙位數成長",
+      "summary": "劉揚偉稱明年景氣呈K型，AI資料中心需求續增，鴻海明年營運可望維持雙位數成長。 他指AI非產業泡沫，市場供需短缺是需求遠大於供應，非產能突然不足。 鴻海去年宣布與OpenAI合作資料中心，劉揚偉今會晤Sam Altman，稱未來合作將更具體。",
+      "time": "10/30 17:52",
+      "url": "https://news.cnyes.com/news/id/6641948",
+      "category": "台股",
+      "stocks": [
+        "2317"
+      ]
+    },
+    {
+      "id": "N3",
+      "source_id": "6641944",
+      "title": "〈光寶科法說〉800V Power Rack明年Q1出貨 2027資本支出高於197億元",
+      "summary": "光寶科明年 AI 營收占比估升至四至五成，AI 伺服器電源成長可望維持約七成。 800V HVDC Power Rack 8月底送樣、11月再送樣，預計明年Q1出貨；ASIC用50V，NVIDIA平台走800V。 董事會分割機構件給力能，整合DCX推液冷；今年資本支出上修，明年將更高。",
+      "time": "10/30 17:49",
+      "url": "https://news.cnyes.com/news/id/6641944",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N4",
+      "source_id": "6641795",
+      "title": "〈光寶科法說〉Q3每股賺3.27元創新高 雲端電源助攻Q4營收溫和季增",
+      "summary": "光寶科第三季稅後純益74.3億元、EPS 3.27元，季增4.4%、年增59.9% 第四季營收估季增溫和，雲端電源續成長；PC與消費性產品偏弱，毛利率持平 雲端物聯網營收338億元年增57%，AI伺服器電源成長八成以上，占全公司營收約52%",
+      "time": "10/30 17:47",
+      "url": "https://news.cnyes.com/news/id/6641795",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N5",
+      "source_id": "6641939",
+      "title": "外資單日重砍台股1124億元創史上第七大賣超 反手布局防禦型傳產股",
+      "summary": "台股今收45211.83點、跌1156.5點，市場成交值8777.3億元。 三大法人賣超1398.44億元；外資賣超1124.67億元，創史上第七大，期貨再加空1780口。 分析師指大盤跌破半年線，谷歌、英特爾展望引發科技股疑慮，台股整理恐拉長。",
+      "time": "10/30 17:44",
+      "url": "https://news.cnyes.com/news/id/6641939",
+      "category": "台股",
+      "stocks": [
+        "1101",
+        "1216",
+        "2412",
+        "2603",
+        "9904"
+      ]
+    },
+    {
+      "id": "N6",
+      "source_id": "6641877",
+      "title": "〈鴻海科技日〉發表3款全新電動車參考設計 擴大B2B產品組合",
+      "summary": "鴻海科技日發表3款全新參考設計電動車：MODEL A+、MODEL K+、MODEL K。 3車分攻B級SUV、年輕族群與日本K-Car商用市場，主打CDMS與客製化。 鴻海電動移動生態系研發成果同步亮相，參考設計車型累計達12款。",
+      "time": "10/30 17:42",
+      "url": "https://news.cnyes.com/news/id/6641877",
+      "category": "台股",
+      "stocks": [
+        "2317"
+      ]
+    },
+    {
+      "id": "N7",
+      "source_id": "6641772",
+      "title": "波羅的海運價指數 是怎麼被南韓船王「畫」出來的？",
+      "summary": "摩科瑞在英國高等法院告波羅的海交易所，指TD3C VLCC運價指數戰火後失真，要求追溯性暫停發布並已向FCA申訴。 荷姆茲海峽運輸近停擺下，長錦商船以80至93艘VLCC留在波斯灣，透過WhatsApp群組報出高價租船訊息，成為市場定價依據。 TD3C失真衝擊FFA避險，摩科瑞稱損失數億美元。",
+      "time": "10/30 17:40",
+      "url": "https://news.cnyes.com/news/id/6641772",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N8",
+      "source_id": "6641957",
+      "title": "台股震盪整理 考驗主動式ETF策略",
+      "summary": "台股近期修正，外資調節、科技股震盪與避險升溫，但外銷訂單續增、製造業用電連18月亮紅燈，顯示基本面仍有動能。 融資餘額逾6,400億元不代表全面斷頭，應留意高融資使用率、低維持率個股風險；瑞昱、達發、健策、華新科可再檢視。",
+      "time": "10/30 17:39",
+      "url": "https://news.cnyes.com/news/id/6641957",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N9",
+      "source_id": "6641955",
+      "title": "8700億巨量殺破底、融資斷頭潮湧現！「160%生死線」到了，該斷尾求生還是抱緊低估核心？",
+      "summary": "美科技巨頭財報與財測不佳，台股開低走低，盤中一度重挫逾1600點，終場跌1156.5點至45211.83點。 成交金額8777.3億元，台積電收2370元、聯發科失守4000元、台達電跌停，AI供應鏈普遍承壓。 分析稱市場進入加速去槓桿，觀察融資維持率是否回測160%，並強調零槓桿、保留現金。",
+      "time": "10/30 17:36",
+      "url": "https://news.cnyes.com/news/id/6641955",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N10",
+      "source_id": "6641954",
+      "title": "頭部一定是利多、底部一定是利空、機會就在燈火闌珊處",
+      "summary": "台股終場大跌1,156點收45,211點，盤中一度跌逾1,600點，AI股受美科技股重挫與Alphabet財報不如預期拖累 指數失守10日線、月線、季線，短線觀察44,200點附近支撐及量能是否降溫，才有機會止穩 雖短線震盪加劇，但9月外銷訂單年增62.4％，AI長線需求與台灣經濟成長動能仍在",
+      "time": "10/30 17:34",
+      "url": "https://news.cnyes.com/news/id/6641954",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N11",
+      "source_id": "6641927",
+      "title": "幣安爆發63億美元史上最大加密貨幣竊案！北韓精銳駭客組織被指是幕後黑手",
+      "summary": "TRM Labs指幣安63.6億美元資產遭竊，疑北韓TraderTraitor所為，被稱為史上最大加密貨幣竊案。 TRM稱資產在10條區塊鏈轉出，多數約20分鐘內完成；與去年Bybit 15億美元案特徵相似。 幣安表示疑為DevOps工程師筆電遭入侵，客戶資金安全；比特幣一度跌破7.7萬美元。",
+      "time": "10/30 17:20",
+      "url": "https://news.cnyes.com/news/id/6641927",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N12",
+      "source_id": "6641830",
+      "title": "十月科技股血洗8%！避險基金「指數級做空」成波動炸彈 專家：別被反彈騙 AI交易暗藏更大危險",
+      "summary": "避險基金未撤出AI交易，10月科技股回檔約8%後轉向用QQQ等指數工具做空那斯達克100。 高盛稱截至5月美股宏觀產品空頭部位創10年高；QQQ賣空升、SPY較低，對沖集中科技與AI。 指數對沖擴大帶動股票相關性回升，VIX緩衝減弱，市場波動率上行壓力增加。",
+      "time": "10/30 17:10",
+      "url": "https://news.cnyes.com/news/id/6641830",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N13",
+      "source_id": "6641819",
+      "title": "DDR5漲多兇？這款一年暴漲761% 一組128GB要價逾3200美元",
+      "summary": "DDR5價格續飆，日本秋葉原調查顯示海盜船128GB套裝漲至514,800日元，年增約761%。 相較9月12日的316,980日元再漲62.4%，較一年前59,800日元大增，單買記憶體已逾3,200美元。 Crucial等DDR5桌機、筆電規格也同步上漲，推高電腦組裝與升級成本。",
+      "time": "10/30 17:00",
+      "url": "https://news.cnyes.com/news/id/6641819",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N14",
+      "source_id": "6641922",
+      "title": "【盤後贏指標】狂殺1156點！45K守得住嗎？贏指標「跌破12日」，反彈先看這條線！",
+      "summary": "",
+      "time": "10/30 16:51",
+      "url": "https://news.cnyes.com/news/id/6641922",
+      "category": "盤勢",
+      "stocks": []
+    },
+    {
+      "id": "N15",
+      "source_id": "6641913",
+      "title": "村田上修全年財測、五年投資1兆日圓！資料中心營收翻倍，擴大高階MLCC布局",
+      "summary": "",
+      "time": "10/30 16:30",
+      "url": "https://news.cnyes.com/news/id/6641913",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N16",
+      "source_id": "6641904",
+      "title": "傳 Marvell 併購 Lumentum，為何兩家股價卻兩樣情？",
+      "summary": "彭博報導，Marvell 正與 Lumentum 深入洽談併購，最快下週可能宣布交易。 市場反應兩樣情：Lumentum 29 日盤中收紅、盤後一度漲逾一成，Marvell 重挫逾 13%。 若成局，AI 光通訊、CPO 與矽光子供應鏈版圖恐洗牌，台廠受惠與風險並存。",
+      "time": "10/30 16:21",
+      "url": "https://news.cnyes.com/news/id/6641904",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N17",
+      "source_id": "6641754",
+      "title": "高盛股價暴漲挹注員工30億美元 業務轉型與AI推動組織精簡",
+      "summary": "高盛今年員工平均薪資與獎金估47.6萬美元，主因是股票價格暴漲帶動遞延獎勵增值。 高盛股價自2023年初約345美元漲至2026年7月逾1000美元，估替員工累計帶來約30億美元增值。 高盛2026年第三季淨利年增29%至52.9億美元，股票業務收入年增72%至64.4億美元。",
+      "time": "10/30 16:20",
+      "url": "https://news.cnyes.com/news/id/6641754",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N18",
+      "source_id": "6641903",
+      "title": "美股冬令時間將上路！11月起晚一小時開盤，年底還有哪些交易日要留意？",
+      "summary": "11月2日起美股改為台灣時間22:30開盤、隔日05:00收盤，投資人看盤與下單節奏需調整。 美國11月1日結束夏令時間回到標準時間，台灣與美東時差由12小時變13小時，交易時長不變。 年底還有感恩節、聖誕節休市與提早收盤，且那斯達克12月6日將啟動23小時交易。",
+      "time": "10/30 16:18",
+      "url": "https://news.cnyes.com/news/id/6641903",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N19",
+      "source_id": "6641882",
+      "title": "留下房子股票，孩子卻得四處籌錢？傳承規劃容易漏算的現金缺口",
+      "summary": "資產集中房產、股票時，遺產交接常先卡在現金不足，影響繼承能否按原定計畫完成 遺產稅原則2個月內繳清，可延期2個月；可申請分18期內繳納，實物抵繳門檻為30萬元以上 傳承規劃宜先列資產保留順序、支出與資金到位時間、家人分工，避免被迫賣資產",
+      "time": "10/30 16:05",
+      "url": "https://news.cnyes.com/news/id/6641882",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N20",
+      "source_id": "6641878",
+      "title": "IT通路雙雄股價走勢分歧！同樣受惠記憶體漲價，聯強、大聯大獲利模式有何不同？",
+      "summary": "",
+      "time": "10/30 16:00",
+      "url": "https://news.cnyes.com/news/id/6641878",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N21",
+      "source_id": "6641852",
+      "title": "adidas財報解讀｜服飾撐起成長 台灣鞋廠訂單待觀察",
+      "summary": "",
+      "time": "10/30 15:30",
+      "url": "https://news.cnyes.com/news/id/6641852",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N22",
+      "source_id": "6641844",
+      "title": "11家銀行參與！兆豐銀統籌創意400億元聯貸 超額認購1.2倍",
+      "summary": "創意電子400億元聯貸案今簽約，11家金融機構參與，認參達目標1.2倍。 受惠AI、HPC與雲端需求升溫，創意2026年前三季營收440.99億元、年增102.83%。 聯貸案將支應營運擴張並導入ESG連結機制，兆豐銀稱看好其客製化晶片競爭力。",
+      "time": "10/30 15:23",
+      "url": "https://news.cnyes.com/news/id/6641844",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N23",
+      "source_id": "6641758",
+      "title": "IMF預測2026年越南人均GDP將首度超越印尼",
+      "summary": "IMF預測越南2026年人均GDP將達5,259美元，首度超越印尼5,153美元，東協排名升至第五。 越南受惠高科技製造轉移，鴻海、三星擴產帶動出口；前九月出口4,343億美元、FDI 211億美元。 越南規劃2026年投入約1000兆盾拚基建，全年經濟成長目標至少10%。",
+      "time": "10/30 15:20",
+      "url": "https://news.cnyes.com/news/id/6641758",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N24",
+      "source_id": "6641837",
+      "title": "台股大跌逾千點，股票該賣還是撿便宜？關鍵5步驟自救法搶先看！",
+      "summary": "台股加權指數重挫1156.5點、跌2.49%，櫃買指數跌4.42%，全市場逾1600檔收黑、18檔跌停。 電子股、半導體失守，金融股成資金避風港，顯示賣壓已由單一類股擴散為系統性。 市場提出5步驟自救邏輯：先查融資維持率與持股集中度，再檢視下跌原因，避免貿然攤平。",
+      "time": "10/30 14:54",
+      "url": "https://news.cnyes.com/news/id/6641837",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N25",
+      "source_id": "6641756",
+      "title": "南韓重罰Google與蘋果 認定收取高抽成屬阻礙競爭",
+      "summary": "",
+      "time": "10/30 14:50",
+      "url": "https://news.cnyes.com/news/id/6641756",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N26",
+      "source_id": "6641770",
+      "title": "谷歌財報炸出第一槍！港股AI周四迎最狠估值清洗 專家：投資邏輯轉向 會賺錢才配高估值",
+      "summary": "港股AI產業鏈與A股算力硬體今同跌，恒生科技午盤反彈1.4%仍未收復昨日跌幅 導火線為Alphabet Q3營收1275.8億美元遜預期、自由現金流負90.7億美元；微軟財報優於預期 港股AI鏈三角色遭重估，南向資金淨流出；恒科PE-TTM 20.3倍，近10年約8%分位",
+      "time": "10/30 14:40",
+      "url": "https://news.cnyes.com/news/id/6641770",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N27",
+      "source_id": "6641783",
+      "title": "AI、半導體需求強勁 國科會：全國研發經費連2年突破兆元",
+      "summary": "",
+      "time": "10/30 14:26",
+      "url": "https://news.cnyes.com/news/id/6641783",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N28",
+      "source_id": "6641818",
+      "title": "〈鴻海科技日〉東元與鴻海展出模組化資料中心 一站式整合交付攻AI基建商機",
+      "summary": "東元二度參展鴻海科技日，聚焦與鴻海合作的40呎貨櫃模組化資料中心MDC，基於NVIDIA DSX POD參考設計打造。 MDC整合IT機櫃、冷卻、配電、EMS與消防，提升交付效率並降低施工成本。 東元展示800VDC、SST及冷卻方案，馬來西亞MW級專案預計今年底前完成，回應AI算力擴建需求。",
+      "time": "10/30 14:19",
+      "url": "https://news.cnyes.com/news/id/6641818",
+      "category": "台股",
+      "stocks": [
+        "1504",
+        "2317"
+      ]
+    },
+    {
+      "id": "N29",
+      "source_id": "6641797",
+      "title": "〈台股盤後〉美企AI疑雲攪局 收跌1156點摜破半年線 艱苦守住45K",
+      "summary": "",
+      "time": "10/30 14:12",
+      "url": "https://news.cnyes.com/news/id/6641797",
+      "category": "盤勢",
+      "stocks": [
+        "2308",
+        "2317",
+        "2330",
+        "2454",
+        "3037",
+        "3189",
+        "8046"
+      ]
+    },
+    {
+      "id": "N30",
+      "source_id": "6641753",
+      "title": "廣達攜MIT舉辦2026年科技論壇 聚焦AI驅動醫療創新與變革",
+      "summary": "",
+      "time": "10/30 14:09",
+      "url": "https://news.cnyes.com/news/id/6641753",
+      "category": "台股",
+      "stocks": [
+        "2382"
+      ]
+    },
+    {
+      "id": "N31",
+      "source_id": "6641749",
+      "title": "廣達成立智慧醫療新公司「達穎智能」 實現AI醫療落地、邁向市場",
+      "summary": "",
+      "time": "10/30 14:07",
+      "url": "https://news.cnyes.com/news/id/6641749",
+      "category": "台股",
+      "stocks": [
+        "2382"
+      ]
+    },
+    {
+      "id": "N32",
+      "source_id": "6641724",
+      "title": "AI需求顯現 華通規劃連續3年每年資本支出皆維持200億元以上",
+      "summary": "",
+      "time": "10/30 14:06",
+      "url": "https://news.cnyes.com/news/id/6641724",
+      "category": "台股",
+      "stocks": [
+        "2313"
+      ]
+    },
+    {
+      "id": "N33",
+      "source_id": "6641682",
+      "title": "商發署：今年培育2萬人次運用AI技術已達標 瞄準AI普及率達過半",
+      "summary": "2025年台灣服務業GDP達新台幣15.60兆元、年增3.57%，占總GDP 55.11%；就業709.3萬人，占61.01%。 商業署發布《2026商業服務業年鑑》，聚焦AI服務商業、AI治理、低碳商場等前瞻主題。 調查顯示35.8%企業已導入AI，商業署輔導2萬人達標，擬提升AI普及率至50%。",
+      "time": "10/30 14:03",
+      "url": "https://news.cnyes.com/news/id/6641682",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N34",
+      "source_id": "6641741",
+      "title": "〈鴻海科技日〉劉揚偉：今年展現集團加乘力與垂直整合力 AI伺服器機架產能已較去年翻倍",
+      "summary": "鴻海科技日登場，劉揚偉稱第七屆規模最大，AI伺服器機架週產能一年增至2,000架。 鴻海秀垂直整合與精密製造，AI伺服器Compute Tray組裝由2小時多縮至20分鐘。 鴻海全球廠區逾270個、土地逾4000萬平方公尺，數位分身與Physical AI加速製造轉型。",
+      "time": "10/30 14:00",
+      "url": "https://news.cnyes.com/news/id/6641741",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N35",
+      "source_id": "6641787",
+      "title": "友達（2409）帳上賺185億元，為何股價不漲反跌停？",
+      "summary": "友達台中廠以388億元售台積電，估處分利益185億元。 華亞廠原傳賣廣達卻生變，原預期進帳添變數。 友達第三季本業轉虧，開盤一度跌停。",
+      "time": "10/30 13:57",
+      "url": "https://news.cnyes.com/news/id/6641787",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N36",
+      "source_id": "6641767",
+      "title": "盤中速報 - 櫃買市場加權指數下跌-15.51點至371.86點，跌幅4%",
+      "summary": "",
+      "time": "10/30 13:04",
+      "url": "https://news.cnyes.com/news/id/6641767",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N37",
+      "source_id": "6641751",
+      "title": "盤中速報 - 集中市場加權指數下跌-1003.41點至45364.92點，跌幅2.16%",
+      "summary": "",
+      "time": "10/30 12:57",
+      "url": "https://news.cnyes.com/news/id/6641751",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N38",
+      "source_id": "6641750",
+      "title": "盤中速報 - 櫃買市場加權指數下跌-14.25點至373.12點，跌幅3.68%",
+      "summary": "",
+      "time": "10/30 12:57",
+      "url": "https://news.cnyes.com/news/id/6641750",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N39",
+      "source_id": "6641555",
+      "title": "〈台股開盤〉美股利空籠罩 狂瀉逾1600點失守4萬5、摜破半年線",
+      "summary": "",
+      "time": "10/30 09:52",
+      "url": "https://news.cnyes.com/news/id/6641555",
+      "category": "盤勢",
+      "stocks": [
+        "2303",
+        "2308",
+        "2317",
+        "2330",
+        "2360",
+        "2382",
+        "2454",
+        "3037",
+        "3189",
+        "3324",
+        "3711",
+        "4958",
+        "5274",
+        "6213",
+        "6223",
+        "6274",
+        "6515",
+        "7769",
+        "8046"
+      ]
+    },
+    {
+      "id": "N40",
+      "source_id": "6641128",
+      "title": "〈台股盤前要聞〉台達電預期Q4營收優於Q3、國巨Q4可望淡季不淡",
+      "summary": "",
+      "time": "10/30 05:10",
+      "url": "https://news.cnyes.com/news/id/6641128",
+      "category": "盤勢",
+      "stocks": [
+        "2308",
+        "2327",
+        "2330",
+        "3711"
+      ]
+    },
+    {
+      "id": "N41",
+      "source_id": "",
+      "title": "三大法人買賣超– 外資買超(3008)大立光、(2603)長榮，投信買超(3711)日月光投控、(2330)台積電，法人合計賣超1398.44億元(1030)｜豐雲學堂2026 年 10 月",
+      "summary": "",
+      "time": "",
+      "url": "https://www.sinotrade.com.tw/richclub/MarketTrends/%E4%B8%89%E5%A4%A7%E6%B3%95%E4%BA%BA%E8%B2%B7%E8%B3%A3%E8%B6%85-%E2%80%93-%E5%A4%96%E8%B3%87%E8%B2%B7%E8%B6%85-3008-%E5%A4%A7%E7%AB%8B%E5%85%89--2603-%E9%95%B7%E6%A6%AE-%E6%8A%95%E4%BF%A1%E8%B2%B7%E8%B6%85-3711-%E6%97%A5%E6%9C%88%E5%85%89%E6%8A%95%E6%8E%A7--2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB-%E6%B3%95%E4%BA%BA%E5%90%88%E8%A8%88%E8%B3%A3%E8%B6%851398-44%E5%84%84%E5%85%83--1030--6ae454d9df300800529b7ac5",
+      "category": "個股",
+      "source": "永豐金證券",
+      "stocks": [
+        "2603"
+      ]
+    },
+    {
+      "id": "N42",
+      "source_id": "",
+      "title": "2603 長榮 - 🏴‍☠️ 【錢男友航海日誌｜世界越動盪，大航海時代越要開始！】 - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "http://www.cmoney.tw/forum/article/187233763",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2603"
+      ]
+    },
+    {
+      "id": "N43",
+      "source_id": "",
+      "title": "2603 長榮 - AI相關資產重新估值，極端殺盤之後，市場在重新尋找價格- 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187214760",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2603"
+      ]
+    },
+    {
+      "id": "N44",
+      "source_id": "",
+      "title": "台股盤中跌逾千點！長榮衝271元 萬海、陽明跟漲掀航運熱潮",
+      "summary": "",
+      "time": "",
+      "url": "https://news.wearn.com/c2135423.html",
+      "category": "個股",
+      "source": "聚財網",
+      "stocks": [
+        "2603"
+      ]
+    },
+    {
+      "id": "N45",
+      "source_id": "",
+      "title": "【10:09 即時新聞】陽明(2609)盤中穩步走強，法人與主力買盤延續",
+      "summary": "",
+      "time": "",
+      "url": "https://cmnews.com.tw/article/cmoneyairesearcher-e8d1814f-d406-11f1-963a-f6afca9b075b",
+      "category": "個股",
+      "source": "CMoney投資網誌",
+      "stocks": [
+        "2609"
+      ]
+    },
+    {
+      "id": "N46",
+      "source_id": "",
+      "title": "2609 陽明 - 跟著弱那就砍了！轉電子跌深股- 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187154157",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2609"
+      ]
+    },
+    {
+      "id": "N47",
+      "source_id": "",
+      "title": "2912 統一超- 7-ELEVEN 雙 IP 集點開跑米飛兔、咖波聯手推逾60款生活精品- 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187213618",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2912"
+      ]
+    },
+    {
+      "id": "N48",
+      "source_id": "",
+      "title": "焦點股：前三季獲利創高＋外資買盤連續，統一超(2912)股價整理待攻",
+      "summary": "",
+      "time": "",
+      "url": "https://ww2.money-link.com.tw/RealtimeNews/NewsContent.aspx?SN=2436624002&PU=0010",
+      "category": "個股",
+      "source": "富聯網",
+      "stocks": [
+        "2912"
+      ]
+    },
+    {
+      "id": "N49",
+      "source_id": "",
+      "title": "【09:51 即時新聞】統一超(2912)盤中走強，聚焦前3季獲利創高",
+      "summary": "",
+      "time": "",
+      "url": "https://cmnews.com.tw/article/cmoneyairesearcher-91802ae6-d404-11f1-8d71-7575e9bc3954",
+      "category": "個股",
+      "source": "CMoney投資網誌",
+      "stocks": [
+        "2912"
+      ]
+    },
+    {
+      "id": "N50",
+      "source_id": "",
+      "title": "2834 臺企銀 - 低檔盤整繼續買 - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187206462",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2834"
+      ]
+    },
+    {
+      "id": "N51",
+      "source_id": "",
+      "title": "4526 東台 - WOW🤩🤩🤩 - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187209413",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "4526"
+      ]
+    },
+    {
+      "id": "N52",
+      "source_id": "",
+      "title": "東台精機(4526)漲停衝上近50元，毛利率撐得起這波漲勢嗎？-葉博金融研究院",
+      "summary": "",
+      "time": "",
+      "url": "https://cmnews.com.tw/article/yeguanyu-de731d9a-d40d-11f1-8dc9-86f5baa34312",
+      "category": "個股",
+      "source": "CMoney投資網誌",
+      "stocks": [
+        "4526"
+      ]
+    },
+    {
+      "id": "N53",
+      "source_id": "",
+      "title": "4526 東台 - 是福不是禍 是禍躲不過 - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187178157",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "4526"
+      ]
+    },
+    {
+      "id": "N54",
+      "source_id": "",
+      "title": "【10:38 即時新聞】東台(4526)盤中微幅走強，法人與主力近期買盤受關注",
+      "summary": "",
+      "time": "",
+      "url": "https://cmnews.com.tw/article/cmoneyairesearcher-1b654a44-d40b-11f1-b966-ef14cefffa77",
+      "category": "個股",
+      "source": "CMoney投資網誌",
+      "stocks": [
+        "4526"
+      ]
+    },
+    {
+      "id": "N55",
+      "source_id": "",
+      "title": "4577 達航科技 - 兄弟姐妹早安☀️ 再努力一天，明天就可以好好放鬆了！... - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/187151854",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "4577"
+      ]
+    }
+  ]
+}
