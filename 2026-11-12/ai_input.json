@@ -1,0 +1,854 @@
+{
+  "date": "2026-11-12",
+  "instructions": "依 docs/AI_WRITING_RULES.md 撰寫 history/<date>/ai_output.json；數字只能照抄本檔。",
+  "market": {
+    "close": 43091.87,
+    "chg": -1165.28,
+    "chg_pct": -2.63,
+    "money_100m": 10568.0,
+    "breadth": {
+      "up": 277,
+      "limit_up": 12,
+      "down": 730,
+      "limit_down": 10,
+      "flat": 75
+    },
+    "top_turnover": [
+      {
+        "stock_id": "2330",
+        "name": "台積電",
+        "close": 2340.0,
+        "chg_pct": -2.3,
+        "value_100m": 812.83
+      },
+      {
+        "stock_id": "2454",
+        "name": "聯發科",
+        "close": 3850.0,
+        "chg_pct": -3.51,
+        "value_100m": 518.0
+      },
+      {
+        "stock_id": "1303",
+        "name": "南亞",
+        "close": 293.0,
+        "chg_pct": -6.39,
+        "value_100m": 470.7
+      },
+      {
+        "stock_id": "1802",
+        "name": "台玻",
+        "close": 81.7,
+        "chg_pct": 6.52,
+        "value_100m": 400.93
+      },
+      {
+        "stock_id": "3443",
+        "name": "創意",
+        "close": 7860.0,
+        "chg_pct": -0.32,
+        "value_100m": 296.19
+      }
+    ],
+    "institutional_100m": {
+      "foreign": -6.85,
+      "sitc": 125.68,
+      "dealer": -65.41
+    }
+  },
+  "us_markets": [
+    {
+      "id": "^DJI",
+      "name": "道瓊",
+      "date": "2026-11-11",
+      "close": 52486.49,
+      "chg_pct": 0.49
+    },
+    {
+      "id": "^GSPC",
+      "name": "S&P 500",
+      "date": "2026-11-11",
+      "close": 7619.38,
+      "chg_pct": 1.31
+    },
+    {
+      "id": "^IXIC",
+      "name": "那斯達克",
+      "date": "2026-11-11",
+      "close": 25466.19,
+      "chg_pct": 1.6
+    },
+    {
+      "id": "^SOX",
+      "name": "費城半導體",
+      "date": "2026-11-11",
+      "close": 10564.11,
+      "chg_pct": 5.66
+    },
+    {
+      "id": "TSM",
+      "name": "台積電 ADR",
+      "date": "2026-11-11",
+      "close": 413.35,
+      "chg_pct": 4.25
+    }
+  ],
+  "themes": [
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": -2.66
+    },
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": -3.3
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": -4.14
+    },
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": -4.7
+    },
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": -5.1
+    }
+  ],
+  "candidates": [
+    {
+      "stock_id": "1802",
+      "name": "台玻",
+      "themes": [
+        "當日熱門"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 81.7,
+      "today_chg_pct": 6.52,
+      "chg_5d_pct": 35.94,
+      "score": 73,
+      "score_breakdown": {
+        "momentum": 25,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M3": "外資連續買超 3 日以上",
+        "M4": "投信 + 自營商買超近 3 日逐日增加",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 3.18,
+      "vol_vs_5d": 3.47,
+      "rsi14": 65.9,
+      "kd_cross": false,
+      "ma5": 69.9,
+      "ma20": 66.35,
+      "atr14": 5.83,
+      "high_60d": 84.3,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 5,
+        "foreign_net_5d_lots": 264796,
+        "sitc_net_5d_lots": 9808,
+        "dealer_net_5d_lots": -1597
+      },
+      "program_levels": {
+        "entry_low": 80.07,
+        "entry_high": 83.33,
+        "target1": 105.02,
+        "target_basis": "4倍ATR",
+        "stop_loss": 75.98,
+        "rr_ratio": 4.08
+      },
+      "related_news": [
+        "N40",
+        "N41",
+        "N42",
+        "N43"
+      ]
+    },
+    {
+      "stock_id": "2471",
+      "name": "資通",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 64.7,
+      "today_chg_pct": 8.19,
+      "chg_5d_pct": 18.5,
+      "score": 68,
+      "score_breakdown": {
+        "momentum": 20,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M3": "外資連續買超 3 日以上",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 9.67,
+      "vol_vs_5d": 2.76,
+      "rsi14": 79.9,
+      "kd_cross": false,
+      "ma5": 56.48,
+      "ma20": 52.22,
+      "atr14": 3.25,
+      "high_60d": 65.7,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 5,
+        "foreign_net_5d_lots": 1635,
+        "sitc_net_5d_lots": 0,
+        "dealer_net_5d_lots": 33
+      },
+      "program_levels": {
+        "entry_low": 63.41,
+        "entry_high": 65.99,
+        "target1": 77.7,
+        "target_basis": "4倍ATR",
+        "stop_loss": 60.17,
+        "rr_ratio": 2.87
+      },
+      "related_news": [
+        "N44",
+        "N45",
+        "N46"
+      ]
+    },
+    {
+      "stock_id": "2412",
+      "name": "中華電",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 162.0,
+      "today_chg_pct": 0.62,
+      "chg_5d_pct": 0.31,
+      "score": 63,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M3": "外資連續買超 3 日以上",
+        "M4": "投信 + 自營商買超近 3 日逐日增加",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 0.38,
+      "vol_vs_5d": 0.26,
+      "rsi14": 68.2,
+      "kd_cross": false,
+      "ma5": 161.0,
+      "ma20": 157.7,
+      "atr14": 4.07,
+      "high_60d": 166.5,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 7,
+        "foreign_net_5d_lots": 15156,
+        "sitc_net_5d_lots": -3980,
+        "dealer_net_5d_lots": 1757
+      },
+      "program_levels": {
+        "entry_low": 158.76,
+        "entry_high": 165.24,
+        "target1": 178.28,
+        "target_basis": "4倍ATR",
+        "stop_loss": 156.12,
+        "rr_ratio": 2.77
+      },
+      "related_news": [
+        "N47",
+        "N48",
+        "N49",
+        "N50"
+      ]
+    },
+    {
+      "stock_id": "2466",
+      "name": "冠西電",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 436.5,
+      "today_chg_pct": 9.95,
+      "chg_5d_pct": 46.72,
+      "score": 45,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 5,
+        "tech": 25,
+        "theme": 0
+      },
+      "signals": {
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M5": "KD 近 3 日黃金交叉",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 1.35,
+      "vol_vs_5d": 2.35,
+      "rsi14": 76.6,
+      "kd_cross": true,
+      "ma5": 364.4,
+      "ma20": 301.48,
+      "atr14": 37.0,
+      "high_60d": 436.5,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 1,
+        "foreign_net_5d_lots": -248,
+        "sitc_net_5d_lots": 87,
+        "dealer_net_5d_lots": 67
+      },
+      "program_levels": {
+        "entry_low": 427.77,
+        "entry_high": 445.23,
+        "target1": 584.5,
+        "target_basis": "4倍ATR",
+        "stop_loss": 405.94,
+        "rr_ratio": 4.84
+      },
+      "related_news": [
+        "N51",
+        "N52",
+        "N53"
+      ]
+    },
+    {
+      "stock_id": "2355",
+      "name": "敬鵬",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 60.7,
+      "today_chg_pct": 9.96,
+      "chg_5d_pct": 26.33,
+      "score": 43,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 5,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 2.68,
+      "vol_vs_5d": 2.58,
+      "rsi14": 64.3,
+      "kd_cross": false,
+      "ma5": 53.17,
+      "ma20": 51.78,
+      "atr14": 3.86,
+      "high_60d": 60.7,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 1,
+        "foreign_net_5d_lots": 2908,
+        "sitc_net_5d_lots": 1508,
+        "dealer_net_5d_lots": 991
+      },
+      "program_levels": {
+        "entry_low": 59.49,
+        "entry_high": 61.91,
+        "target1": 76.14,
+        "target_basis": "4倍ATR",
+        "stop_loss": 56.45,
+        "rr_ratio": 3.63
+      },
+      "related_news": [
+        "N54",
+        "N55",
+        "N56",
+        "N57"
+      ]
+    }
+  ],
+  "other_picks": [],
+  "watchlist": [
+    {
+      "stock_id": "4577",
+      "name": "達航科技",
+      "pick_rank": null,
+      "close": 129.5,
+      "today_chg_pct": -5.82,
+      "chg_5d_pct": 12.12,
+      "score": 36,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 5,
+        "tech": 16,
+        "theme": 0
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M5": "KD 近 3 日黃金交叉"
+      },
+      "vol_vs_20d": 3.48,
+      "vol_vs_5d": 3.31,
+      "rsi14": 55.2,
+      "kd_cross": true,
+      "ma5": 122.0,
+      "ma20": 116.29,
+      "atr14": 13.79,
+      "high_60d": 147.5,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 1,
+        "foreign_net_5d_lots": 372,
+        "sitc_net_5d_lots": 0,
+        "dealer_net_5d_lots": 244
+      },
+      "program_levels": {
+        "entry_low": 126.91,
+        "entry_high": 132.09,
+        "target1": 184.66,
+        "target_basis": "4倍ATR",
+        "stop_loss": 120.43,
+        "rr_ratio": 6.08
+      },
+      "trend_ok": {
+        "T1": true,
+        "T2": true,
+        "T3": false
+      },
+      "not_selected_reasons": [
+        "今日跌幅超過 3%",
+        "收盤沒有比前一日高"
+      ],
+      "related_news": []
+    }
+  ],
+  "news": [
+    {
+      "id": "N1",
+      "category": "台股",
+      "title": "中華資安(7765) 前 3 季營收創新高！商品銷售成長 83%，為何本業獲利跟不上？",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N2",
+      "category": "台股",
+      "title": "中華資安(7765) 2027 年一半訂閱型收入年底前已簽定！SOC 續約率逾九成、兩個月簽進數個上億元長約，營收起點有支撐",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N3",
+      "category": "台股",
+      "title": "中華資安(7765) 10 月營收年增 32%！第 4 季還有 4 到 5 億元專案待驗收，全年雙位數成長靠什麼？",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N4",
+      "category": "台股",
+      "title": "中華資安(7765) 上網資安客戶達 126 萬戶！營收僅增 7% 並非降價，方案選擇拉開增幅",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N5",
+      "category": "台股",
+      "title": "中華資安(7765) 海外營收年增 261%！第 3 季取得日本製造業首案，夥伴交付降低設點需求",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N6",
+      "category": "台股",
+      "title": "中華資安(7765) 後量子遷移缺乏法遵推力！2027 年第 1 季推 WAF，免改網站仍須等客戶決策",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N7",
+      "category": "台股",
+      "title": "中華資安(7765) AI 檢測從人力走向模型加專家！導入四家業者前沿模型，下一步擬轉訂閱",
+      "summary": "",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N8",
+      "category": "國際",
+      "title": "輝達風險不只在股價！4000億美元承諾如何牽動AI資金鏈",
+      "summary": "輝達透過採購、擔保等安排支撐AI客戶融資，學者估整體承諾約4,000億美元。 Fed關注AI投資熱潮若逆轉，恐引發資產重新定價，但專家稱不至於重演2008金融海嘯。 若GPU跌價與承諾落空，壓力或傳向借款企業、銀行與信用市場；CoreWeave利差已擴大94%。",
+      "time": "11/13 01:30"
+    },
+    {
+      "id": "N9",
+      "category": "國際",
+      "title": "美股盤中／三大指數翻紅輝達跌幅收斂、AMD與博通走強",
+      "summary": "",
+      "time": "11/13 01:00"
+    },
+    {
+      "id": "N10",
+      "category": "國際",
+      "title": "輝達新加坡百億美元營收一夕消失！WSJ曝財報揭露方式突變更 Megaspeed疑雲再升高",
+      "summary": "輝達列Megaspeed入2025年6月封鎖名單後，同年10月起改採客戶總部所在地揭露營收，新加坡營收自財報中消失。 輝達最後一次揭露新加坡營收為102億美元，占總營收22%；兩年前僅占8%。 WSJ質疑改制使投資人難追蹤晶片去向，且輝達未說明與Megaspeed相關營收歸類；黃仁勳婚外情風波延燒。",
+      "time": "11/13 01:00"
+    },
+    {
+      "id": "N11",
+      "category": "台股",
+      "title": "車用元件占比從 6% 升至 11%！艾笛森(3591) 封裝產能轉向車用",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N12",
+      "category": "台股",
+      "title": "光學設計不再全靠外包！艾笛森(3591) 合資布局，短期先顧既有產品",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N13",
+      "category": "台股",
+      "title": "東協組合增 10%，中租-KY(5871) 東協單季獲利卻減 21%！柬埔寨增提減損成壓力",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N14",
+      "category": "台股",
+      "title": "中國獲利增 12%、營收仍減 4%，中租-KY(5871) 組合回升還待延續",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N15",
+      "category": "台股",
+      "title": "儲能併購帶入折舊，中租-KY(5871) 太陽能資產達 911 億元、台灣淨利季減 3%",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N16",
+      "category": "台股",
+      "title": "資金成本升 6 個基點，中租-KY(5871) 合併利差反擴至 6.95%！收益率回升抵銷壓力",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N17",
+      "category": "台股",
+      "title": "鑫傳(6856) 營收微減、稅前淨利卻增 32.8%！業外減虧貢獻一半增幅",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N18",
+      "category": "台股",
+      "title": "廣告收入占比回升至 31.9%！鑫傳(6856) 營收總額仍未成長",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N19",
+      "category": "國際",
+      "title": "銅價跌至四個月低點AI需求疑慮、升息預期加重壓力",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N20",
+      "category": "國際",
+      "title": "川普點名庫克接掌輝達黃仁勳卸任後，晶片出口政策受關注",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N21",
+      "category": "台股",
+      "title": "美麗人生購物台六成銷售來自生鮮！鑫傳(6856) 以回購與自營商品拓展營收",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N22",
+      "category": "台股",
+      "title": "寵研所三支保健食品已有回購！鑫傳(6856) 寵物事業持股升至八成六",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N23",
+      "category": "台股",
+      "title": "東元(1504) 日本首案 6.4MW 於 2027 年交付！下一階段 350MW 仍待爭取",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N24",
+      "category": "台股",
+      "title": "美國資料中心須自備發電！東元(1504) 第 3 季北美大馬達與變壓器接單年增近五成",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N25",
+      "category": "台股",
+      "title": "商用空調將占東元(1504) 事業群六成！2027 年機組規格從 500 以下推升至 1,800 冷凍噸",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N26",
+      "category": "台股",
+      "title": "營收創同期新高，東元(1504) 第 3 季營業利益卻減 8.95%！工程占比提高稀釋毛利",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N27",
+      "category": "台股",
+      "title": "百億接單目標已達八成！東元(1504) 資料中心交付擴量待檳城廠 2027 年 7 到 8 月完工",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N28",
+      "category": "台股",
+      "title": "法人估東元(1504) 2027 年 EPS 2.98 到 3.67 元！營收差 6%，利潤率卻差 2.3 個百分點",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N29",
+      "category": "台股",
+      "title": "大眾控(3701) 10 月營收年增 93.95%！新廠出貨創高，毛利率為何仍低於上半年？",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N30",
+      "category": "台股",
+      "title": "新山廠開幕前已量產！大眾控(3701) 8 條產線瞄準海外光通訊客戶",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N31",
+      "category": "台股",
+      "title": "光模組進入 3.2T、6.4T 世代！大眾控(3701) 放量關鍵在良率與交期",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N32",
+      "category": "台股",
+      "title": "產能仍落後客戶需求！大眾控(3701) 規劃私募 3,000 萬股支應光通訊擴充",
+      "summary": "",
+      "time": "11/13 00:30"
+    },
+    {
+      "id": "N33",
+      "category": "國際",
+      "title": "卸任還沒完！黃仁勳同意赴美國會作證 晶片出口爭議成焦點",
+      "summary": "黃仁勳已同意赴美國國會作證，預計感恩節前宣誓接受詢問，可能閉門進行並錄影留存。 此次由眾院外交、對中事務特別與情報委員會共同參與，議員先前曾揚言若他不出席將發傳票。 婚外關係曝光後，輝達對中晶片銷售與出口管制受華府更嚴格檢視；公司已宣布由Colette Kress暫代執行長。",
+      "time": "11/13 00:27"
+    },
+    {
+      "id": "N34",
+      "category": "國際",
+      "title": "盤中速報 - 超微半導體(AMD-US)大漲5.18%，報581.52美元",
+      "summary": "",
+      "time": "11/13 00:12"
+    },
+    {
+      "id": "N35",
+      "category": "國際",
+      "title": "黃仁勳辭職後管制恐再收緊！美眾院議長：對中國晶片出口限制共識升溫",
+      "summary": "強生稱國會對限制半導體晶片出口中國正逐步形成共識，最近事件可能促使更多議員改變立場。 輝達宣布黃仁勳辭任執行長後，對中晶片出口管制再受關注，美方也懷疑Megaspeed協助中國取得受限AI晶片。 眾院外交委員會主席馬斯特稱，預期黃仁勳將於未來一周內向國會作證。",
+      "time": "11/13 00:00"
+    },
+    {
+      "id": "N36",
+      "category": "國際",
+      "title": "盤中速報 - 思佳訊半導體(SWKS-US)大漲5.39%，報92.37美元",
+      "summary": "",
+      "time": "11/12 23:54"
+    },
+    {
+      "id": "N37",
+      "category": "台股",
+      "title": "黃仁勳下台震撼AI產業鏈 法人：台廠迎訂單大挪移與評價修正",
+      "summary": "",
+      "time": "11/12 23:04"
+    },
+    {
+      "id": "N38",
+      "category": "台股",
+      "title": "原相(3227) 毛利率勝法人預期！營收微減之際，第 4 季仍看回升",
+      "summary": "",
+      "time": "11/12 21:30"
+    },
+    {
+      "id": "N39",
+      "category": "盤勢",
+      "title": "〈台股盤前要聞〉廣達明年AI伺服器營收年增高雙位數、中信金前10月加計FVOCI股票狂賺1488億元",
+      "summary": "",
+      "time": "11/12 05:10"
+    },
+    {
+      "id": "N40",
+      "category": "個股",
+      "title": "TWA00 加權指數- 零組件大廠兩樣情！台玻爆量狂飆聯茂跌停- 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N41",
+      "category": "個股",
+      "title": "台玻、富喬 四檔搶鏡",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N42",
+      "category": "個股",
+      "title": "台玻(1802) 個股概覽 | 個股 - 股市",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N43",
+      "category": "個股",
+      "title": "玻纖布不懼黃仁勳風波！外資狂砸116億瘋搶台玻14萬張 「5檔金融股」同上榜敲進5.56萬張",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N44",
+      "category": "個股",
+      "title": "2471 資通- 富邦和元大竹科元大隔日沖- 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N45",
+      "category": "個股",
+      "title": "資通(2471)前三季EPS 3.08元年增八成 毛利率升至44.35% 金融科技、AI題材受關注",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N46",
+      "category": "個股",
+      "title": "【12:48 即時新聞】資通(2471)股價走強，資安族群買盤延續",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N47",
+      "category": "個股",
+      "title": "中華電信前進資訊月 展出防詐守衛、Hami Cam 等 AI 防護實力",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N48",
+      "category": "個股",
+      "title": "個股：中華電(2412)11/18參加摩根大通(JPMorgan)舉辦之投資人會議",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N49",
+      "category": "個股",
+      "title": "2412 中華電- 新竹縣長最新民調！徐欣瑩44.4%領先鄭朝方：「縣民期待陽光政治」 - 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N50",
+      "category": "個股",
+      "title": "2412 中華電- Google Pixel Tag 在台推出，全方位守護你的重要物品- 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N51",
+      "category": "個股",
+      "title": "財報：冠西電(2466)115/1/1～115/9/30歸屬母公司淨損1425萬元，EPS為-0.08元",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N52",
+      "category": "個股",
+      "title": "2466 冠西電- 相信光鄭大優選飆股賺到手抽筋舒服啦- 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N53",
+      "category": "個股",
+      "title": "【09:30 即時新聞】冠西電(2466)亮燈漲停，市場聚焦連月營收高成長",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N54",
+      "category": "個股",
+      "title": "【即時新聞】最新！敬鵬前三季EPS達2.42元賺贏去年，今日爆量攻上漲停價60.7元",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N55",
+      "category": "個股",
+      "title": "敬鵬、GIS 押逾120天",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N56",
+      "category": "個股",
+      "title": "低軌衛星飛天變兩樣情！敬鵬領4檔漲停 台揚連2天跌停",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N57",
+      "category": "個股",
+      "title": "敬鵬毛利率逾20%前三季賺贏去年 股價回神",
+      "summary": "",
+      "time": ""
+    }
+  ],
+  "missing": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  }
+}
