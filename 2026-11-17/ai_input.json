@@ -1,0 +1,801 @@
+{
+  "date": "2026-11-17",
+  "instructions": "依 docs/AI_WRITING_RULES.md 撰寫 history/<date>/ai_output.json；數字只能照抄本檔。",
+  "market": {
+    "close": 40092.11,
+    "chg": -947.97,
+    "chg_pct": -2.31,
+    "money_100m": 10129.0,
+    "breadth": {
+      "up": 234,
+      "limit_up": 6,
+      "down": 789,
+      "limit_down": 30,
+      "flat": 61
+    },
+    "top_turnover": [
+      {
+        "stock_id": "2330",
+        "name": "台積電",
+        "close": 2170.0,
+        "chg_pct": -2.03,
+        "value_100m": 1354.65
+      },
+      {
+        "stock_id": "2454",
+        "name": "聯發科",
+        "close": 3840.0,
+        "chg_pct": 1.19,
+        "value_100m": 607.45
+      },
+      {
+        "stock_id": "1303",
+        "name": "南亞",
+        "close": 261.5,
+        "chg_pct": -4.56,
+        "value_100m": 327.23
+      },
+      {
+        "stock_id": "2308",
+        "name": "台達電",
+        "close": 1055.0,
+        "chg_pct": -5.8,
+        "value_100m": 258.26
+      },
+      {
+        "stock_id": "3443",
+        "name": "創意",
+        "close": 6975.0,
+        "chg_pct": -10.0,
+        "value_100m": 253.37
+      }
+    ],
+    "institutional_100m": {
+      "foreign": -380.94,
+      "sitc": -38.21,
+      "dealer": -156.96
+    }
+  },
+  "us_markets": [
+    {
+      "id": "^DJI",
+      "name": "道瓊",
+      "date": "2026-11-16",
+      "close": 51608.17,
+      "chg_pct": -1.41
+    },
+    {
+      "id": "^GSPC",
+      "name": "S&P 500",
+      "date": "2026-11-16",
+      "close": 7416.59,
+      "chg_pct": -1.92
+    },
+    {
+      "id": "^IXIC",
+      "name": "那斯達克",
+      "date": "2026-11-16",
+      "close": 24509.76,
+      "chg_pct": -2.49
+    },
+    {
+      "id": "^SOX",
+      "name": "費城半導體",
+      "date": "2026-11-16",
+      "close": 9610.65,
+      "chg_pct": -5.28
+    },
+    {
+      "id": "TSM",
+      "name": "台積電 ADR",
+      "date": "2026-11-16",
+      "close": 373.45,
+      "chg_pct": -6.34
+    }
+  ],
+  "themes": [
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": -2.76
+    },
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": -3.73
+    },
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": -4.43
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": -5.41
+    },
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": -6.13
+    }
+  ],
+  "candidates": [
+    {
+      "stock_id": "9933",
+      "name": "中鼎",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 56.6,
+      "today_chg_pct": 9.9,
+      "chg_5d_pct": 18.16,
+      "score": 68,
+      "score_breakdown": {
+        "momentum": 20,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M3": "外資連續買超 3 日以上",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 5.95,
+      "vol_vs_5d": 3.25,
+      "rsi14": 68.3,
+      "kd_cross": false,
+      "ma5": 52.2,
+      "ma20": 47.3,
+      "atr14": 2.71,
+      "high_60d": 56.6,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 6,
+        "foreign_net_5d_lots": 46325,
+        "sitc_net_5d_lots": -642,
+        "dealer_net_5d_lots": -1175
+      },
+      "program_levels": {
+        "entry_low": 55.47,
+        "entry_high": 57.73,
+        "target1": 67.44,
+        "target_basis": "4倍ATR",
+        "stop_loss": 52.64,
+        "rr_ratio": 2.74
+      },
+      "related_news": [
+        "N36",
+        "N37",
+        "N38",
+        "N39"
+      ]
+    },
+    {
+      "stock_id": "7799",
+      "name": "禾榮科",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 485.0,
+      "today_chg_pct": 4.75,
+      "chg_5d_pct": 21.25,
+      "score": 68,
+      "score_breakdown": {
+        "momentum": 20,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M1": "今日量大於 20 日均量 1.5 倍",
+        "M2": "今日量大於 5 日均量 1.3 倍",
+        "M3": "外資連續買超 3 日以上",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 4.03,
+      "vol_vs_5d": 2.28,
+      "rsi14": 64.7,
+      "kd_cross": false,
+      "ma5": 463.8,
+      "ma20": 431.7,
+      "atr14": 30.5,
+      "high_60d": 574.0,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 5,
+        "foreign_net_5d_lots": 637,
+        "sitc_net_5d_lots": 15,
+        "dealer_net_5d_lots": 4
+      },
+      "program_levels": {
+        "entry_low": 475.3,
+        "entry_high": 494.7,
+        "target1": 607.0,
+        "target_basis": "4倍ATR",
+        "stop_loss": 451.05,
+        "rr_ratio": 3.59
+      },
+      "related_news": [
+        "N40",
+        "N41"
+      ]
+    },
+    {
+      "stock_id": "2886",
+      "name": "兆豐金",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 54.7,
+      "today_chg_pct": 0.37,
+      "chg_5d_pct": 3.21,
+      "score": 63,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M3": "外資連續買超 3 日以上",
+        "M4": "投信 + 自營商買超近 3 日逐日增加",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 1.35,
+      "vol_vs_5d": 1.27,
+      "rsi14": 54.9,
+      "kd_cross": false,
+      "ma5": 54.64,
+      "ma20": 54.08,
+      "atr14": 1.88,
+      "high_60d": 56.3,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 7,
+        "foreign_net_5d_lots": 41469,
+        "sitc_net_5d_lots": -28034,
+        "dealer_net_5d_lots": 7476
+      },
+      "program_levels": {
+        "entry_low": 53.61,
+        "entry_high": 55.79,
+        "target1": 62.22,
+        "target_basis": "4倍ATR",
+        "stop_loss": 53.06,
+        "rr_ratio": 4.58
+      },
+      "related_news": [
+        "N42",
+        "N43",
+        "N44"
+      ]
+    },
+    {
+      "stock_id": "2618",
+      "name": "長榮航",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 48.1,
+      "today_chg_pct": 1.48,
+      "chg_5d_pct": 4.23,
+      "score": 63,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M3": "外資連續買超 3 日以上",
+        "M4": "投信 + 自營商買超近 3 日逐日增加",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 1.33,
+      "vol_vs_5d": 0.9,
+      "rsi14": 76.1,
+      "kd_cross": false,
+      "ma5": 47.55,
+      "ma20": 44.36,
+      "atr14": 1.79,
+      "high_60d": 48.95,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 14,
+        "foreign_net_5d_lots": 64420,
+        "sitc_net_5d_lots": 1238,
+        "dealer_net_5d_lots": 2682
+      },
+      "program_levels": {
+        "entry_low": 47.14,
+        "entry_high": 49.06,
+        "target1": 55.26,
+        "target_basis": "4倍ATR",
+        "stop_loss": 44.73,
+        "rr_ratio": 2.13
+      },
+      "related_news": [
+        "N45",
+        "N46"
+      ]
+    },
+    {
+      "stock_id": "2610",
+      "name": "華航",
+      "themes": [
+        "市場掃描"
+      ],
+      "tier": "嚴選",
+      "tier_note": null,
+      "close": 23.1,
+      "today_chg_pct": 1.76,
+      "chg_5d_pct": 1.32,
+      "score": 58,
+      "score_breakdown": {
+        "momentum": 10,
+        "chip": 25,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": {
+        "M3": "外資連續買超 3 日以上",
+        "M6": "RSI 上穿 50 或大於 60"
+      },
+      "vol_vs_20d": 1.05,
+      "vol_vs_5d": 0.58,
+      "rsi14": 71.1,
+      "kd_cross": false,
+      "ma5": 23.06,
+      "ma20": 21.37,
+      "atr14": 0.85,
+      "high_60d": 23.7,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 14,
+        "foreign_net_5d_lots": 74389,
+        "sitc_net_5d_lots": 2192,
+        "dealer_net_5d_lots": 1082
+      },
+      "program_levels": {
+        "entry_low": 22.64,
+        "entry_high": 23.56,
+        "target1": 26.5,
+        "target_basis": "4倍ATR",
+        "stop_loss": 21.48,
+        "rr_ratio": 2.1
+      },
+      "related_news": [
+        "N10",
+        "N47",
+        "N48",
+        "N49",
+        "N50"
+      ]
+    }
+  ],
+  "other_picks": [],
+  "watchlist": [
+    {
+      "stock_id": "4577",
+      "name": "達航科技",
+      "pick_rank": null,
+      "close": 112.5,
+      "today_chg_pct": -9.64,
+      "chg_5d_pct": -10.0,
+      "score": 7,
+      "score_breakdown": {
+        "momentum": 0,
+        "chip": 0,
+        "tech": 7,
+        "theme": 0
+      },
+      "signals": {},
+      "vol_vs_20d": 0.46,
+      "vol_vs_5d": 0.28,
+      "rsi14": 45.1,
+      "kd_cross": false,
+      "ma5": 128.4,
+      "ma20": 121.4,
+      "atr14": 13.93,
+      "high_60d": 147.5,
+      "institutional": {
+        "available": true,
+        "foreign_buy_days": 0,
+        "foreign_net_5d_lots": 261,
+        "sitc_net_5d_lots": 0,
+        "dealer_net_5d_lots": 269
+      },
+      "program_levels": {
+        "entry_low": 110.25,
+        "entry_high": 114.75,
+        "target1": 168.22,
+        "target_basis": "4倍ATR",
+        "stop_loss": 109.12,
+        "rr_ratio": 16.51
+      },
+      "trend_ok": {
+        "T1": false,
+        "T2": true,
+        "T3": false
+      },
+      "not_selected_reasons": [
+        "今日跌幅超過 3%",
+        "近 5 日跌幅超過 8%",
+        "近 5 日出現爆量長黑",
+        "收盤沒有站上 MA20",
+        "收盤沒有比前一日高",
+        "動能訊號只有 0 個（要 2 個）"
+      ],
+      "related_news": []
+    }
+  ],
+  "news": [
+    {
+      "id": "N1",
+      "category": "國際",
+      "title": "盤中速報 - 安謀控股公司(ARM-US)大漲5.09%，報183.96美元",
+      "summary": "",
+      "time": "11/18 02:47"
+    },
+    {
+      "id": "N2",
+      "category": "國際",
+      "title": "AI光通訊市場恐洗牌！美國擬封堵中國產品 兩大美廠股價走揚",
+      "summary": "川普政府傳擬禁中國光收發模組進口，Coherent、Lumentum周二早盤走高。 Google、Meta據報反對限制，稱供應鏈調整可能耗時長達10年。 FCC先前已考慮阻擋中國新款模組進口，分析師稱恐影響美國下一代3.2T市場。",
+      "time": "11/18 02:28"
+    },
+    {
+      "id": "N3",
+      "category": "國際",
+      "title": "美光近一個月跌兩成！上季一家AI基金清倉 另一家買成第一大持股",
+      "summary": "美光周二早盤一度跌6.7%，近一個月累跌約20%。 Situational Awareness 第三季已全數出清 483 萬股美光，價值 55.7 億美元。 Appaloosa 逆勢加碼美光 28%至125萬股，市值13.3億美元，成第一大持股。",
+      "time": "11/18 02:00"
+    },
+    {
+      "id": "N4",
+      "category": "國際",
+      "title": "Avantus與PG&E簽20年購電協議800MW太陽能搭配大型儲能",
+      "summary": "",
+      "time": "11/18 01:30"
+    },
+    {
+      "id": "N5",
+      "category": "國際",
+      "title": "盤中速報 - Take-Two互動軟體(TTWO-US)大跌5.15%，報202.48美元",
+      "summary": "",
+      "time": "11/18 01:16"
+    },
+    {
+      "id": "N6",
+      "category": "國際",
+      "title": "輝達法說會前黃仁勳發表聲明：若符合股東與員工利益，願回任執行長",
+      "summary": "",
+      "time": "11/18 01:00"
+    },
+    {
+      "id": "N7",
+      "category": "國際",
+      "title": "輝達增設董事會國安委員會強化晶片出口與全球貿易監督",
+      "summary": "",
+      "time": "11/18 01:00"
+    },
+    {
+      "id": "N8",
+      "category": "國際",
+      "title": "Google簽50MW超高溫地熱購電協議最快2030年供應奧勒岡資料中心",
+      "summary": "",
+      "time": "11/18 01:00"
+    },
+    {
+      "id": "N9",
+      "category": "國際",
+      "title": "美擬限制中國光收發器進口科技巨頭警告轉換供應鏈恐需十年",
+      "summary": "",
+      "time": "11/18 01:00"
+    },
+    {
+      "id": "N10",
+      "category": "台股",
+      "title": "華航公益棒球營 攜手這4位旅外球星傳承棒球夢",
+      "summary": "",
+      "time": "11/17 23:13"
+    },
+    {
+      "id": "N11",
+      "category": "台股",
+      "title": "堵中國算力繞道！美BIS晶片禁令19日生效 經部表態了！曝台廠代工申請關鍵",
+      "summary": "美商務部BIS 11/19新規生效，管制先進SI晶片與伺服器遠端存取，防堵中國透過第三國AIDC取得雲端算力。 經濟部稱台灣半導體與AI伺服器業者多依訂單代工；若涉及新規則由美方客戶向BIS申請許可。 新規擴大至第三國資料中心，並對印尼、大馬、新加坡、泰國、巴西出口晶片增許可要求，限縮OSAT豁免。",
+      "time": "11/17 23:10"
+    },
+    {
+      "id": "N12",
+      "category": "台股",
+      "title": "台股續跌險守4萬關 證交所連二日信心喊話：基本面穩健、追繳風險可控",
+      "summary": "台股今重挫947.97點、跌幅2.31%，收40,092.11點，受市場對AI前景疑慮與國際股市震盪拖累。 證交所連兩天喊話，國際機構持續看好AI中長期發展，籲投資人回歸基本面。 截至16日信用交易維持率165.98%，今年前三季上市公司稅前淨利年增82.69%，獲利公司占81%。",
+      "time": "11/17 22:14"
+    },
+    {
+      "id": "N13",
+      "category": "台股",
+      "title": "證交所Q3財報審閱出爐：力銘、正峰11/19起列全額交割 台揚12/21下市",
+      "summary": "",
+      "time": "11/17 22:04"
+    },
+    {
+      "id": "N14",
+      "category": "台股",
+      "title": "鴻海72億日圓收購Sony車載相機模組業務 切入日系車廠供應鏈",
+      "summary": "",
+      "time": "11/17 22:00"
+    },
+    {
+      "id": "N15",
+      "category": "台股",
+      "title": "櫃買爆2檔違約交割逾6500萬元 千金股旺矽今年二度上榜",
+      "summary": "",
+      "time": "11/17 21:49"
+    },
+    {
+      "id": "N16",
+      "category": "台股",
+      "title": "工業電腦族群／瑞祺電通(6416)前三季EPS達5.4元超越去年全年法人看好明年挑戰8元以上",
+      "summary": "",
+      "time": "11/17 21:00"
+    },
+    {
+      "id": "N17",
+      "category": "台股",
+      "title": "國精化：CCL材料M8、M9世代已獲客戶認證 看好AI伺服器、低軌衛星需求強勁",
+      "summary": "國精化前3季稅後純益2.4億元、年增80.4%，EPS 2.36元，合併營收31.6億元、年增10.68%。 董事長蔡志翔稱，高速CCL樹脂M8至M9已獲多數客戶認證放量，M10送樣驗證中；PSMA客戶已認證。 安南廠UV光固化材料8月試量產，預計明年首季正式量產；法人看好AI伺服器、低軌衛星需求。",
+      "time": "11/17 20:28"
+    },
+    {
+      "id": "N18",
+      "category": "台股",
+      "title": "研揚BB值持穩1.5接單狀況健康 明年單季營收拚40億元",
+      "summary": "研揚總經理林建宏稱，去年來訂單年增逾20%，BB Ratio約1.5，能見度看到明年第一季。 2027年目標單季營收破40億元，動能聚焦半導體設備、資料中心、邊緣運算、醫療儀器及國防。 AI新增專案已逾400個；前10月AI相關營收4,800萬美元，年增52%，占比約23%。",
+      "time": "11/17 20:08"
+    },
+    {
+      "id": "N19",
+      "category": "台股",
+      "title": "老牌PCB廠佳總每股淨值回升 11/19由全額交割改列爲普通交易",
+      "summary": "",
+      "time": "11/17 20:03"
+    },
+    {
+      "id": "N20",
+      "category": "台股",
+      "title": "營收速報 - 新產(2850)10月營收24.25億元年增率高達34.68％",
+      "summary": "",
+      "time": "11/17 19:50"
+    },
+    {
+      "id": "N21",
+      "category": "台股",
+      "title": "明起新增5檔處置股抓去關禁閉 這檔資安飆股處置到11/26",
+      "summary": "證交所與櫃買中心今公告新增5檔處置股：浩鼎、訊達、巨虹、萊德光電-KY、東捷資訊。 東捷資訊因6日漲36.76%、周轉率9.17%，自明日處置至11月26日；浩鼎、訊達、巨虹、萊德光電-KY則處置至11月24日。 其中巨虹因6日跌34.68%；其餘個股多因短線漲幅過大，撮合時間除巨虹外皆為2分鐘。",
+      "time": "11/17 19:22"
+    },
+    {
+      "id": "N22",
+      "category": "台股",
+      "title": "後黃仁勳時代AI怎麼賺？PwC揭新創變獨角獸秘訣：要先算清「單位經濟學」",
+      "summary": "劉冠志指黃仁勳雖人事變動，台灣供應鏈已創造需求，AI剛性需求不會消失。 PwC調查：79%企業已用AI代理、88%擬增預算、66%見到生產力價值。 AI落地須經PoC、MVP到實場定型；新創要靠單位貢獻、護城河與治理信任變現。",
+      "time": "11/17 19:11"
+    },
+    {
+      "id": "N23",
+      "category": "台股",
+      "title": "東元前進波蘭展出AIDC與EV動力解決方案 攻歐洲AI基建與電氣化商機",
+      "summary": "東元與電電公會赴波蘭參加TEEMA科學園區產業日，聚焦AI算力基礎建設與電動載具動力系統。 東元展出2款模組化資料中心方案，預製整合供配電、冷卻、消防與監控，交付期最快9個月，目標PUE 1.2。 電動載具方面推出OD180扁線馬達與EV動力系統，功率50kW至410kW、電壓250V至800V。",
+      "time": "11/17 18:45"
+    },
+    {
+      "id": "N24",
+      "category": "台股",
+      "title": "鴻海擬斥14.5億元收購Sony半導體車載相機模組事業 強化車用電子系統整合",
+      "summary": "鴻海以72.4億日圓收購索尼半導體解決方案公司車載相機模組事業，預計2027年4月底前交割。 交易涵蓋相關業務、技術、客戶關係及營運資源，不含海外生產設備及存貨，仍待主管機關核准。 鴻海稱將結合SSS技術與客戶基礎，強化車載整合服務，布局汽車電子與智慧移動。",
+      "time": "11/17 18:42"
+    },
+    {
+      "id": "N25",
+      "category": "台股",
+      "title": "星宇航空要直飛紐澳了 明年3月下旬啟航雪梨、奧克蘭",
+      "summary": "星宇航空宣布2027年3月23日開航「台北-雪梨-奧克蘭」，首度延伸航網至大洋洲並開賣機票。 航班以A330-900執飛，初期每周4班，5月1日起增至每日1班。 可透過與澳洲航空聯航銜接澳洲國內、紐西蘭與斐濟航網。",
+      "time": "11/17 18:36"
+    },
+    {
+      "id": "N26",
+      "category": "台股",
+      "title": "華碩(2357)擴大輝達Rubin整櫃出貨第四季增加產能因應需求",
+      "summary": "",
+      "time": "11/17 18:30"
+    },
+    {
+      "id": "N27",
+      "category": "台股",
+      "title": "大大寬頻12月中旬掛牌上市 中華電信持股8%董事長簡志誠親自站台",
+      "summary": "",
+      "time": "11/17 18:28"
+    },
+    {
+      "id": "N28",
+      "category": "台股",
+      "title": "台灣光罩大尺寸及矽光子應用逐步放量 明年營收可望年增2成",
+      "summary": "",
+      "time": "11/17 18:27"
+    },
+    {
+      "id": "N29",
+      "category": "台股",
+      "title": "助攻AI及HBM技術轉型 兆豐銀統籌力積電300億元聯貸今簽約",
+      "summary": "兆豐銀行統籌主辦力積電300億元聯貸案，今由謝再居、董瑞斌完成簽約，10家金融機構參貸。 資金將用於償還借款、購置機器設備、興建或改建廠房，並結合節能率、廢棄物再利用率、製程用水回收率3項ESG指標。 力積電稱將藉此整合中長期資金，支援AI與HBM等先進技術轉型及產能升級。",
+      "time": "11/17 18:21"
+    },
+    {
+      "id": "N30",
+      "category": "台股",
+      "title": "國道通行費凍漲13年將漲價？ 高公局澄清目前無調漲規劃",
+      "summary": "",
+      "time": "11/17 18:09"
+    },
+    {
+      "id": "N31",
+      "category": "台股",
+      "title": "讓同事搶代班！3大育兒補助明年元旦上路 職代日領800元津貼、接送小孩免請假",
+      "summary": "勞動部今發布友善職場育兒彈性工作安排獎勵及補助要點，2027年1月1日起實施 3大補助含減工時薪資、職務代理津貼、新聘替代人力；加碼5項友善制度獎勵 撫育未滿12歲子女可每日減工時1小時不扣薪，企業最高可領補助135萬元、獎勵15萬元",
+      "time": "11/17 17:55"
+    },
+    {
+      "id": "N32",
+      "category": "台股",
+      "title": "〈消費趨勢〉外食又要變貴 瓦城五大品牌下周起漲價",
+      "summary": "瓦城宣布旗下「瓦城」等5品牌部分品項11月24日起漲價，平均調幅約3.6%。 公司稱食材原物料、基本工資與營運成本持續攀升，為合理反映成本才調整價格。",
+      "time": "11/17 17:54"
+    },
+    {
+      "id": "N33",
+      "category": "台股",
+      "title": "〈玉山金法說〉陳茂欽看川普內政「跛鴨期」轉拚外交壓通膨 估台年底溫和升息半碼",
+      "summary": "玉山金估台灣央行年底仍有升息半碼條件，主因GDP強勁、CPI與核心CPI續站2%警戒線上。 陳茂欽指外資今年狂賣台股3兆元，資金外流使市場實質緊縮已相當於升息2至3碼。 美國期中選舉後川普進入跛鴨期，未來2年恐轉向外交處理戰事，以壓低油價與通膨。",
+      "time": "11/17 17:42"
+    },
+    {
+      "id": "N34",
+      "category": "盤勢",
+      "title": "〈台股開盤〉台股早盤重挫後買盤浮現 多空交戰台股苦撐4萬點之上",
+      "summary": "",
+      "time": "11/17 09:39"
+    },
+    {
+      "id": "N35",
+      "category": "盤勢",
+      "title": "〈台股盤前要聞〉13家金控10月獲利僅國泰金與台新新光金月增、台股狂瀉逾2600點證交所信心喊話",
+      "summary": "",
+      "time": "11/17 05:10"
+    },
+    {
+      "id": "N36",
+      "category": "個股",
+      "title": "今日漲停股｜台股大跌947點守4萬大關，工程鋼鐵與生技逆勢吸金，中鼎、合勤控、浩鼎強勢攻頂 1117",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N37",
+      "category": "個股",
+      "title": "中鼎踩雷後股價創了13年新高 做對了什麼？",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N38",
+      "category": "個股",
+      "title": "【即時新聞】中鼎Q3獲利大爆發年增1.7倍，今日帶量衝上漲停價56.6元！",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N39",
+      "category": "個股",
+      "title": "9933 中鼎- 大盤跌近948點，這檔反而改寫新高？ - 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N40",
+      "category": "個股",
+      "title": "【11/17 產業即時新聞】醫療器材族群逆勢揚升2.19% 禾榮科強勢飆漲、高階醫材個別表現",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N41",
+      "category": "個股",
+      "title": "【09:49 即時新聞】禾榮科(7799)盤中走強，市場聚焦BNCT商轉進度",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N42",
+      "category": "個股",
+      "title": "《金融股》兆豐金前三季每股盈餘2.21元",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N43",
+      "category": "個股",
+      "title": "財報：兆豐金(2886)115年前三季歸屬母公司淨利328億4828萬元，EPS 2.21元",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N44",
+      "category": "個股",
+      "title": "華南金今年大漲8成，股價52元還能買？「銀行+證券」兩箭齊發，EPS年增25％官股最強！比兆豐金、第一金更划算？",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N45",
+      "category": "個股",
+      "title": "2618 長榮航- 當舉杯不再被酒精定義！交信A&L《自由的藝術》無酒精品飲會集結四大品牌十款酒款- 股市爆料同學會",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N46",
+      "category": "個股",
+      "title": "【13:30 即時新聞】長榮航(2618)盤中續揚逼近前高，外資買盤成焦點",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N47",
+      "category": "個股",
+      "title": "華航(2610) 個股概覽 | 個股 - 股市",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N48",
+      "category": "個股",
+      "title": "翼起揮棒！華航公益棒球營攜手四旅外球星傳承棒球夢",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N49",
+      "category": "個股",
+      "title": "【即時新聞】法人看旺2027年航空產業需求，華航客運與貨運帶動營運成長",
+      "summary": "",
+      "time": ""
+    },
+    {
+      "id": "N50",
+      "category": "個股",
+      "title": "不敵賣壓台股17日再跌947點 華航逆風收漲1.76%",
+      "summary": "",
+      "time": ""
+    }
+  ],
+  "missing": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  }
+}
