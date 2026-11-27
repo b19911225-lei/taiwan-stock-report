@@ -1,0 +1,1799 @@
+{
+  "date": "2026-11-27",
+  "generated_at": "2026-11-28T03:14:39+08:00",
+  "market": {
+    "close": 39308.08,
+    "chg": 156.27,
+    "chg_pct": 0.4,
+    "money_100m": 6947.0,
+    "breadth": {
+      "up": 438,
+      "limit_up": 20,
+      "down": 551,
+      "limit_down": 5,
+      "flat": 97
+    },
+    "top_turnover": [
+      {
+        "stock_id": "2330",
+        "name": "台積電",
+        "close": 2180.0,
+        "chg_pct": 1.63,
+        "value_100m": 921.61
+      },
+      {
+        "stock_id": "2454",
+        "name": "聯發科",
+        "close": 3680.0,
+        "chg_pct": -0.67,
+        "value_100m": 330.79
+      },
+      {
+        "stock_id": "3037",
+        "name": "欣興",
+        "close": 646.0,
+        "chg_pct": 0.47,
+        "value_100m": 205.28
+      },
+      {
+        "stock_id": "2308",
+        "name": "台達電",
+        "close": 1125.0,
+        "chg_pct": 0.45,
+        "value_100m": 167.72
+      },
+      {
+        "stock_id": "2383",
+        "name": "台光電",
+        "close": 3605.0,
+        "chg_pct": -1.5,
+        "value_100m": 162.67
+      }
+    ],
+    "institutional_100m": {
+      "foreign": -296.28,
+      "sitc": 85.21,
+      "dealer": -1.95
+    }
+  },
+  "us_markets": [
+    {
+      "id": "^DJI",
+      "name": "道瓊",
+      "date": "2026-11-25",
+      "close": 50182.95,
+      "chg_pct": 0.33
+    },
+    {
+      "id": "^GSPC",
+      "name": "S&P 500",
+      "date": "2026-11-25",
+      "close": 7182.78,
+      "chg_pct": -0.25
+    },
+    {
+      "id": "^IXIC",
+      "name": "那斯達克",
+      "date": "2026-11-25",
+      "close": 23585.8,
+      "chg_pct": -0.62
+    },
+    {
+      "id": "^SOX",
+      "name": "費城半導體",
+      "date": "2026-11-25",
+      "close": 8774.86,
+      "chg_pct": -0.65
+    },
+    {
+      "id": "TSM",
+      "name": "台積電 ADR",
+      "date": "2026-11-25",
+      "close": 342.34,
+      "chg_pct": -1.96
+    }
+  ],
+  "themes": [
+    {
+      "theme": "T5_散熱電源",
+      "name": "散熱電源",
+      "avg_chg_pct": 2.01
+    },
+    {
+      "theme": "T1_AI伺服器CoWoS",
+      "name": "AI伺服器CoWoS",
+      "avg_chg_pct": -0.59
+    },
+    {
+      "theme": "T4_HBM先進封裝",
+      "name": "HBM先進封裝",
+      "avg_chg_pct": -1.02
+    },
+    {
+      "theme": "T2_CPO光通訊",
+      "name": "CPO光通訊",
+      "avg_chg_pct": -1.59
+    },
+    {
+      "theme": "T3_矽光子",
+      "name": "矽光子",
+      "avg_chg_pct": -3.55
+    }
+  ],
+  "picks": [
+    {
+      "stock_id": "2413",
+      "name": "環科",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 54.0,
+      "today_chg": 9.98,
+      "chg_5d": 25.0,
+      "score": 50,
+      "score_breakdown": {
+        "momentum": 25,
+        "chip": 0,
+        "tech": 25,
+        "theme": 0
+      },
+      "signals": [
+        "M1",
+        "M2",
+        "M4",
+        "M5",
+        "M6"
+      ],
+      "momentum_count": 5,
+      "vol_vs_20d": 4.47,
+      "vol_vs_5d": 6.29,
+      "inst_available": true,
+      "foreign_buy_days": 0,
+      "foreign_net_5d_lots": 134,
+      "sitc_net_5d_lots": 0,
+      "dealer_net_5d_lots": -4,
+      "rsi14": 61.5,
+      "kd_cross": true,
+      "ma5": 47.42,
+      "ma20": 47.42,
+      "atr": 4.62,
+      "high_60d": 61.5,
+      "targets": {
+        "entry_low": 52.92,
+        "entry_high": 55.08,
+        "target1": 72.48,
+        "target_basis": "4倍ATR",
+        "stop_loss": 50.22,
+        "rr_ratio": 4.89
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N26",
+        "N39",
+        "N40",
+        "N41",
+        "N42"
+      ]
+    },
+    {
+      "stock_id": "3491",
+      "name": "昇達科",
+      "themes": [
+        "CPO光通訊"
+      ],
+      "close": 1480.0,
+      "today_chg": 7.25,
+      "chg_5d": 20.82,
+      "score": 45,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 5,
+        "tech": 25,
+        "theme": 0
+      },
+      "signals": [
+        "M2",
+        "M5",
+        "M6"
+      ],
+      "momentum_count": 3,
+      "vol_vs_20d": 0.62,
+      "vol_vs_5d": 1.78,
+      "inst_available": true,
+      "foreign_buy_days": 1,
+      "foreign_net_5d_lots": -77,
+      "sitc_net_5d_lots": 23,
+      "dealer_net_5d_lots": 18,
+      "rsi14": 61.9,
+      "kd_cross": true,
+      "ma5": 1352.0,
+      "ma20": 1328.5,
+      "atr": 150.0,
+      "high_60d": 1760.0,
+      "targets": {
+        "entry_low": 1450.4,
+        "entry_high": 1509.6,
+        "target1": 2080.0,
+        "target_basis": "4倍ATR",
+        "stop_loss": 1376.4,
+        "rr_ratio": 5.79
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N26",
+        "N28",
+        "N43",
+        "N44",
+        "N45",
+        "N46"
+      ]
+    },
+    {
+      "stock_id": "2451",
+      "name": "創見",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 239.0,
+      "today_chg": 0.84,
+      "chg_5d": 13.27,
+      "score": 38,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 0,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": [
+        "M1",
+        "M2",
+        "M6"
+      ],
+      "momentum_count": 3,
+      "vol_vs_20d": 1.69,
+      "vol_vs_5d": 1.35,
+      "inst_available": true,
+      "foreign_buy_days": 0,
+      "foreign_net_5d_lots": -2203,
+      "sitc_net_5d_lots": 3728,
+      "dealer_net_5d_lots": 108,
+      "rsi14": 50.0,
+      "kd_cross": false,
+      "ma5": 238.5,
+      "ma20": 237.5,
+      "atr": 17.89,
+      "high_60d": 300.0,
+      "targets": {
+        "entry_low": 234.22,
+        "entry_high": 243.78,
+        "target1": 310.56,
+        "target_basis": "4倍ATR",
+        "stop_loss": 231.83,
+        "rr_ratio": 9.98
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N47",
+        "N48",
+        "N49"
+      ]
+    },
+    {
+      "stock_id": "2385",
+      "name": "群光",
+      "themes": [
+        "市場掃描"
+      ],
+      "close": 101.0,
+      "today_chg": 9.78,
+      "chg_5d": 18.96,
+      "score": 38,
+      "score_breakdown": {
+        "momentum": 15,
+        "chip": 0,
+        "tech": 23,
+        "theme": 0
+      },
+      "signals": [
+        "M1",
+        "M2",
+        "M6"
+      ],
+      "momentum_count": 3,
+      "vol_vs_20d": 2.19,
+      "vol_vs_5d": 1.97,
+      "inst_available": true,
+      "foreign_buy_days": 0,
+      "foreign_net_5d_lots": -8,
+      "sitc_net_5d_lots": 3741,
+      "dealer_net_5d_lots": 391,
+      "rsi14": 69.2,
+      "kd_cross": false,
+      "ma5": 93.12,
+      "ma20": 90.84,
+      "atr": 4.31,
+      "high_60d": 111.5,
+      "targets": {
+        "entry_low": 98.98,
+        "entry_high": 103.02,
+        "target1": 118.24,
+        "target_basis": "4倍ATR",
+        "stop_loss": 93.93,
+        "rr_ratio": 2.44
+      },
+      "tier": "A",
+      "tier_label": "嚴選",
+      "tier_note": null,
+      "related_news": [
+        "N26",
+        "N50",
+        "N51"
+      ]
+    }
+  ],
+  "debate_ids": [
+    "2413",
+    "3491",
+    "2451",
+    "2385"
+  ],
+  "watchlist": [
+    {
+      "stock_id": "4577",
+      "name": "達航科技",
+      "pick_rank": null,
+      "close": 64.5,
+      "today_chg": -9.79,
+      "chg_5d": -22.75,
+      "score": 10,
+      "score_breakdown": {
+        "momentum": 10,
+        "chip": 0,
+        "tech": 0,
+        "theme": 0
+      },
+      "signals": [
+        "M2",
+        "M4"
+      ],
+      "momentum_count": 2,
+      "vol_vs_20d": 0.29,
+      "vol_vs_5d": 1.9,
+      "inst_available": true,
+      "foreign_buy_days": 0,
+      "foreign_net_5d_lots": -151,
+      "sitc_net_5d_lots": 0,
+      "dealer_net_5d_lots": -134,
+      "rsi14": 30.7,
+      "kd_cross": false,
+      "ma5": 73.68,
+      "ma20": 106.43,
+      "atr": 11.0,
+      "high_60d": 147.5,
+      "trend": {
+        "T1": false,
+        "T2": false,
+        "T3": false
+      },
+      "fail_reasons": [
+        "今日跌幅超過 3%",
+        "近 5 日跌幅超過 8%",
+        "收盤沒有站上 MA20",
+        "MA5 沒有在 MA20 之上",
+        "收盤沒有比前一日高"
+      ],
+      "targets": {
+        "entry_low": 63.21,
+        "entry_high": 65.79,
+        "target1": 147.5,
+        "target_basis": "60日高點",
+        "stop_loss": 62.56,
+        "rr_ratio": 42.89
+      },
+      "related_news": [
+        "N52"
+      ]
+    }
+  ],
+  "stats": {
+    "universe": 83,
+    "fetched": 83,
+    "scan_added": 30,
+    "prefilter_passed": 6,
+    "scored_passed": 5,
+    "rr_ok": 4
+  },
+  "incomplete": [],
+  "exclude_counts": {
+    "趨勢不符": 48,
+    "X5": 11,
+    "X1": 12,
+    "X3": 5,
+    "X2": 1,
+    "動能不足": 1
+  },
+  "quality": {
+    "missing_price": [],
+    "missing_inst": [],
+    "notes": [],
+    "checks": []
+  },
+  "performance": {
+    "lookback_days": 20,
+    "days_with_history": 20,
+    "total": 65,
+    "hit": 2,
+    "stopped": 53,
+    "holding": 10,
+    "no_data": 0,
+    "win_rate_pct": 3.6,
+    "avg_return_pct": -4.62,
+    "items": [
+      {
+        "stock_id": "3715",
+        "date": "2026-11-26",
+        "entry": 143.5,
+        "target1": 197.58,
+        "stop_loss": 133.45,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -2.79
+      },
+      {
+        "stock_id": "2412",
+        "date": "2026-11-26",
+        "entry": 166.5,
+        "target1": 186.94,
+        "stop_loss": 160.94,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.6
+      },
+      {
+        "stock_id": "2597",
+        "date": "2026-11-25",
+        "entry": 193.0,
+        "target1": 219.56,
+        "stop_loss": 179.49,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.52
+      },
+      {
+        "stock_id": "2610",
+        "date": "2026-11-24",
+        "entry": 22.5,
+        "target1": 26.98,
+        "stop_loss": 21.55,
+        "status": "停損",
+        "exit": 21.55,
+        "exit_date": "2026-11-25",
+        "return_pct": -4.22
+      },
+      {
+        "stock_id": "3023",
+        "date": "2026-11-24",
+        "entry": 278.0,
+        "target1": 348.0,
+        "stop_loss": 259.03,
+        "status": "停損",
+        "exit": 259.03,
+        "exit_date": "2026-11-25",
+        "return_pct": -6.82
+      },
+      {
+        "stock_id": "2474",
+        "date": "2026-11-24",
+        "entry": 206.0,
+        "target1": 234.84,
+        "stop_loss": 191.58,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -3.16
+      },
+      {
+        "stock_id": "2618",
+        "date": "2026-11-24",
+        "entry": 48.6,
+        "target1": 58.4,
+        "stop_loss": 45.2,
+        "status": "停損",
+        "exit": 45.2,
+        "exit_date": "2026-11-25",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "9933",
+        "date": "2026-11-24",
+        "entry": 54.0,
+        "target1": 68.16,
+        "stop_loss": 50.22,
+        "status": "停損",
+        "exit": 50.22,
+        "exit_date": "2026-11-25",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2412",
+        "date": "2026-11-23",
+        "entry": 164.5,
+        "target1": 183.66,
+        "stop_loss": 159.56,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 0.61
+      },
+      {
+        "stock_id": "6782",
+        "date": "2026-11-19",
+        "entry": 290.5,
+        "target1": 361.94,
+        "stop_loss": 270.16,
+        "status": "停損",
+        "exit": 269.0,
+        "exit_date": "2026-11-23",
+        "return_pct": -7.4
+      },
+      {
+        "stock_id": "2597",
+        "date": "2026-11-19",
+        "entry": 177.5,
+        "target1": 198.78,
+        "stop_loss": 168.25,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 8.17
+      },
+      {
+        "stock_id": "2207",
+        "date": "2026-11-19",
+        "entry": 546.0,
+        "target1": 617.72,
+        "stop_loss": 526.38,
+        "status": "停損",
+        "exit": 526.38,
+        "exit_date": "2026-11-20",
+        "return_pct": -3.59
+      },
+      {
+        "stock_id": "2412",
+        "date": "2026-11-19",
+        "entry": 166.0,
+        "target1": 183.72,
+        "stop_loss": 159.11,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -0.3
+      },
+      {
+        "stock_id": "1476",
+        "date": "2026-11-19",
+        "entry": 384.5,
+        "target1": 456.06,
+        "stop_loss": 357.58,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": -4.03
+      },
+      {
+        "stock_id": "9933",
+        "date": "2026-11-18",
+        "entry": 57.5,
+        "target1": 69.1,
+        "stop_loss": 53.47,
+        "status": "停損",
+        "exit": 53.47,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.01
+      },
+      {
+        "stock_id": "4977",
+        "date": "2026-11-18",
+        "entry": 197.0,
+        "target1": 270.72,
+        "stop_loss": 183.21,
+        "status": "停損",
+        "exit": 183.21,
+        "exit_date": "2026-11-19",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "9933",
+        "date": "2026-11-17",
+        "entry": 56.6,
+        "target1": 67.44,
+        "stop_loss": 52.64,
+        "status": "停損",
+        "exit": 52.64,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "7799",
+        "date": "2026-11-17",
+        "entry": 485.0,
+        "target1": 607.0,
+        "stop_loss": 451.05,
+        "status": "停損",
+        "exit": 451.05,
+        "exit_date": "2026-11-19",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2886",
+        "date": "2026-11-17",
+        "entry": 54.7,
+        "target1": 62.22,
+        "stop_loss": 53.06,
+        "status": "停損",
+        "exit": 53.06,
+        "exit_date": "2026-11-18",
+        "return_pct": -3.0
+      },
+      {
+        "stock_id": "2618",
+        "date": "2026-11-17",
+        "entry": 48.1,
+        "target1": 55.26,
+        "stop_loss": 44.73,
+        "status": "停損",
+        "exit": 44.73,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.01
+      },
+      {
+        "stock_id": "2610",
+        "date": "2026-11-17",
+        "entry": 23.1,
+        "target1": 26.5,
+        "stop_loss": 21.48,
+        "status": "停損",
+        "exit": 21.48,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.01
+      },
+      {
+        "stock_id": "7765",
+        "date": "2026-11-16",
+        "entry": 296.0,
+        "target1": 344.0,
+        "stop_loss": 275.28,
+        "status": "停損",
+        "exit": 275.28,
+        "exit_date": "2026-11-17",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2548",
+        "date": "2026-11-16",
+        "entry": 95.3,
+        "target1": 104.14,
+        "stop_loss": 91.48,
+        "status": "停損",
+        "exit": 91.48,
+        "exit_date": "2026-11-20",
+        "return_pct": -4.01
+      },
+      {
+        "stock_id": "9904",
+        "date": "2026-11-16",
+        "entry": 26.8,
+        "target1": 29.68,
+        "stop_loss": 25.73,
+        "status": "停損",
+        "exit": 25.73,
+        "exit_date": "2026-11-18",
+        "return_pct": -3.99
+      },
+      {
+        "stock_id": "2501",
+        "date": "2026-11-16",
+        "entry": 21.05,
+        "target1": 23.5,
+        "stop_loss": 20.22,
+        "status": "停損",
+        "exit": 20.22,
+        "exit_date": "2026-11-20",
+        "return_pct": -3.94
+      },
+      {
+        "stock_id": "6890",
+        "date": "2026-11-16",
+        "entry": 165.0,
+        "target1": 196.84,
+        "stop_loss": 153.45,
+        "status": "停損",
+        "exit": 153.45,
+        "exit_date": "2026-11-18",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "3661",
+        "date": "2026-11-13",
+        "entry": 4020.0,
+        "target1": 5077.16,
+        "stop_loss": 3738.6,
+        "status": "停損",
+        "exit": 3738.6,
+        "exit_date": "2026-11-16",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2355",
+        "date": "2026-11-13",
+        "entry": 65.9,
+        "target1": 82.42,
+        "stop_loss": 61.29,
+        "status": "停損",
+        "exit": 61.29,
+        "exit_date": "2026-11-16",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "1802",
+        "date": "2026-11-13",
+        "entry": 85.1,
+        "target1": 108.54,
+        "stop_loss": 79.14,
+        "status": "停損",
+        "exit": 79.14,
+        "exit_date": "2026-11-16",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2891",
+        "date": "2026-11-13",
+        "entry": 78.7,
+        "target1": 89.94,
+        "stop_loss": 73.78,
+        "status": "停損",
+        "exit": 73.78,
+        "exit_date": "2026-11-18",
+        "return_pct": -6.25
+      },
+      {
+        "stock_id": "6269",
+        "date": "2026-11-13",
+        "entry": 80.5,
+        "target1": 106.46,
+        "stop_loss": 75.54,
+        "status": "停損",
+        "exit": 75.54,
+        "exit_date": "2026-11-16",
+        "return_pct": -6.16
+      },
+      {
+        "stock_id": "1802",
+        "date": "2026-11-12",
+        "entry": 81.7,
+        "target1": 105.02,
+        "stop_loss": 75.98,
+        "status": "停損",
+        "exit": 72.8,
+        "exit_date": "2026-11-17",
+        "return_pct": -10.89
+      },
+      {
+        "stock_id": "2471",
+        "date": "2026-11-12",
+        "entry": 64.7,
+        "target1": 77.7,
+        "stop_loss": 60.17,
+        "status": "達標",
+        "exit": 77.7,
+        "exit_date": "2026-11-16",
+        "return_pct": 20.09
+      },
+      {
+        "stock_id": "2412",
+        "date": "2026-11-12",
+        "entry": 162.0,
+        "target1": 178.28,
+        "stop_loss": 156.12,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 2.16
+      },
+      {
+        "stock_id": "2466",
+        "date": "2026-11-12",
+        "entry": 436.5,
+        "target1": 584.5,
+        "stop_loss": 405.94,
+        "status": "停損",
+        "exit": 405.94,
+        "exit_date": "2026-11-13",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2355",
+        "date": "2026-11-12",
+        "entry": 60.7,
+        "target1": 76.14,
+        "stop_loss": 56.45,
+        "status": "停損",
+        "exit": 56.45,
+        "exit_date": "2026-11-17",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "4577",
+        "date": "2026-11-11",
+        "entry": 137.5,
+        "target1": 189.66,
+        "stop_loss": 127.87,
+        "status": "停損",
+        "exit": 127.87,
+        "exit_date": "2026-11-12",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2610",
+        "date": "2026-11-11",
+        "entry": 23.5,
+        "target1": 26.18,
+        "stop_loss": 21.85,
+        "status": "停損",
+        "exit": 21.85,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.02
+      },
+      {
+        "stock_id": "4577",
+        "date": "2026-11-10",
+        "entry": 125.0,
+        "target1": 176.44,
+        "stop_loss": 116.25,
+        "status": "停損",
+        "exit": 112.5,
+        "exit_date": "2026-11-17",
+        "return_pct": -10.0
+      },
+      {
+        "stock_id": "2610",
+        "date": "2026-11-10",
+        "entry": 22.8,
+        "target1": 25.16,
+        "stop_loss": 21.2,
+        "status": "停損",
+        "exit": 21.2,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.02
+      },
+      {
+        "stock_id": "6446",
+        "date": "2026-11-09",
+        "entry": 1370.0,
+        "target1": 1658.56,
+        "stop_loss": 1274.1,
+        "status": "停損",
+        "exit": 1274.1,
+        "exit_date": "2026-11-11",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2891",
+        "date": "2026-11-09",
+        "entry": 75.9,
+        "target1": 86.46,
+        "stop_loss": 72.68,
+        "status": "停損",
+        "exit": 72.68,
+        "exit_date": "2026-11-11",
+        "return_pct": -4.24
+      },
+      {
+        "stock_id": "6782",
+        "date": "2026-11-06",
+        "entry": 274.5,
+        "target1": 329.5,
+        "stop_loss": 255.28,
+        "status": "停損",
+        "exit": 255.28,
+        "exit_date": "2026-11-18",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "1416",
+        "date": "2026-11-06",
+        "entry": 16.35,
+        "target1": 19.15,
+        "stop_loss": 15.21,
+        "status": "達標",
+        "exit": 19.15,
+        "exit_date": "2026-11-10",
+        "return_pct": 17.13
+      },
+      {
+        "stock_id": "3045",
+        "date": "2026-11-06",
+        "entry": 133.0,
+        "target1": 145.44,
+        "stop_loss": 129.01,
+        "status": "停損",
+        "exit": 129.01,
+        "exit_date": "2026-11-10",
+        "return_pct": -3.0
+      },
+      {
+        "stock_id": "2880",
+        "date": "2026-11-05",
+        "entry": 49.6,
+        "target1": 55.2,
+        "stop_loss": 48.11,
+        "status": "停損",
+        "exit": 48.0,
+        "exit_date": "2026-11-06",
+        "return_pct": -3.23
+      },
+      {
+        "stock_id": "2886",
+        "date": "2026-11-05",
+        "entry": 54.0,
+        "target1": 60.76,
+        "stop_loss": 52.26,
+        "status": "停損",
+        "exit": 51.6,
+        "exit_date": "2026-11-06",
+        "return_pct": -4.44
+      },
+      {
+        "stock_id": "2618",
+        "date": "2026-11-05",
+        "entry": 45.1,
+        "target1": 49.22,
+        "stop_loss": 42.38,
+        "status": "停損",
+        "exit": 42.38,
+        "exit_date": "2026-11-06",
+        "return_pct": -6.03
+      },
+      {
+        "stock_id": "6446",
+        "date": "2026-11-04",
+        "entry": 1250.0,
+        "target1": 1645.0,
+        "stop_loss": 1183.3,
+        "status": "停損",
+        "exit": 1075.0,
+        "exit_date": "2026-11-06",
+        "return_pct": -14.0
+      },
+      {
+        "stock_id": "2886",
+        "date": "2026-11-04",
+        "entry": 53.5,
+        "target1": 59.7,
+        "stop_loss": 51.89,
+        "status": "停損",
+        "exit": 51.6,
+        "exit_date": "2026-11-06",
+        "return_pct": -3.55
+      },
+      {
+        "stock_id": "2412",
+        "date": "2026-11-04",
+        "entry": 161.5,
+        "target1": 174.34,
+        "stop_loss": 151.72,
+        "status": "持有中",
+        "exit": null,
+        "return_pct": 2.48
+      },
+      {
+        "stock_id": "1802",
+        "date": "2026-11-03",
+        "entry": 67.7,
+        "target1": 88.02,
+        "stop_loss": 63.58,
+        "status": "停損",
+        "exit": 63.58,
+        "exit_date": "2026-11-04",
+        "return_pct": -6.09
+      },
+      {
+        "stock_id": "2618",
+        "date": "2026-11-03",
+        "entry": 43.7,
+        "target1": 47.22,
+        "stop_loss": 42.15,
+        "status": "停損",
+        "exit": 42.15,
+        "exit_date": "2026-11-06",
+        "return_pct": -3.55
+      },
+      {
+        "stock_id": "6467",
+        "date": "2026-11-03",
+        "entry": 246.0,
+        "target1": 326.56,
+        "stop_loss": 228.78,
+        "status": "停損",
+        "exit": 214.5,
+        "exit_date": "2026-11-06",
+        "return_pct": -12.8
+      },
+      {
+        "stock_id": "2023",
+        "date": "2026-11-03",
+        "entry": 14.85,
+        "target1": 16.41,
+        "stop_loss": 14.35,
+        "status": "停損",
+        "exit": 14.35,
+        "exit_date": "2026-11-06",
+        "return_pct": -3.37
+      },
+      {
+        "stock_id": "2033",
+        "date": "2026-11-03",
+        "entry": 70.1,
+        "target1": 91.66,
+        "stop_loss": 65.19,
+        "status": "停損",
+        "exit": 65.19,
+        "exit_date": "2026-11-20",
+        "return_pct": -7.0
+      },
+      {
+        "stock_id": "2603",
+        "date": "2026-11-02",
+        "entry": 274.5,
+        "target1": 313.22,
+        "stop_loss": 255.28,
+        "status": "停損",
+        "exit": 240.0,
+        "exit_date": "2026-11-06",
+        "return_pct": -12.57
+      },
+      {
+        "stock_id": "2609",
+        "date": "2026-11-02",
+        "entry": 64.0,
+        "target1": 72.72,
+        "stop_loss": 61.45,
+        "status": "停損",
+        "exit": 61.45,
+        "exit_date": "2026-11-04",
+        "return_pct": -3.98
+      },
+      {
+        "stock_id": "2468",
+        "date": "2026-11-02",
+        "entry": 58.5,
+        "target1": 76.7,
+        "stop_loss": 54.4,
+        "status": "停損",
+        "exit": 53.1,
+        "exit_date": "2026-11-06",
+        "return_pct": -9.23
+      },
+      {
+        "stock_id": "2317",
+        "date": "2026-11-02",
+        "entry": 251.0,
+        "target1": 277.0,
+        "stop_loss": 243.47,
+        "status": "停損",
+        "exit": 243.47,
+        "exit_date": "2026-11-04",
+        "return_pct": -3.0
+      },
+      {
+        "stock_id": "2603",
+        "date": "2026-10-30",
+        "entry": 271.5,
+        "target1": 310.06,
+        "stop_loss": 252.49,
+        "status": "停損",
+        "exit": 240.0,
+        "exit_date": "2026-11-06",
+        "return_pct": -11.6
+      },
+      {
+        "stock_id": "2609",
+        "date": "2026-10-30",
+        "entry": 63.5,
+        "target1": 72.1,
+        "stop_loss": 61.22,
+        "status": "停損",
+        "exit": 61.22,
+        "exit_date": "2026-11-04",
+        "return_pct": -3.59
+      },
+      {
+        "stock_id": "2912",
+        "date": "2026-10-30",
+        "entry": 225.5,
+        "target1": 242.94,
+        "stop_loss": 217.11,
+        "status": "停損",
+        "exit": 217.11,
+        "exit_date": "2026-11-04",
+        "return_pct": -3.72
+      },
+      {
+        "stock_id": "2834",
+        "date": "2026-10-30",
+        "entry": 18.05,
+        "target1": 19.17,
+        "stop_loss": 17.51,
+        "status": "停損",
+        "exit": 17.51,
+        "exit_date": "2026-11-04",
+        "return_pct": -2.99
+      },
+      {
+        "stock_id": "4526",
+        "date": "2026-10-30",
+        "entry": 56.0,
+        "target1": 67.6,
+        "stop_loss": 52.08,
+        "status": "停損",
+        "exit": 52.08,
+        "exit_date": "2026-11-03",
+        "return_pct": -7.0
+      }
+    ]
+  },
+  "news": [
+    {
+      "id": "N1",
+      "source_id": "6674246",
+      "title": "盤中速報 - 和康電訊(MTSI-US)大漲5.29%，報210.52美元",
+      "summary": "",
+      "time": "11/28 02:15",
+      "url": "https://news.cnyes.com/news/id/6674246",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N2",
+      "source_id": "6674245",
+      "title": "盤中速報 - 科磊(KLAC-US)大漲5.01%，報140.93美元",
+      "summary": "",
+      "time": "11/28 02:15",
+      "url": "https://news.cnyes.com/news/id/6674245",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N3",
+      "source_id": "6674242",
+      "title": "盤中速報 - 泰瑞達(TER-US)大漲5.36%，報223.53美元",
+      "summary": "",
+      "time": "11/28 02:14",
+      "url": "https://news.cnyes.com/news/id/6674242",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N4",
+      "source_id": "6674240",
+      "title": "盤中速報 - 芯源系統(MPWR-US)大漲5.18%，報1256.47美元",
+      "summary": "",
+      "time": "11/28 02:14",
+      "url": "https://news.cnyes.com/news/id/6674240",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N5",
+      "source_id": "6674239",
+      "title": "盤中速報 - 英特爾(INTC-US)大漲5.33%，報57.38美元",
+      "summary": "",
+      "time": "11/28 02:14",
+      "url": "https://news.cnyes.com/news/id/6674239",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N6",
+      "source_id": "6674238",
+      "title": "盤中速報 - 英特格(ENTG-US)大漲5.09%，報134.9美元",
+      "summary": "",
+      "time": "11/28 02:12",
+      "url": "https://news.cnyes.com/news/id/6674238",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N7",
+      "source_id": "6674220",
+      "title": "盤中速報 - 萊迪思半導體(LSCC-US)大漲5.02%，報103.16美元",
+      "summary": "",
+      "time": "11/28 01:05",
+      "url": "https://news.cnyes.com/news/id/6674220",
+      "category": "國際",
+      "stocks": []
+    },
+    {
+      "id": "N8",
+      "source_id": "6674092",
+      "title": "選前疏運運能創歷年新高 高鐵尖峰訂位近全滿、交長視察疏運狀況",
+      "summary": "",
+      "time": "11/27 20:28",
+      "url": "https://news.cnyes.com/news/id/6674092",
+      "category": "台股",
+      "stocks": [
+        "2633"
+      ]
+    },
+    {
+      "id": "N9",
+      "source_id": "6674059",
+      "title": "正崴看好明年AI高速線出貨續成長 算力中心需求旺租金有調漲空間",
+      "summary": "正崴法說會表示，AI伺服器高速傳輸線已切入美系客戶，明年營收可望續增。 土城明權廠AI算力中心已達滿載，月營收約3000多萬元，租約到期後重新議價有望再升。 機器狗、美國德州據點與AI智慧視訊會議等布局，將成明年零組件與系統產品成長動能。",
+      "time": "11/27 20:15",
+      "url": "https://news.cnyes.com/news/id/6674059",
+      "category": "台股",
+      "stocks": [
+        "2392"
+      ]
+    },
+    {
+      "id": "N10",
+      "source_id": "6674058",
+      "title": "〈第一金法說〉築底訊號出現？估房市將逐步止跌回穩 明年房貸穩健成長5%",
+      "summary": "六都買賣移轉棟數10月年增率轉正，房市交易量現初步回溫，明年可望止跌回穩。 一銀明年房貸業務目標成長4%至5%，主攻首購自住需求，受新青安3.0與央行選擇性信用管制調整支撐。 第一金明年總放款拚增5%至6%，中小企業放款估增10%，財管手續費收入目標增15%。",
+      "time": "11/27 20:11",
+      "url": "https://news.cnyes.com/news/id/6674058",
+      "category": "台股",
+      "stocks": [
+        "2892"
+      ]
+    },
+    {
+      "id": "N11",
+      "source_id": "6674057",
+      "title": "眾達-KY自結10月EPS淨損0.46元 單月虧損3200萬元",
+      "summary": "眾達-KY 10月稅後淨損3200萬元、每股淨損0.46元；2026年第3季稅後純益2.36億元、EPS 2.84元，年增194.11%。 第3季營運大躍升，受5月納入品固集團營收帶動，單季營收季增1.79倍。 眾達今股價重挫7.42%收131元，較11/18高點197元跌逾30%。",
+      "time": "11/27 19:55",
+      "url": "https://news.cnyes.com/news/id/6674057",
+      "category": "台股",
+      "stocks": [
+        "4977"
+      ]
+    },
+    {
+      "id": "N12",
+      "source_id": "6674029",
+      "title": "鴻海大語言模型FoxBrain 臺灣主權AI評測奪全球第二",
+      "summary": "鴻海研究院FoxBrain v2.1在AIEC「臺灣主權AI基礎評測指標」暫列全球第二，31B參數可部署於單台AI伺服器。 國學素養、公民素養、臺灣核心價值觀正確率96.20%、91.37%、98%，核心價值觀居彙整名單國際模型之冠。 鴻海AI布局由硬體製造延伸至模型研發與企業應用。",
+      "time": "11/27 19:50",
+      "url": "https://news.cnyes.com/news/id/6674029",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N13",
+      "source_id": "6674022",
+      "title": "〈第一金法說〉央行年底升息？一銀估台灣按兵不動 惟Fed明年Q1前有望升息2次",
+      "summary": "第一金控估全球明年經濟成長率3.4%、台灣約6%，景氣維持正成長。 預期聯準會12月及明年3月前各有1碼升息空間，與市場共識相符。 台灣央行12月基準情境維持利率不變，但若台美利差擴大、輸入性通膨升溫，不排除升息。",
+      "time": "11/27 19:44",
+      "url": "https://news.cnyes.com/news/id/6674022",
+      "category": "台股",
+      "stocks": [
+        "2892"
+      ]
+    },
+    {
+      "id": "N14",
+      "source_id": "6674033",
+      "title": "友達華亞廠找到新買家 售予矽品處分利益估104億元",
+      "summary": "",
+      "time": "11/27 19:26",
+      "url": "https://news.cnyes.com/news/id/6674033",
+      "category": "台股",
+      "stocks": [
+        "2382",
+        "2409",
+        "3711"
+      ]
+    },
+    {
+      "id": "N15",
+      "source_id": "6673986",
+      "title": "〈航運指數〉歐洲線運價強彈 SCFI止跌 航商力拚年約價漲",
+      "summary": "SCFI今反彈65.76點至3569.54點，終結連3周下跌，周漲1.88%。 歐洲線強彈，遠東到歐洲每FEU漲389美元至3745美元；地中海漲893美元至5764美元。 美國線續弱，遠東到美西跌至6357美元、美東跌至8262美元；航商拚歐洲年約小漲。",
+      "time": "11/27 18:56",
+      "url": "https://news.cnyes.com/news/id/6673986",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N16",
+      "source_id": "6673984",
+      "title": "〈第一金法說〉現金股利配發保底6成！一銀喊台股修正是買點 明年SWAP上看127億",
+      "summary": "第一金控宣布未來以現金股利為主，原則上以現金配發率60%以上為目標。 估今年換匯交易收益可望達105億元，明年上看125億至127億元。 第一金證券與人壽截至9月底獲利達20億、6.5億元，非銀獲利占比盼明年突破15%。",
+      "time": "11/27 18:47",
+      "url": "https://news.cnyes.com/news/id/6673984",
+      "category": "台股",
+      "stocks": [
+        "2892"
+      ]
+    },
+    {
+      "id": "N17",
+      "source_id": "6673898",
+      "title": "中鋼10月營業利益月增28%、稅前盈餘6.11億元 多國鋼廠盤價穩中有升",
+      "summary": "中鋼10月自結營業利益6.01億元、稅前盈餘6.11億元，前10月營益51.48億元、稅前盈餘43.01億元。 中鋼稱鋼價上漲帶動，熱軋行情續漲；美國供給趨緊、歐盟受CBAM限制進口，亞洲盤價多穩中有升。",
+      "time": "11/27 18:44",
+      "url": "https://news.cnyes.com/news/id/6673898",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N18",
+      "source_id": "6673977",
+      "title": "免驚美國反AI聲浪？主計上修今明年台灣GDP 創80年代來新高峰",
+      "summary": "主計總處上修台灣今年GDP至13.28%，較上次提高2.23個百分點，為48年來新高。 第4季商品出口估2771億美元、年增達47.88%，AI供應鏈與傳產回溫帶動外需。 明年GDP估6.51%。",
+      "time": "11/27 18:28",
+      "url": "https://news.cnyes.com/news/id/6673977",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N19",
+      "source_id": "6673973",
+      "title": "〈台幣〉股匯齊揚！台股守穩3萬9大關 台幣連2升收32.935元",
+      "summary": "",
+      "time": "11/27 18:28",
+      "url": "https://news.cnyes.com/news/id/6673973",
+      "category": "台股",
+      "stocks": [
+        "2330"
+      ]
+    },
+    {
+      "id": "N20",
+      "source_id": "6673942",
+      "title": "〈台新新光法說〉林維俊：2銀行拚元旦平穩整併 重申股利三原則暫不計入壽險上繳",
+      "summary": "",
+      "time": "11/27 18:15",
+      "url": "https://news.cnyes.com/news/id/6673942",
+      "category": "台股",
+      "stocks": [
+        "2887"
+      ]
+    },
+    {
+      "id": "N21",
+      "source_id": "6673951",
+      "title": "無懼景氣逆風加薪 台塑集團50年僅2年未調薪、滿5年送金",
+      "summary": "",
+      "time": "11/27 18:10",
+      "url": "https://news.cnyes.com/news/id/6673951",
+      "category": "台股",
+      "stocks": [
+        "1301"
+      ]
+    },
+    {
+      "id": "N22",
+      "source_id": "6673941",
+      "title": "外資賣超296億元連十賣 選前倒貨00406A 15萬張 台指期空單再增至10萬7503口",
+      "summary": "",
+      "time": "11/27 18:00",
+      "url": "https://news.cnyes.com/news/id/6673941",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N23",
+      "source_id": "6673843",
+      "title": "〈國泰金法說〉明年股利5元起跳？李長庚笑回「期望更高」 財務長曝配發率參考區間",
+      "summary": "",
+      "time": "11/27 17:49",
+      "url": "https://news.cnyes.com/news/id/6673843",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N24",
+      "source_id": "6673900",
+      "title": "光群雷營運轉盈前三季EPS1.05元 還要再買5000張庫藏股護盤",
+      "summary": "光群雷2026年前三季純益1.87億元、EPS 1.05元，較去年同期由虧轉盈。 公司決議11月30日起2個月內再買回5000張庫藏股，為今年第3度護盤。 若本次全數買齊，庫藏股占股本2.63%；今收15.85元，低於第三季底每股淨值19.17元。",
+      "time": "11/27 17:47",
+      "url": "https://news.cnyes.com/news/id/6673900",
+      "category": "台股",
+      "stocks": [
+        "2461"
+      ]
+    },
+    {
+      "id": "N25",
+      "source_id": "6673884",
+      "title": "非紅供應鏈發威！國發會：高階製造回流明顯 資通訊海外生產自9成跌至7成",
+      "summary": "明年9大CSP資本支出估達1.5兆美元，AI算力需求仍強，循環融資雜音多集中小型雲端業者。 10月景氣對策信號40分、較上月減1分；領先指標104.64連15月升，外銷訂單1238.2億美元續成長。 台灣10月出口967.6億美元創新高，全年可望破9300億美元；資通訊業海外生產比降至70%。",
+      "time": "11/27 17:41",
+      "url": "https://news.cnyes.com/news/id/6673884",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N26",
+      "source_id": "6673891",
+      "title": "台股3萬9千點暗藏變盤訊號？下一波主流?!",
+      "summary": "台股開高震盪走高，終場漲156.27點收39308.08點，成交量6660.70億。 三大法人合計賣超213.04億元，外資連賣十日；投信連買四日共買超935.05億元。 資金轉向散熱、光學、低軌衛星與AI題材，台積電、鴻海、昇達科、萊德光電、啟碁受關注。",
+      "time": "11/27 17:29",
+      "url": "https://news.cnyes.com/news/id/6673891",
+      "category": "台股",
+      "stocks": [
+        "1595",
+        "2313",
+        "2316",
+        "2317",
+        "2330",
+        "2385",
+        "2413",
+        "2454",
+        "2466",
+        "2485",
+        "2491",
+        "2630",
+        "3138",
+        "3221",
+        "3260",
+        "3441",
+        "3491",
+        "3653",
+        "3685",
+        "3691",
+        "3701",
+        "4174",
+        "4909",
+        "4916",
+        "5457",
+        "6150",
+        "6152",
+        "6163",
+        "6190",
+        "6244",
+        "6285",
+        "6443",
+        "6669",
+        "6902",
+        "7717",
+        "8099",
+        "8937"
+      ]
+    },
+    {
+      "id": "N27",
+      "source_id": "6673726",
+      "title": "〈國泰金法說〉看到「00981A違約交割上億」嚇一跳 李長庚急查：國泰證實虧僅1157元",
+      "summary": "",
+      "time": "11/27 17:25",
+      "url": "https://news.cnyes.com/news/id/6673726",
+      "category": "台股",
+      "stocks": [
+        "2882"
+      ]
+    },
+    {
+      "id": "N28",
+      "source_id": "6673888",
+      "title": "時間讓小麥更茁壯、鎖定被錯殺的成長飆股",
+      "summary": "台股量縮震盪收紅，上漲156點收39,308點，成交量約6,670億元，重新站回10日線。 自10月6日高點49,968點跌至11月21日35,442點，融資餘額減至4,352億元，顯示浮額去化。 AI長線需求、台美關稅趨勢與企業獲利仍為支撐，後市觀察月線、季線反壓與量能回溫。",
+      "time": "11/27 17:19",
+      "url": "https://news.cnyes.com/news/id/6673888",
+      "category": "台股",
+      "stocks": [
+        "2313",
+        "2316",
+        "2367",
+        "2485",
+        "3491",
+        "5457",
+        "6190",
+        "6285"
+      ]
+    },
+    {
+      "id": "N29",
+      "source_id": "6673880",
+      "title": "研調：需求能見度低、供應鏈轉趨保守 2028年DRAM合約價走跌風險升溫",
+      "summary": "TrendForce指2026年第四季起DRAM採購動能放緩，因美國期中選舉、NVIDIA融資政策與地緣政治影響資料中心與算力租賃規劃。 基礎情境下，2027年conventional DRAM漲幅將逐季收斂，下半年持平，2028年轉跌；悲觀情境則可能自2027年第四季先行反轉。",
+      "time": "11/27 17:06",
+      "url": "https://news.cnyes.com/news/id/6673880",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N30",
+      "source_id": "6673864",
+      "title": "鴻海增持雲智匯獲越南放行首批股權預計12月3日交割",
+      "summary": "",
+      "time": "11/27 17:00",
+      "url": "https://news.cnyes.com/news/id/6673864",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N31",
+      "source_id": "6673758",
+      "title": "台積電擬在美布局第二座先進晶圓廠！美銀重申買進、目標價3260、隱含漲幅逾5成",
+      "summary": "美銀Haas Liu維持台積電「買進」，目標價3260元，看好估值具防禦空間。 台積電擬投資226億美元於德州新廠，鎖定2奈米以下製程，規劃2028年動工、2031年投產。 Liu稱AI營收與現金流支撐溢價，但仍有消費電子需求、製程延宕與AI資本支出回落風險。",
+      "time": "11/27 17:00",
+      "url": "https://news.cnyes.com/news/id/6673758",
+      "category": "台股",
+      "stocks": [
+        "2330"
+      ]
+    },
+    {
+      "id": "N32",
+      "source_id": "6673859",
+      "title": "〈消費趨勢〉王品加入外送半年 達百萬筆訂單 火鍋銷售占比過半",
+      "summary": "王品5月加入Uber Eats以來，半年達百萬筆外送訂單。 火鍋占外送全品類達60%。",
+      "time": "11/27 16:56",
+      "url": "https://news.cnyes.com/news/id/6673859",
+      "category": "台股",
+      "stocks": [
+        "2727"
+      ]
+    },
+    {
+      "id": "N33",
+      "source_id": "6673830",
+      "title": "量縮至6千億遇十日線反壓！大漲卻不見融資追價，12月行情藏了什麼玄機？",
+      "summary": "台股終場漲156.27點收39308.08點，成交金額縮至6661億元，量縮消化十日線反壓。 上市融資餘額僅增3.46億元，籌碼沉澱；12月季節性上漲機率較高，有利反彈延續。 AWS供應鏈智邦、貿聯-KY、世芯-KY、金像電高檔換手，資金轉向低位階補漲股。",
+      "time": "11/27 16:26",
+      "url": "https://news.cnyes.com/news/id/6673830",
+      "category": "台股",
+      "stocks": [
+        "2330",
+        "2345",
+        "2368",
+        "3661",
+        "3665"
+      ]
+    },
+    {
+      "id": "N34",
+      "source_id": "6673829",
+      "title": "〈智邦法說〉AI重點筆記2026/11/27",
+      "summary": "",
+      "time": "11/27 16:25",
+      "url": "https://news.cnyes.com/news/id/6673829",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N35",
+      "source_id": "6673824",
+      "title": "一篇給融資新手與老手的教育文 融資維持率120% 新制的雙面刃",
+      "summary": "證交所11月24日起將信用交易追繳標準自130%降至120%，並取消新制前追繳紀錄、不處分擔保品。 此舉為1998年亞洲金融風暴後約28年再度動用，目的在緩解台股急跌下的融資追繳壓力。 專家提醒新制只是暫時措施，追繳緩衝增加但虧損可能放大，融資前應評估資金、停損與波動承受度。",
+      "time": "11/27 16:22",
+      "url": "https://news.cnyes.com/news/id/6673824",
+      "category": "台股",
+      "stocks": []
+    },
+    {
+      "id": "N36",
+      "source_id": "6673825",
+      "title": "〈智邦法說〉領先同業出貨1.6T全液冷交換器 明年灣區設研發中心卡位光通訊與800V商機",
+      "summary": "智邦今召開法說，揭露次世代藍圖，宣布今年初已領先同業出貨全液冷1.6T交換器系統。 明年將在美國舊金山灣區設全新先進研發實驗室，支援德州新廠並卡位液冷散熱、光通訊與800V高壓直流機櫃。 李寬澤指CPO與NPO將並存，智邦並推進OCS、OWS及DPU/網卡驗證平台，強化AI資料中心量產與穩定性。",
+      "time": "11/27 16:20",
+      "url": "https://news.cnyes.com/news/id/6673825",
+      "category": "台股",
+      "stocks": [
+        "2345"
+      ]
+    },
+    {
+      "id": "N37",
+      "source_id": "6673788",
+      "title": "〈國泰金法說〉國壽9、10月提前大減碼股票 股市震盪下淨值比仍穩守11.2%以上",
+      "summary": "國壽前9月新契約CSM 852億元、CSM餘額5,678億元，FYP達2,859億元、年增111%。 國壽前3季稅後純益601億元，保險服務結果321億元、財務結果517億元，對保留盈餘影響數1,741億元。 國壽9、10月提前減碼股票，11月股市回檔下淨值比仍達11.2%，TIS比率受影響不大。",
+      "time": "11/27 16:16",
+      "url": "https://news.cnyes.com/news/id/6673788",
+      "category": "台股",
+      "stocks": [
+        "2882"
+      ]
+    },
+    {
+      "id": "N38",
+      "source_id": "6673295",
+      "title": "〈台股盤前要聞〉富邦006208分割投票開跑、華南金前10月獲利284億元超過去年",
+      "summary": "",
+      "time": "11/27 04:10",
+      "url": "https://news.cnyes.com/news/id/6673295",
+      "category": "盤勢",
+      "stocks": [
+        "2880",
+        "6515"
+      ]
+    },
+    {
+      "id": "N39",
+      "source_id": "",
+      "title": "環科持股萊德光電逾2成，低軌衛星/太空AIDC添亮點",
+      "summary": "",
+      "time": "",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPRm5MbU40NXlERnVpaE9UYkhXYnYxb1E1MC1Md3R3ek14NUlKSktnZlJLNG5LcG1QQ1V3TEo2VkVYNFpJc01TTHZzVDZuWUxZTkY4dWtuNEY2VXVJcWZLTVJnWS0yTmh0WC1jR0o0VGVSYTE5X0k3Wm5wTW1hWkxzRVBGMm9VTTJyN3pLdDY2WnB0Zw?oc=5",
+      "category": "個股",
+      "source": "台視全球資訊網",
+      "stocks": [
+        "2413"
+      ]
+    },
+    {
+      "id": "N40",
+      "source_id": "",
+      "title": "盤中速報 - 環科(2413)股價拉至漲停，漲停價54.0元，成交13,923張",
+      "summary": "",
+      "time": "",
+      "url": "https://tw.tradingview.com/news/cnyes:f195f6806acdf:0/",
+      "category": "個股",
+      "source": "TradingView",
+      "stocks": [
+        "2413"
+      ]
+    },
+    {
+      "id": "N41",
+      "source_id": "",
+      "title": "2413 環科- 環科持股萊德光電逾2成，低軌衛星/太空AIDC添亮點- 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/190078829",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2413"
+      ]
+    },
+    {
+      "id": "N42",
+      "source_id": "",
+      "title": "【09:43 即時新聞】環科(2413)股價走強，短線買盤延續成盤面焦點",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/190068704",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2413"
+      ]
+    },
+    {
+      "id": "N43",
+      "source_id": "",
+      "title": "3491 昇達科 - https://youtube.com/shorts/0JN... - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/190153934",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "3491"
+      ]
+    },
+    {
+      "id": "N44",
+      "source_id": "",
+      "title": "昇達科(3491) 個股概覽 | 個股 - 股市",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/finance/3491/f00025",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "3491"
+      ]
+    },
+    {
+      "id": "N45",
+      "source_id": "",
+      "title": "3491 昇達科 - 昇達科今日（11/27）買賣超分點籌碼 供參考 今天融資... - 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/190125745",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "3491"
+      ]
+    },
+    {
+      "id": "N46",
+      "source_id": "",
+      "title": "2027 低軌衛星產業展望｜亞馬遜等火箭、星鏈換代，昇達科何時放量？",
+      "summary": "",
+      "time": "",
+      "url": "https://www.pocket.tw/school/articles/article-mwymur73/",
+      "category": "個股",
+      "source": "口袋證券",
+      "stocks": [
+        "3491"
+      ]
+    },
+    {
+      "id": "N47",
+      "source_id": "",
+      "title": "創見(2451) 個股概覽 | 個股 - 股市",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/finance/2451/f00025",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2451"
+      ]
+    },
+    {
+      "id": "N48",
+      "source_id": "",
+      "title": "2451 創見 - 【12:39 即時新聞】創見(2451)股價走強，記憶體族群買盤延續- 股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/forum/article/190100314",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2451"
+      ]
+    },
+    {
+      "id": "N49",
+      "source_id": "",
+      "title": "創見（2451）昨天鎖不住今天鎖很緊－熱門話題｜股市爆料同學會",
+      "summary": "",
+      "time": "",
+      "url": "https://mobile.cmoney.tw/forum/stock/2451?s=reinvestment&trending=1",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2451"
+      ]
+    },
+    {
+      "id": "N50",
+      "source_id": "",
+      "title": "【11/27 產業即時新聞】電子下游-電腦周邊飆漲4.05%！權值群光強彈領軍，強勢族群鎖定利基亮點",
+      "summary": "",
+      "time": "",
+      "url": "https://www.cmoney.tw/notes/note-detail.aspx?nid=1300506",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2385"
+      ]
+    },
+    {
+      "id": "N51",
+      "source_id": "",
+      "title": "【12:33 即時新聞】群光(2385)盤中走強，法人與主力買盤成焦點",
+      "summary": "",
+      "time": "",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1XbFExWURPNFFOdkh3am1BeTRVWlNEWkwzdTk3UnRaR1Y1RjBEeTBranNPTXJ2WGJMLUtPc1d2QV9GNENSQlVScGFQYWQtSTIwUFpGMW5IME1JWS1BMHZsOFg0X1dydXc?oc=5",
+      "category": "個股",
+      "source": "CMoney",
+      "stocks": [
+        "2385"
+      ]
+    },
+    {
+      "id": "N52",
+      "source_id": "",
+      "title": "盤中速報 - 達航科技(4577)股價殺至跌停，跌停價64.4元，成交254張",
+      "summary": "",
+      "time": "",
+      "url": "https://tw.tradingview.com/news/cnyes:ca05766d0acdf:0/",
+      "category": "個股",
+      "source": "TradingView",
+      "stocks": [
+        "4577"
+      ]
+    }
+  ]
+}
